@@ -327,6 +327,28 @@ if (zen_not_null($ep_dltype)) {
 
 	$filelayout = array();
 	$fileheaders = array();
+
+    // build filters
+    $sql_filter = '';
+    if (!empty($_GET['ep_category_filter'])) {
+      $sub_categories = array();
+      $categories_query_addition = 'ptoc.categories_id = ' . (int)$_GET['ep_category_filter'] . '';
+      zen_get_sub_categories($sub_categories, $_GET['ep_category_filter']);
+      foreach ($sub_categories AS $key => $category ) {
+        $categories_query_addition .= ' OR ptoc.categories_id = ' . (int)$category . '';
+      }
+      $sql_filter .= ' AND (' . $categories_query_addition . ')';
+    }
+    if ($_GET['ep_manufacturer_filter']!='') {
+      $sql_filter .= ' and p.manufacturers_id = ' . (int)$_GET['ep_manufacturer_filter'];
+    }
+    if ($_GET['ep_status_filter']!='') {
+      $sql_filter .= ' AND p.products_status = ' . (int)$_GET['ep_status_filter'];
+    }
+    if ($_GET['dltype']!='') {
+      $ep_dltype = $_GET['dltype'];
+    }
+
 	switch($ep_dltype){
 	case 'full':
 	
