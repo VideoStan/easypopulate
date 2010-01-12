@@ -11,6 +11,51 @@
  * @todo document these functions
  */
 
+if (!function_exists('fputcsv')) {
+    /**
+     * Add csv formatted line to a file
+     *
+     * required for PHP < 5.1.0
+     * @author phazei??
+     * @todo find out the original author or remove it
+     */
+    function fputcsv(&$handle, $fields = array(), $delimiter = ',', $enclosure = '"') {
+        $str = '';
+        $escape_char = '\\';
+        foreach ($fields as $value) {
+            settype($value, 'string');
+            if (strpos($value, $delimiter) !== false ||
+                strpos($value, $enclosure) !== false ||
+                strpos($value, "\n") !== false ||
+                strpos($value, "\r") !== false ||
+                strpos($value, "  ") !== false ||
+                strpos($value, ' ') !== false) {
+
+                $str2 = $enclosure;
+                $escaped = 0;
+                $len = strlen($value);
+                for ($i=0;$i<$len;$i++) {
+                    if ($value[$i] == $escape_char) {
+                        $escaped = 1;
+                    } else if (!$escaped && $value[$i] == $enclosure) {
+                        $str2 .= $enclosure;
+                    } else {
+                        $escaped = 0;
+                    }
+                    $str2 .= $value[$i];
+                }
+                $str2 .= $enclosure;
+                $str .= $str2.$delimiter;
+            } else {
+                $str .= $value.$delimiter;
+            }
+        }
+        $str = substr($str,0,-1);
+        $str .= "\n";
+        return fwrite($handle, $str);
+    }
+}
+
 function ep_get_uploaded_file($filename) {
 	if (isset($_FILES[$filename])) {
 		//global $_FILES;
