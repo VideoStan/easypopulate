@@ -213,61 +213,28 @@ fclose($fp);
 * Pre-flight checks start here
 */
 
-// temp folder exists & permissions check & adjust if we can
-// lets check our config is installed 1st..
-// when installing, we skip these tests..
-if (EASYPOPULATE_CONFIG_TEMP_DIR == 'EASYPOPULATE_CONFIG_TEMP_DIR' && ($_GET['langer'] != 'install' or $_GET['langer'] != 'installnew')) {
-	// admin area config not installed
-	$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_INSTALL_KEYS_FAIL, '<a href="' . zen_href_link(FILENAME_EASYPOPULATE, 'langer=installnew') . '">', '</a>'), 'warning');
-} elseif ($_GET['langer'] != 'install' && $_GET['langer'] != 'installnew') {
-	ep_chmod_check ($tempdir);
+$chmod_check = ep_chmod_check($tempdir);
+if ($chmod_check == false) { // test for temporary folder and that it is writable
+    // $messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_FAIL, 'caution');
+}
+
+// /temp is the default folder - check if it exists & has writeable permissions
+if (EASYPOPULATE_CONFIG_TEMP_DIR == 'EASYPOPULATE_CONFIG_TEMP_DIR' && ($_GET['epinstaller'] != 'install')) { // admin area config not installed
+    $messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_INSTALL_KEYS_FAIL, '<a href="' . zen_href_link(FILENAME_EASYPOPULATE, 'epinstaller=install') . '">', '</a>'), 'warning');
 }
 
 // installation start
-if ($_GET['langer'] == 'install' or $_GET['langer'] == 'installnew') {
-	if ($_GET['langer'] == 'installnew') {
-		// remove any old config..
-		remove_easypopulate();
-		// install new config
-		install_easypopulate();
-		zen_redirect(zen_href_link(FILENAME_EASYPOPULATE, 'langer=install'));
-	}
-	
-	$chmod_check = ep_chmod_check($tempdir);
-	if ($chmod_check == false) {
-		// no temp dir, so template download wont work..
-		$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_FAIL, 'caution');
-	} else {
-		// chmod success
-		if (defined('EASYPOPULATE_MSGSTACK_LANGER') && strpos(EASYPOPULATE_MSGSTACK_LANGER, 'paypal@portability.com.au') == true) {
-			$messageStack->add(EASYPOPULATE_MSGSTACK_LANGER, 'caution');
-		} else {
-			$messageStack->add('EasyPopulate support & development by <b>langer</b>. Donations are always appreciated to support continuing development: paypal@portability.com.au', 'caution');
-		}
-		// lets do a full download to the temp file
-		$ep_dltype = 'full';
-		$ep_dlmethod = 'tempfile';
-		$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_SUCCESS, 'success');
-	}
-	//zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
-	
-	// attempt to delete redundant files from previous versions v1.2.5.2 and lower
-	// delete easypopulate_functions from admin dir
-	$return = @unlink('easypopulate_functions.php');
-	if($return == true) $messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_INSTALL_DELETE_SUCCESS, 'easypopulate_functions.php', 'ADMIN'), 'success');
-	$return = @unlink('includes/boxes/extra_boxes/populate_tools_dhtml.php');
-	if($return == true) {
-		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_INSTALL_DELETE_SUCCESS, 'populate_tools_dhtml.php', '/includes/boxes/extra_boxes/'), 'success');
-	} else {
-		// delete populate_tools_dhtml.php from extra boxes failed. Tell user to delete it, otherwise it shows in DHTML menu.
-		if (@is_file(includes/boxes/extra_boxes/populate_tools_dhtml.php)) $messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_INSTALL_DELETE_FAIL, 'populate_tools_dhtml.php', '/includes/boxes/extra_boxes/'), 'caution');
-	}
-	
-} elseif ($_GET['langer'] == 'remove') {
-	remove_easypopulate();
-	zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+if ($_GET['epinstaller'] == 'install'  ) {
+    remove_easypopulate(); // remove old configuration keys
+    install_easypopulate(); // install new configuration keys
+    //$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_SUCCESS, 'success');
+    zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
 }
-// end installation/removal
+
+if ($_GET['epinstaller'] == 'remove') { // remove easy populate configuration variables
+    remove_easypopulate();
+    zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+} // end installation/removal
 
 /**
 * START check for existance of various mods
