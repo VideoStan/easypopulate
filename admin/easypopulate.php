@@ -239,9 +239,9 @@ if ($_GET['epinstaller'] == 'remove') { // remove easy populate configuration va
 /**
 * START check for existance of various mods
 */
-
-// $ep_supported_mods['psd'] = ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_short_desc') ? 'Product Short Descriptions' : NULL; // this will mean if isset, we have it, and the array has the name for html display
-$ep_supported_mods['psd'] = ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_short_desc');
+$ep_supported_mods['psd'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_short_desc');
+$ep_supported_mods['uom'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_as'); // uom = unit of measure
+$ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
 
 // others go here..
 
@@ -262,13 +262,12 @@ if (!isset($model_varchar)) {
 } else {
 	$modelsize = $model_varchar;
 }
-//echo $modelsize;
 
 /**
 * Pre-flight checks finish here
 */
 
-// now to create the file layout for each download type..
+// START: Create File Layout for Download Types
 
 // VJ product attributes begin
 // this creates our attributes array
@@ -297,18 +296,17 @@ if (is_array($attribute_options_select) && (count($attribute_options_select) > 0
 
 
 //elari check default language_id from configuration table DEFAULT_LANGUAGE
-$epdlanguage_query = ep_query("select languages_id, name from " . TABLE_LANGUAGES . " where code = '" . DEFAULT_LANGUAGE . "'");
+$epdlanguage_query = ep_query("select languages_id, name FROM " . TABLE_LANGUAGES . " WHERE code = '" . DEFAULT_LANGUAGE . "'");
 if (mysql_num_rows($epdlanguage_query)) {
-	$epdlanguage = mysql_fetch_array($epdlanguage_query);
-	$epdlanguage_id   = $epdlanguage['languages_id'];
-	$epdlanguage_name = $epdlanguage['name'];
+    $epdlanguage = mysql_fetch_array($epdlanguage_query);
+    $epdlanguage_id   = $epdlanguage['languages_id'];
+    $epdlanguage_name = $epdlanguage['name'];
 } else {
-	//$messageStack->add('', 'warning'); // langer - this will never occur..
-	echo 'Strange but there is no default language to work... That may not happen, just in case...';
+    echo 'No default language set!... This should not happen';
 }
 
 $langcode = array();
-$languages_query = ep_query("select languages_id, code from " . TABLE_LANGUAGES . " order by sort_order");
+$languages_query = ep_query("select languages_id, code FROM " . TABLE_LANGUAGES . " ORDER BY sort_order");
 // start array at one, the rest of the code expects it that way
 $ll =1;
 while ($ep_languages = mysql_fetch_array($languages_query)) {
@@ -325,8 +323,6 @@ $ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : $ep_dltype;
 if (zen_not_null($ep_dltype)) {
 	
 	// if dltype is set, then create the filelayout.  Otherwise it gets read from the uploaded file
-	// ep_create_filelayout($dltype); // get the right filelayout for this download. langer - redundant function call..
-
 	// depending on the type of the download the user wanted, create a file layout for it.
 
 	$filelayout = array();
