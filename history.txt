@@ -1,0 +1,360 @@
+ 
+//*******************************
+//*******************************
+// E D I T   H I S T O R Y
+//*******************************
+//*******************************
+Easy Populate
+
+The point of easy populate is to let someone use an excel file exported to
+a tab delimited file to set up their entire store:
+categories, products, manufacturers, quantities, and prices.
+
+-----------------------------------
+Modified by Tim Wasson - Wasson65 (wasson65@nc.rr.com) to:
+ accept category/subcategory names
+ allow reordering of columns in csv file
+ accept manufacturer name or id
+ some minor code simplification
+ accept and set status of the product if desired
+ changed all # to // comment markers so KDE's Kate will syntax highlight correctly
+ added support for default images for products, categories, and categories.
+ added support for exporting a csv file that can be modified and sent back in.
+-----------------------------------
+1.1 Changes
+ Fixed a stupid bug, I didn't change the references to easypopulate.php from excel.php
+ Added note in the docs that if the Excel import is already done, don't need to do the alter table
+ Removed the extra semicolon on the end of the line in the csv download.  It prevented you from exporting and importing a file.
+-----------------------------------
+1.2 Fixes
+More bugs fixed
+___________________________________
+1.3 Fixes
+Added another link to put csv file in temp file for access via tools->files, for some windows machines that refuse to dl right...
+-----------------------------------
+1.4 Fixes
+Switchted to tabs for delimiters
+Strip cr's and tab's from strings before exporting
+Added explicit end of row field
+Added ability to split a big file into smaller files in the temp dir
+Preserve double quotes, single quotes, and apostrophes and commas
+Removed references to category_root, it's no longer required
+------------------------------------
+1.5 Fixes
+Changed --EOR-- to EOREOR for better excel usability.
+Made script accept "EOREOR" or EOREOR without the quotes.
+If inserting a new product, delete any product_descriptions with that product_id to avoid an error if old data was still present.
+------------------------------------
+1.6 Fixes
+Ooops, manufacturer_id variable misspellings meant that mfg wasn't getting set or updated
+Whe I re-arranged the code, I left out the call to actually put the data into the products table.  Ooops again...
+------------------------------------
+1.61 Fixes
+One more manufacturer id name fix.
+------------------------------------
+Skipped to 2.0 because of the big jump in functionality
+------------------------------------
+2.0
+Made EP handle magic-quotes
+Thanks to Joshua Dechant aka dreamscape, for this fix
+Rewrote the categories part to handle any number of categories
+------------------------------------
+2.1
+Fix split files not splitting.
+Change from "file" to "fgets" to read the file to be split to avoid out of memory problems... hopefully
+------------------------------------
+2.2
+Added multi-language support. - thanks to elari, who wrote all the code around handling all active langs in OSC
+Added category names assumed to be in default language - thanks to elari again!  who wrote all that code as well
+Fixed bug where files wouldn't split because the check for EOREOR was too specific.
+Added separate file for functions tep_get_uploaded_file and friends so that older snapshots will have it and work.
+Finally updated the docs since they sucked
+Moved product_model field to the start of each row because sometimes, if the image name was empty, the parsing would get confused
+------------------------------------
+2.3
+Thanks to these sponsors - their financial support made this release possible!
+Support for more than one output file format with variable numbers of columns
+	Sponsored by Ted Joffs
+
+Support for Separate Price per Customer mod
+	Sponsored by Alan Pace
+
+Support for Linda's Header Controller v2.0
+	Sponsored by Stewart MacKenzie
+
+Removed quotes around all the fields on export.
+Added configuration variable so you can turn off the qoutes -> control codes replacement
+Merged Elari's changes to not hardcode language id's
+------------------------------------
+2.31
+Bugfix for single language non-english name/desc not being put into the output file.
+The code was still checking for product_name_1 instead of product_name_$langid.
+------------------------------------
+2.32 - never released into the wild
+Added config var $zero_qty_inactive, defaulted to true.
+This will make zero qty items inactive by default.
+---- STILL NEED TO DEBUG THIS! ----
+------------------------------------
+2.4
+Support for Froogle downloads to EP.
+	Sponsored by Ted Joffs
+Changed comments - it's not Multiple Price per Product, it's
+Separate Price per Customer.
+------------------------------------
+2.41beta
+Fixed bugs with Froogle:
+1. Category not getting built right
+2. Strip HTML from name/description
+3. Handle SearchEngineFriendly URL's
+
+Adding "Delete" capability via EP. -- NOT COMPLETE
+Fixed bug - the Model/Category would give SQL errors
+Fixed bug - Items with no manufacturer were getting a man of '' (empty string)
+Fixed bug - When trying to import, all items gave a "Deleting product" message but no db changes
+	This was because I'd tried inserting the delete functionality and didn't finish it.
+	Commented it out for now.
+Added Date_added, fixed Date_available
+Fixed active/inactive status settings
+Fixed bug with misnamed item for Linda's Header Controller support
+Fixed bug with SQL syntax error with new products
+These following 3 fixes thanks to Yassen Yotov
+	Fixed bug where the default image name vars weren't declared global in function walk()
+	Added set_time_limit call, it won't cover all cases, but hopefully many. commented out to avoid
+		complaints with safe mode servers
+	Fixed hardcoded catalog/temp/ in output string for splitting files
+------------------------------------
+2.5
+DJZeon found a bug where product URL was getting lost because I always deleted and inserted the product description info - fixed
+Same bug also was causing times viewed to be reset to zero because I always deleted and inserted the product descriiption.
+Added the multi-image lines from Debbie and Nickie - Thanks!
+Changed the output file name to make more sense, now it looks like EP2003Mar20-09:45.txt
+------------------------------------
+2.51
+No code changes, bump version because I forgot to update the docs about the high-to-low category order
+------------------------------------
+2.53
+Bug fixes?
+------------------------------------
+2.60
+Fix froogle categories in reverse order bug
+Comment out mimage lines that were causing problems for people in 2.53
+Added separator configuration variable so you can pick the separator character to use.
+Made Froogle download look for an applicable specials price
+Froogle downloads have "froogle" at the start of the file name
+You can now specify a file in the temp directory and it will upload that instead of uploading via the browser
+------------------------------------
+2.61-MS2
+Bug fixes thanks to frozenlightning.com
+Replaced tep_array_merge with array_merge to bring up to MS2 Standards.
+Modified by Deborah Carney, inspired by the Think Tank to be included in the CRE Loaded 6
+New support will be found at http://phesis.co.uk in the forums, as well as at forums.oscommerce.com in the Contributions section.  This script was/is written by volunteers, please don't email or PM them, more answers are available in the forums if you search.  If you want EP to do something, someone else probably already asked....
+Known issue:  html in the product description gets messed up, not sure how to fix it.  
+------------------------------------
+2.62-MS2
+Modified by Karlheinz Meier on 08.August.2003
+As some people happen to have something like DIFFERENT_Prefix_TABLES in their databases,
+normally there is a file called /admin/includes/database_tables.php
+which defines nice varibales for them; you can for example make prefixed_databases, or live backups or so.
+As some programmers did use DIRECT table names, this was changed.
+And now if you use the "separte price..."-module and have an article where there is NO special price,
+the import process won't die
+------------------------------------
+2.71-MS2 (with attributes)
+
+Modified by Vijay Immanuel (vj@vjdom.com)
+Released on November 27, 2003
+
+This release includes ability to handle product attributes. This should theoretically work for any number of product attribute options and values, as well as languages. 
+------------------------------------
+2.72-MS2 (with attributes)
+
+Modified by Vijay Immanuel (vj@vjdom.com)
+Released on December 28, 2003
+
+Added feature to turn off product attribute data when downloading tab-delimited file. 
+------------------------------------
+2.73-MS2 (with attributes)
+
+Alfred Raphael - Fixed the problem of using 'max(product_id)' in easypopulate.php. This Has been replaced by 'SHOW TABLE STATUS LIKE tablename' and fetching 'Auto_increment'. 
+
+
+------------------------------------
+2.74-MS2 (with attributes)
+
+Modified by Rob Woodgate on 3rd May 2004
+
+- Fixed rounding issues with when using prices with tax
+- Fixed price with tax in Model/Price/Quantity download
+- Modified Date Available code to set Null if left empty (instead of setting current timestamp)
+
+
+------------------------------------
+
+2.74-Zen-Cart v1.2 (with attributes)
+
+Ported from osC to Zen-Cart by Scott Drake aka ecdiscounts on 11/05/2004
+
+
+------------------------------------
+
+2.74a-Zen-Cart v1.2 (with attributes)
+
+- Changed the directory structure so that the catalog/temp directory
+  actually goes to Zen-Cart root directory/temp instead of
+  Zen-Cart root directory/catalog/temp
+
+- Updated Froogle command to exclude unsupported data in the exported
+  Froogle file
+
+- Set Exporting Attributes to false so that Attributes do not get downloaded
+  by default
+
+- Removed the Old out dated Docs
+
+------------------------------------
+
+1.2.5.1-Zen-Cart v1.2.5
+
+Modified by Nicholas Keown (langer) www.portability.com.au
+
+- v_status is now 1 (Active) or 0 (Inactive) only. Resolved inconsistancy between uploads & downloads (this may change back later to accommodate more options (delete, move, etc..)
+	* UPDATE: Added v_status 9 for product delete.
+- Should not bug out now due to unescaped characters for all descriptions, manufacturer names, product names.
+- New version scheme to indicate known supported zencart version (planning for backward compatability)
+- Fixed undefined variable bug preventing updates with no date_added ($default_these)
+- Fixed incorrectly assigned date_added -> date_avail (the ol' switcheroo..)
+- Rolled main array process function into process code. Moved other functions around, and modified variables to support Register_Globals = off.
+- Finally works with register_globals = off & PHP 5!!!!!
+- Incorporated file download result display into main page (no more history-back re-posts - Argh!!)
+- Separate naming conventions for each file download
+- Modified attributes settings to exclude attributes from full download by default. Attributes still available via the separate files if desired, and via the full download by setting to true (see config)
+- Safety check for length of products_model field in products table & automatic adjusting to suit
+- addition of smart-tags array for replacement of carriage returns with <br /> in descriptions, and elimination from other fields to prevent errors.
+- added product deletion on upload
+- If category name(s) exceeds maximum length allowed, skip upload of product (used to produce multiple identical categories..)
+- added support for products short descriptions mod - no configuration required (you must have it installed though..)
+- handling of products without model numbers fixed - product is skipped
+- should now handle data with text delimiter of " without incident
+- added chmod check & adjust for temp folder, as well as chmod warnings
+- added split list for simple uploading of split files
+- re-indexing of master categories and pricing after uploads now automatic
+
+------------------------------------
+
+v 1.2.5.2
+
+Modified by Nicholas Keown (langer) www.portability.com.au
+
+- improve error handling (there was none!!) for new products - a failed upload will actually tell you now..
+- added specials (v_specials_price column in upload file will update specials)
+ * this is from v2.75, so it will not upload the expiry date - defaults to not expire
+ * This will be fixed soon, as will date available..
+- products without master category field on upload do not update categories (if column present), or skip if new product (regardless if column present)
+- product fragmants (which can cause unwanted zencart behaviour) are now detected, and can be eliminated
+- added debug log for detecting problems
+- fixed IE DHTML issue
+- fixed file naming & directory positioning to suit zencart
+
+------------------------------------
+
+Modified by Nicholas Keown (langer) www.portability.com.au
+
+v 1.2.5.3
+- added install action for deleting 2 redundant files, and downloading 1st full data dump - for use as uploads template
+- error handling of file permission checking/setting fixed
+- added message on data debris successfully deleted
+- fixed IE DHTML issue
+- fixed file naming & directory structure to conform to zencart
+- debug log now defaults to on, and only records SQL error strings (when they rarely occur) at this time..
+- completed escaping of all relevant user file input, including relevant WHERE clauses (some price fields omitted... if you mangle these, you deserve a failed upload ;-)
+- fixed error in attributes upload logic preventing it from always working
+- added downloading of specials on Full and Price/Qty downloads
+- specials deletion on upload if price = 0. Also, all null values in specials price on upload (blank fields) will not affect data.
+- specials results display added
+- multi-language support added (99% - html controls to be done - will be done after html template renovation)
+- date handling added. Will now update directly from output of M$ Excel. ENSURE DATE FORMAT SETTING IN CONFIG SET CORRECTLY!
+	* Improved date handling in both products and specials - now works with excel file.
+	* Raw dates no longer required in excel files, but ensure you date format is m-d-y, or adjust in config area of YOUR_ADMIN/easypopulate.php
+- attributes sorter function added on adding/updating of attributes
+
+------------------------------------
+
+Modified by Nicholas Keown (langer) www.portability.com.au
+
+v 1.2.5.4
+- fixed froogle error (thanks to Baelzebub)
+- Images changes
+	* default product image is now zencart default.
+	* Removed default manufacturer image.. you either have a manufacturer image, or none.
+	* Removed default category image - set to null for new categories (zencart default)
+- removed requirement for Froogle configuration. Now automatically done
+- migrated config to admin area of Zen Cart
+
+------------------------------------
+
+Modified by Robert Shady (oeginc) rshady (at) oeginc.com
+
+v 1.2.5.5
+- fixed problem with salemaker not working on imported items.
+- fixed CR/LF's in license.txt file to display properly under windows like the rest of the .txt files.
+
+------------------------------------
+
+Modified by Adam S (phazei) phazei (at) gmail.com
+Jan 8, 2009
+
+v 1.2.5.5.csv
+- added normal csv support
+- removed split files, it wasn't needed I don't belive
+- added meta tags for products only on a 'full'/complete download
+- rewrote lots of bad code and added 'LIMIT 1' to many sql calls.
+- changed date function to 'strtotime()'
+- inserted new manufacturers into the MANUFACTURERS_INFO db as well
+- changed default temp directory to tempEP
+
+
+------------------------------------
+
+Modified by pickupman 23 m (at) yahoo dot com
+Jun 18, 2009
+
+v 1.2.5.6.csv
+
+-- add a configuration key to hold csv list of custom fields
+-- added sql statements and filelayout statements to append custom fields
+-- fields are exploded into an array and iterated through each of the necessary spots.
+-- glad there is finally an easier way to add fields to the file.
+-- only works on the products table.
+
+
+------------------------------------
+
+------------------------------------
+
+Modified by Guven M - (gizmus) - notebookwebsite (at) gmail dot com
+October 29, 2009
+
+v 1.2.5.7.csv
+
+-- fixed bug where the new added custom field section was not getting uninstalled from database when uninstallation was run.
+-- added "Download Model/Price/Qty/Last Modified/Status .csv file to edit" to download as I needed date modified to change when uploading so that an addon I use auto catches which item was edited inorder to change quantity on eBay.
+-- version number was 1.2.5.6 but in easypopulate admin section 1.2.5.5 was still showing.
+
+Mod looks great and works perfectly, I would like to thank the creator and all the people that have kept it up to date.
+
+
+------------------------------------
+
+Derived from the Excel Import 1.51 by:
+
+ukrainianshop.net
+
+  Copyright (c) 2002-2003 Tim Wasson
+  Released under the GNU General Public License
+*/
+//*******************************
+//*******************************
+// E N D
+// E D I T   H I S T O R Y
+//*******************************
+//*******************************
