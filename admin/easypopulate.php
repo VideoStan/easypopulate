@@ -9,6 +9,24 @@
  *
  */
 
+// START INITIALIZATION
+require_once ('includes/application_top.php');
+
+@set_time_limit(1200);
+@ini_set('max_input_time', 1200);
+
+
+// CSV VARIABLES - need to make this configurable in the ADMIN
+$csv_deliminator = "\t"; // "\t" = tab AND "," = COMMA
+$csv_deliminator = ","; // "\t" = tab AND "," = COMMA
+
+$csv_enclosure   = '"'; // if want none, change to space (chadd - i think you should always us the '"').
+// define(EASYPOPULATE_CONFIG_COL_DELIMITER, "\t");
+$separator = "\t"; // tab delimited file
+$separator = ",";  // CSV - comma delimited file
+
+$excel_safe_output = true; // this  forces enclosure in quotes
+
 //*******************************
 //*******************************
 // C O N F I G U R A T I O N
@@ -16,15 +34,6 @@
 //*******************************
 //*******************************
 
-
-//CSV VARIABLES
-$csv_deliminator = ","; // "\t" for tab
-$csv_enclosure = '"'; //if want none, change to space.
-
-/* put below
-@set_time_limit(1200);
-@ini_set('max_input_time','1200');
-//*/
 /**
 * Advanced Smart Tags - activated/de-activated in Zencart Admin
 */
@@ -83,7 +92,6 @@ $advanced_smart_tags = array(
 										// ensures "Description:" followed by single <br /> is fllowed by double <br />
 										"<b>Description:<\/b><br \/>" => '<br /><b>Description:</b><br /><br />',
 										);
-										
 
 //*******************************
 //*******************************
@@ -92,18 +100,6 @@ $advanced_smart_tags = array(
 // V A R I A B L E S
 //*******************************
 //*******************************
-
-
-//*******************************
-//*******************************
-// S T A R T
-// INITIALIZATION
-//*******************************
-
-require_once ('includes/application_top.php');
-
-@set_time_limit(1200);
-@ini_set('max_input_time','1200');
 
 /*
 * Add your custom fields to this array
@@ -124,6 +120,7 @@ if(strlen(EASYPOPULATE_CONFIG_CUSTOM_FIELDS) > 0)
 * Config translation layer..
 */
 // note - not all config defines are in below...
+$max_qty_discounts = 6;
 $tempdir = EASYPOPULATE_CONFIG_TEMP_DIR;
 $ep_date_format = EASYPOPULATE_CONFIG_FILE_DATE_FORMAT;
 $ep_raw_time = EASYPOPULATE_CONFIG_DEFAULT_RAW_TIME;
@@ -152,46 +149,6 @@ $ep_debug_logging_all = false; // do not comment out.. make false instead
 * Test area end
 **/
 
-//phazei
-//** required for PHP < 5.1
-if (!function_exists('fputcsv')) {
-    function fputcsv(&$handle, $fields = array(), $delimiter = ',', $enclosure = '"') {
-        $str = '';
-        $escape_char = '\\';
-        foreach ($fields as $value) {
-            settype($value, 'string');
-            if (strpos($value, $delimiter) !== false ||
-                strpos($value, $enclosure) !== false ||
-                strpos($value, "\n") !== false ||
-                strpos($value, "\r") !== false ||
-                strpos($value, "  ") !== false ||
-                strpos($value, ' ') !== false) {
-                
-                $str2 = $enclosure;
-                $escaped = 0;
-                $len = strlen($value);
-                for ($i=0;$i<$len;$i++) {
-                    if ($value[$i] == $escape_char) {
-                        $escaped = 1;
-                    } else if (!$escaped && $value[$i] == $enclosure) {
-                        $str2 .= $enclosure;
-                    } else {
-                        $escaped = 0;
-                    }
-                    $str2 .= $value[$i];
-                }
-                $str2 .= $enclosure;
-                $str .= $str2.$delimiter;
-            } else {
-                $str .= $value.$delimiter;
-            }
-        }
-        $str = substr($str,0,-1);
-        $str .= "\n";
-        return fwrite($handle, $str);
-    }
-}  
-
 //used for froogle
 function kill_breaks($thing) {
 	//kills all line breaks and tabs
@@ -219,30 +176,28 @@ $products_with_attributes = false; // langer - this will be redundant after html
 $has_attributes == false;
 $has_specials == false;
 
-// define(EASYPOPULATE_CONFIG_COL_DELIMITER, "\t");
-$separator = "\t"; // only tab allowed at present
 
 // all mods go in this array as 'name' => 'true' if exist. eg $ep_supported_mods['psd'] => true means it exists.
 // langer - scan array in future to reveal if any mods for inclusion in downloads
 $ep_supported_mods = array();
 
 // config keys array - must contain any expired keys to ensure they are deleted on install or removal
-$ep_keys = array('EASYPOPULATE_CONFIG_TEMP_DIR',
-								'EASYPOPULATE_CONFIG_FILE_DATE_FORMAT',
-								'EASYPOPULATE_CONFIG_DEFAULT_RAW_TIME',
-								'EASYPOPULATE_CONFIG_CUSTOM_FIELDS',
-								'EASYPOPULATE_CONFIG_SPLIT_MAX',
-								'EASYPOPULATE_CONFIG_MAX_CATEGORY_LEVELS',
-								'EASYPOPULATE_CONFIG_PRICE_INC_TAX',
-								'EASYPOPULATE_CONFIG_ZERO_QTY_INACTIVE',
-								'EASYPOPULATE_CONFIG_SMART_TAGS',
-								'EASYPOPULATE_CONFIG_ADV_SMART_TAGS',
-								'EASYPOPULATE_CONFIG_DEBUG_LOGGING',
-								);
+$ep_keys = array(
+	'EASYPOPULATE_CONFIG_TEMP_DIR',
+	'EASYPOPULATE_CONFIG_FILE_DATE_FORMAT',
+	'EASYPOPULATE_CONFIG_DEFAULT_RAW_TIME',
+	'EASYPOPULATE_CONFIG_CUSTOM_FIELDS',
+	'EASYPOPULATE_CONFIG_SPLIT_MAX',
+	'EASYPOPULATE_CONFIG_MAX_CATEGORY_LEVELS',
+	'EASYPOPULATE_CONFIG_PRICE_INC_TAX',
+	'EASYPOPULATE_CONFIG_ZERO_QTY_INACTIVE',
+	'EASYPOPULATE_CONFIG_SMART_TAGS',
+	'EASYPOPULATE_CONFIG_ADV_SMART_TAGS',
+	'EASYPOPULATE_CONFIG_DEBUG_LOGGING',
+);
 
 // default smart-tags setting when enabled. This can be added to.
-$smart_tags = array("\r\n|\r|\n" => '<br />',
-										);
+$smart_tags = array("\r\n|\r|\n" => '<br />', );
 
 if (substr($tempdir, -1) != '/') $tempdir .= '/';
 if (substr($tempdir, 0, 1) == '/') $tempdir = substr($tempdir, 1);
