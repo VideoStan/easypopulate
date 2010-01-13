@@ -600,6 +600,41 @@ if (zen_not_null($ep_dltype)) {
 
 		break;
 
+	// Chadd: quantity price breaks file layout
+	// 09-30-09 Need a configuration variable to set the MAX discounts level
+	//          then I will be able to generate $filelayout() dynamically
+	case 'pricebreaks':
+		$filelayout[] =	'v_products_model';
+		$filelayout[] =	'v_products_price';
+
+		if ($ep_supported_mods['uom'] == true) { // price UOM mod
+			$filelayout[] = 'v_products_price_as'; // to soon be changed to v_products_price_uom
+		}
+
+		$filelayout[] =	'v_products_discount_type';
+		$filelayout[] =	'v_products_discount_type_from';
+		// discount quantities base on $max_qty_discounts
+		for ($i=1;$i<$max_qty_discounts+1;$i++) {
+			$filelayout[] = 'v_discount_id_' . $i;
+			$filelayout[] = 'v_discount_qty_' . $i;
+			$filelayout[] = 'v_discount_price_' . $i;
+		}
+
+		$filelayout_sql = 'SELECT
+			p.products_id            as v_products_id,
+			p.products_model         as v_products_model,
+			p.products_price         as v_products_price,';
+
+		if ($ep_supported_mods['uom'] == true) { // price UOM mod
+			$filelayout_sql .=  'p.products_price_as as v_products_price_as,'; // to soon be changed to v_products_price_uom
+		}
+
+		$filelayout_sql .= 'p.products_discount_type as v_products_discount_type,
+			p.products_discount_type_from as v_products_discount_type_from
+			FROM '
+			.TABLE_PRODUCTS.' as p';
+	break;
+
 	case 'category':
 		// The file layout is dynamically made depending on the number of languages
 		$filelayout[] = 'v_products_model';
@@ -1877,7 +1912,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 									language_id = '$key'";
 						}
 						// end support for Linda's Header Controller 2.0
-						//echo 'existing product desc:'.$sql.'<br />';
 						$result = ep_query($sql);
 					}
 			}
