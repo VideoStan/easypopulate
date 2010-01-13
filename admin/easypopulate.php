@@ -979,12 +979,12 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		}
 		// if the filelayout says we need a manufacturers name, get it
 		if (isset($filelayout['v_manufacturers_name'])){
-			if ($row['v_manufacturers_id'] != ''){
+			$row['v_manufacturers_name'] = '';
+			if (!empty($row['v_manufacturers_id'])) {
 				$sql2 = "SELECT manufacturers_name
 					FROM ".TABLE_MANUFACTURERS."
 					WHERE
-					manufacturers_id = " . $row['v_manufacturers_id']
-					;
+					manufacturers_id = " . $row['v_manufacturers_id'];
 				$result2 = ep_query($sql2);
 				$row2 =  mysql_fetch_array($result2);
 				$row['v_manufacturers_name'] = $row2['manufacturers_name'];
