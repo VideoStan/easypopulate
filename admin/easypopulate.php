@@ -588,16 +588,15 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout[] = 'v_status';
 		//*/
 
-		$filelayout_sql = "SELECT
+		$filelayout_sql = 'SELECT
 			p.products_id as v_products_id,
 			p.products_model as v_products_model,
 			p.products_price as v_products_price,
 			p.products_quantity as v_products_quantity,
 			p.products_last_modified as v_last_modified,
 			p.products_status as v_status
-			FROM
-			".TABLE_PRODUCTS." as p
-			";
+			FROM '
+			.TABLE_PRODUCTS.' as p';
 
 		break;
 
@@ -837,11 +836,10 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 				$row['v_metatags_description_' . $lid] = $rowMeta['metatags_description'];
 			//metaData end
 
-
 			// for each language, get the description and set the vals
-			$sql2 = "SELECT * FROM ".TABLE_PRODUCTS_DESCRIPTION." WHERE
-					products_id = " . $row['v_products_id'] . " AND
-					language_id = '" . $lid . "' LIMIT 1 ";
+			$sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_DESCRIPTION .  WHERE
+					products_id = ' . $row['v_products_id'] .  AND
+					language_id = ' . $lid . ' LIMIT 1';
 			$result2 = ep_query($sql2);
 			$row2 =  mysql_fetch_array($result2);
 
@@ -878,7 +876,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 			// end support for Header Controller 2.0
 		}
 
-		// langer - specials
+		// BEGIN: Specials
 		if (isset($filelayout['v_specials_price'])) {
 
 			$specials_query = ep_query("SELECT
@@ -891,7 +889,6 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 				products_id = " . $row['v_products_id']);
 
 			if (mysql_num_rows($specials_query)) {
-				// we have a special
 				$ep_specials = mysql_fetch_array($specials_query);
 				$row['v_specials_price'] = $ep_specials['specials_new_products_price'];
 				$row['v_specials_date_avail'] = $ep_specials['specials_date_available'];
@@ -901,8 +898,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 				$row['v_specials_date_avail'] = '';
 				$row['v_specials_expires_date'] = '';
 			}
-		}
-		// langer - end specials
+		} // END: Specials
 
 		// for the categories, we need to keep looping until we find the root category
 
@@ -1202,8 +1198,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 	}
 
 	if ( isset($_POST['localfile']) ){
-		//file is already in temp directory...
-		$file['name'] = $_POST['localfile'];
+		$file = ep_get_uploaded_file('localfile');
 		$display_output .= sprintf(EASYPOPULATE_DISPLAY_LOCAL_FILE_SPEC, $file['name']);
 	}
 
@@ -1294,15 +1289,13 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			WHERE
 			p.products_id = ptoc.products_id AND
 			p.products_model = '" . zen_db_input($items[$filelayout['v_products_model']]) . "' AND
-			ptoc.categories_id = subc.categories_id
-			";
-			//echo $sql;
+			ptoc.categories_id = subc.categories_id";
+
 		$result = ep_query($sql);
 
 		$product_is_new = true;
 
 		// langer - inputs: $items array (file data by column #); $filelayout array (headings by column #); $row (current db TABLE_PRODUCTS data by heading name)
-
 		while ( $row = mysql_fetch_array($result) ) {
 			$product_is_new = false;
 
@@ -1432,7 +1425,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				$row['v_products_price'] = round($row['v_products_price'] + ($row['v_products_price'] * $row_tax_multiplier / 100),2);
 			}
 
-
 			/**
 			* langer - the following defaults all of our current data from our db ($row array) to our update variables (called internal variables here)
 			* for each $default_these - this limits it just to TABLE_PRODUCTS fields defined in this array!
@@ -1558,7 +1550,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		// langer - this does not appear to support more than 7 categories??
 		unset ($v_categories_name); // default to not set.
 
-		//echo 'max cat len: '.$category_strlen_max.'<br/>';
 		if (isset($filelayout['v_categories_name_1'])) { // does category 1 column exist in our file..
 
 			$category_strlen_long = FALSE;// checks cat length does not exceed db, else exclude product from upload
@@ -1578,7 +1569,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			}
 		}
 
-		// langer - if null, make products qty = 1. Why?? make it 0
+
 		if (trim($v_products_quantity) == '') {
 			$v_products_quantity = 0;
 		}
@@ -1663,9 +1654,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		}
 
 		// insert new, or update existing, product
-		if ($v_products_model != "") {
-			//   products_model exists!
-
+		if ($v_products_model != "") { //   products_model exists!
 			// First we check to see if this is a product in the current db.
 			$result = ep_query("SELECT `products_id` FROM ".TABLE_PRODUCTS." WHERE (products_model = '" . zen_db_input($v_products_model) . "') LIMIT 1 ");
 
@@ -1798,7 +1787,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			//*************************
 			// Product Meta Start
 			//*************************
-
 			if (isset($v_metatags_title)){
 			foreach ( $v_metatags_title as $key => $metaData ) {
 				$sql = "SELECT `products_id` FROM ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION." WHERE (`products_id` = '$v_products_id' AND `language_id` = '$key') LIMIT 1 ";
@@ -2164,7 +2152,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 												expires_date = '" . $v_specials_expires_date . "',
 												status = '1'
 												WHERE products_id = '" . (int)$v_products_id . "'";
-								//echo $sql . "<br>";
 								ep_query($sql);
 								$specials_print .= sprintf(EASYPOPULATE_SPECIALS_UPDATE, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price , $v_specials_price);
 				}
@@ -2182,7 +2169,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		}
 		// end of row insertion code
 	}
-
 	$display_output .= EASYPOPULATE_DISPLAY_RESULT_UPLOAD_COMPLETE;
 
 	}
@@ -2316,7 +2302,7 @@ if ($_GET['dross'] == 'delete') {
 													<br />
 												</div>
 											</form>
-											<br>
+											<br />
 											<form ENCTYPE="multipart/form-data" ACTION="easypopulate.php" METHOD="POST">
 												<div align = "left">
 													<b>Import from Temp Dir (<? echo $tempdir; ?>)</b><br />
