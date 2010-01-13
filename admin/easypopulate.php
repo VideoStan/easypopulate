@@ -843,15 +843,6 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 			$result2 = ep_query($sql2);
 			$row2 =  mysql_fetch_array($result2);
 
-			// I'm only doing this for the first language, since right now froogle is US only.. Fix later! langer - is this still relevant?
-			// adding url for froogle, but it should be available no matter what
-
-				if ($num_of_langs == 1) {
-					$row['v_froogle_products_url_' . $lid] = zen_catalog_href_link(FILENAME_PRODUCT_INFO, 'products_id=' . $row['v_products_id']);
-				} else {
-					$row['v_froogle_products_url_' . $lid] = zen_catalog_href_link(FILENAME_PRODUCT_INFO, 'products_id=' . $row['v_products_id'] . '&language=' . $lid);
-				}
-
 			$row['v_products_name_' . $lid] = $row2['products_name'];
 			$row['v_products_description_' . $lid]  = $row2['products_description'];
 			if ($ep_supported_mods['psd'] == true) {
@@ -935,7 +926,6 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 					// we have found the top level category for this item,
 					$thecategory_id = false;
 				}
-				//$fullcategory .= " > " . $row2['categories_name'];
 				$fullcategory = $row2['categories_name'] . " > " . $fullcategory;
 			} else {
 				$temprow['v_categories_name_' . $categorylevel] = '';
@@ -1067,13 +1057,11 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 			}
 		}
 
-		//elari -
 		//We check the value of tax class and title instead of the id
 		//Then we add the tax to price if $price_with_tax is set to 1
 		$row_tax_multiplier     = ep_get_tax_class_rate($row['v_tax_class_id']);
 		$row['v_tax_class_title']   = zen_get_tax_class_title($row['v_tax_class_id']);
 		$row['v_products_price']  = round($row['v_products_price'] + ($price_with_tax * $row['v_products_price'] * $row_tax_multiplier / 100),2);
-
 
 		// Now set the status to a word the user specd in the config vars
 
@@ -1131,7 +1119,6 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		header("Content-type: application/csv");
 		header("Content-disposition: attachment; filename=$EXPORT_TIME.$FILE_EXT");
 		// Changed if using SSL, helps prevent program delay/timeout (add to backup.php also)
-
 		if ($request_type== 'NONSSL'){
 			header("Pragma: no-cache");
 		} else {
@@ -1269,7 +1256,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		// langer - inputs: $items array (file data by column #); $filelayout array (headings by column #)
 
 		// now do a query to get the record's current contents
-		$sql = "SELECT
+		$sql = 'SELECT
 			p.products_id as v_products_id,
 			p.products_model as v_products_model,
 			p.products_image as v_products_image,
@@ -1280,7 +1267,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			p.products_tax_class_id as v_tax_class_id,
 			p.products_quantity as v_products_quantity,
 			p.manufacturers_id as v_manufacturers_id,
-			subc.categories_id as v_categories_id".
+			subc.categories_id as v_categories_id'.
 			$custom_filelayout_sql.
 			" FROM
 			".TABLE_PRODUCTS." as p,
@@ -1316,12 +1303,8 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			// for each language, get the description and set the vals
 			foreach ($langcode as $key => $lang){
 
-				$sql2 = "SELECT *
-					FROM ".TABLE_PRODUCTS_DESCRIPTION."
-					WHERE
-						products_id = " . $row['v_products_id'] . " AND
-						language_id = '" . $lang['id'] . "' LIMIT 1
-					";
+				$sql2 = 'SELECT * FROM '.TABLE_PRODUCTS_DESCRIPTION.' WHERE products_id = '. 
+					$row['v_products_id'] . ' AND language_id = ' . $lang['id'];
 				$result2 = ep_query($sql2);
 				$row2 =  mysql_fetch_array($result2);
 				// Need to report from ......_name_1 not ..._name_0
@@ -1568,7 +1551,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				continue;
 			}
 		}
-
 
 		if (trim($v_products_quantity) == '') {
 			$v_products_quantity = 0;
@@ -1908,9 +1890,8 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			//*************************
 
 			// langer - Assign product to category if linked
-
-			if (isset($v_categories_id)){
-				//find out if this product is listed in the category given
+			// chadd - this is buggy as instances occur when the master category id is INCORRECT!
+			if (isset($v_categories_id)) { // find out if this product is listed in the category given
 				$result_incategory = ep_query('SELECT
 							'.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id,
 							'.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id
@@ -2180,9 +2161,8 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 	// update price sorter
 	ep_update_prices();
 
-	// specials status = 0 if date_expires is past..
-	if ($has_specials == true) {
-		// specials were in upload
+	// specials status = 0 if date_expires is past.
+	if ($has_specials == true) { // specials were in upload so check for expired specials
 		zen_expire_specials();
 	}
 
