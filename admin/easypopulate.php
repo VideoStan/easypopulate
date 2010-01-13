@@ -1116,33 +1116,45 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 
 	}
 
-
+	// Create export file name
 	//$EXPORT_TIME=time();
-	$FILE_EXT = "csv";
-	$EXPORT_TIME = strftime('%Y%b%d-%H%I');
+	$EXPORT_TIME = strftime('%Y%b%d-%H%M%S');
 	switch ($ep_dltype) {
 		case 'full':
-		$EXPORT_TIME = "Full-EP" . $EXPORT_TIME;
+		$EXPORT_FILE = "Full-EP" . $EXPORT_TIME;
 		break;
 		case 'priceqty':
-		$EXPORT_TIME = "PriceQty-EP" . $EXPORT_TIME;
+		$EXPORT_FILE = "PriceQty-EP" . $EXPORT_TIME;
 		break;
 		case 'modqty':
-		$EXPORT_TIME = "ModifiedDate-EP" . $EXPORT_TIME;
+		$EXPORT_FILE = "ModifiedDate-EP" . $EXPORT_TIME;
+		break;
+		case 'pricebreaks':
+		$EXPORT_FILE = "PriceBreaks-EP" . $EXPORT_TIME;
 		break;
 		case 'category':
-		$EXPORT_TIME = "Category-EP" . $EXPORT_TIME;
+		$EXPORT_FILE = "Category-EP" . $EXPORT_TIME;
 		break;
-		case 'froogle': {
-			$EXPORT_TIME = "Froogle-EP" . $EXPORT_TIME;
+		case 'froogle':
+			$EXPORT_FILE = "Froogle-EP" . $EXPORT_TIME;
 			$csv_deliminator = "\t";
 			$csv_enclosure = ' ';
-			$FILE_EXT = "txt";
 			$filestring = array_map("kill_breaks", $filestring);
-		}
 		break;
 		case 'attrib':
-		$EXPORT_TIME = "Attributes-EP" . $EXPORT_TIME;
+		$EXPORT_FILE = "Attrib-Full-EP" . $EXPORT_TIME;
+		break;
+		case 'attrib_basic':
+		$EXPORT_FILE = "Attrib-Basic-EP" . $EXPORT_TIME;
+		break;
+		case 'options':
+		$EXPORT_FILE = "Options-EP" . $EXPORT_TIME;
+		break;
+		case 'values':
+		$EXPORT_FILE = "Values-EP" . $EXPORT_TIME;
+		break;
+		case 'optionvalues':
+		$EXPORT_FILE = "OptVals-EP" . $EXPORT_TIME;
 		break;
 	}
 
@@ -1152,7 +1164,9 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		// STREAM FILE
 		//*******************************
 		header("Content-type: application/csv");
-		header("Content-disposition: attachment; filename=$EXPORT_TIME.$FILE_EXT");
+		//header("Content-type: application/vnd.ms-excel"); // @todo make this configurable
+		//header("Content-disposition: attachment; filename=$EXPORT_FILE" . (($excel_safe_output == true)?".csv":".txt")); // this should check the delimiter instead!
+		header("Content-disposition: attachment; filename=$EXPORT_FILE" . (($csv_deliminator == ",")?".csv":".txt")); // this should check the delimiter instead!
 		// Changed if using SSL, helps prevent program delay/timeout (add to backup.php also)
 		if ($request_type== 'NONSSL'){
 			header("Pragma: no-cache");
@@ -1171,14 +1185,13 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		//*******************************
 		// PUT FILE IN TEMP DIR
 		//*******************************
-		$tmpfpath = DIR_FS_CATALOG . '' . $tempdir . "$EXPORT_TIME.$FILE_EXT";
+		$tmpfpath = DIR_FS_CATALOG . '' . $tempdir . "$EXPORT_FILE" . (($csv_deliminator == ",")?".csv":".txt");
 		$fp = fopen( $tmpfpath, "w+");
 		foreach ($filestring as $line) {
 			fputcsv($fp, $line, $csv_deliminator, $csv_enclosure);
 		}
 		fclose($fp);
-		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $EXPORT_TIME.'.'.$FILE_EXT." &nbsp;&nbsp;&nbsp;", $tempdir), 'success');
-		//the note includes the .txt in the languages file, didn't want to change that file too
+		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $EXPORT_FILE, $tempdir), 'success');
 	}
 }
 
