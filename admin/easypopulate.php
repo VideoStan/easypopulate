@@ -1201,7 +1201,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 	// langer - why not qry products table and use result array??
 	$default_these = array(
 		'v_products_image',
-		// redundant image mods removed
 		'v_categories_id',
 		'v_products_price',
 		'v_products_quantity',
@@ -1386,12 +1385,12 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			/**
 			* retrieve current manufacturer name from db for this product if exist
 			*/
-			if ($row['v_manufacturers_id'] != ''){
+			$row['v_manufacturers_name'] = '';
+			if (!empty($row['v_manufacturers_id'])) {
 				$sql2 = "SELECT manufacturers_name
 					FROM ".TABLE_MANUFACTURERS."
 					WHERE
-					manufacturers_id = " . $row['v_manufacturers_id']
-					;
+					manufacturers_id = " . $row['v_manufacturers_id'];
 				$result2 = ep_query($sql2);
 				$row2 =  mysql_fetch_array($result2);
 				$row['v_manufacturers_name'] = $row2['manufacturers_name'];
