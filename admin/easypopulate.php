@@ -777,10 +777,10 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout[] =	'v_products_model'; // product model from table PRODUCTS
 		$filelayout[] =	'v_options_id';
 		$filelayout[] =	'v_products_options_name'; // options name from table PRODUCTS_OPTIONS
-		$filelayout[] =	'v_products_options_type'; // 0-drop down, 1=text , 2=radio , 3=checkbox, 4=file, 5=read only 
+		$filelayout[] =	'v_products_options_type'; // 0-drop down, 1=text , 2=radio , 3=checkbox, 4=file, 5=read only
 		$filelayout[] =	'v_options_values_id';
 		$filelayout[] =	'v_products_options_values_name'; // options values name from table PRODUCTS_OPTIONS_VALUES
-	
+
 		// a = table PRODUCTS_ATTRIBUTES
 		// p = table PRODUCTS
 		// o = table PRODUCTS_OPTIONS
@@ -804,10 +804,10 @@ if (zen_not_null($ep_dltype)) {
 			WHERE
 			a.products_id       = p.products_id AND
 			a.options_id        = o.products_options_id AND
-			a.options_values_id = v.products_options_values_id' 			
+			a.options_values_id = v.products_options_values_id'
 			;
 		break;
-		
+
 	case 'options':
 		$filelayout[] =	'v_products_options_id';
 		$filelayout[] =	'v_language_id';
@@ -837,7 +837,7 @@ if (zen_not_null($ep_dltype)) {
 			.' FROM '
 			.TABLE_PRODUCTS_OPTIONS. ' AS o';
 		break;
-	
+
 	case 'values':
 		$filelayout[] =	'v_products_options_values_id';
 		$filelayout[] =	'v_language_id';
@@ -851,7 +851,7 @@ if (zen_not_null($ep_dltype)) {
 			v.products_options_values_name       AS v_products_options_values_name,
 			v.products_options_values_sort_order AS v_products_options_values_sort_order '
 			.' FROM '
-			.TABLE_PRODUCTS_OPTIONS_VALUES. ' AS v'; 
+			.TABLE_PRODUCTS_OPTIONS_VALUES. ' AS v';
 		break;
 
 	case 'optionvalues':
@@ -865,7 +865,7 @@ if (zen_not_null($ep_dltype)) {
 		// v = table PRODUCTS_OPTIONS_VALUES
 		// otv = table PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS
 		$filelayout_sql = 'SELECT
-			otv.products_options_values_to_products_options_id AS v_products_options_values_to_products_options_id,   	    	 
+			otv.products_options_values_to_products_options_id AS v_products_options_values_to_products_options_id,
 			otv.products_options_id           AS v_products_options_id,
 			o.products_options_name           AS v_products_options_name,
 			otv.products_options_values_id    AS v_products_options_values_id,
@@ -873,8 +873,8 @@ if (zen_not_null($ep_dltype)) {
 			.' FROM '
 			.TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS. ' AS otv, '
 			.TABLE_PRODUCTS_OPTIONS.        ' AS o, '
-			.TABLE_PRODUCTS_OPTIONS_VALUES. ' AS v 
-			WHERE 
+			.TABLE_PRODUCTS_OPTIONS_VALUES. ' AS v
+			WHERE
 			otv.products_options_id        = o.products_options_id AND
 			otv.products_options_values_id = v.products_options_values_id';
 		break;
@@ -1204,8 +1204,8 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		 $discount_index = 1;
 		 while (isset($filelayout['v_discount_id_'.$discount_index])) {
 			if ($row['v_products_discount_type'] != '0') { // if v_products_discount_type == 0 then there are no quantity breaks
-				$sql2 = 'SELECT discount_id, discount_qty, discount_price FROM '. 
-					TABLE_PRODUCTS_DISCOUNT_QUANTITY.' WHERE products_id = '. 
+				$sql2 = 'SELECT discount_id, discount_qty, discount_price FROM '.
+					TABLE_PRODUCTS_DISCOUNT_QUANTITY.' WHERE products_id = '.
 					$row['v_products_id'].' AND discount_id='.$discount_index;
 				$result2 = ep_4_query($sql2);
 				$row2    = mysql_fetch_array($result2);
@@ -1213,7 +1213,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 				$row['v_discount_price_'.$discount_index] = $row2['discount_price'];
 				$row['v_discount_qty_'.$discount_index]   = $row2['discount_qty'];
 			}
-			$discount_index++;		
+			$discount_index++;
 		 }
 
 		//We check the value of tax class and title instead of the id
@@ -1474,7 +1474,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			// for each language, get the description and set the vals
 			foreach ($langcode as $key => $lang){
 
-				$sql2 = 'SELECT * FROM '.TABLE_PRODUCTS_DESCRIPTION.' WHERE products_id = '. 
+				$sql2 = 'SELECT * FROM '.TABLE_PRODUCTS_DESCRIPTION.' WHERE products_id = '.
 					$row['v_products_id'] . ' AND language_id = ' . $lang['id'];
 				$result2 = ep_query($sql2);
 				$row2 =  mysql_fetch_array($result2);
@@ -1966,7 +1966,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 
 			// chadd: use this command to remove all old discount entries.
 			// $db->Execute("delete from " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . " where products_id = '" . (int)$v_products_id . "'");
-			
+
 			// this code does not check for existing quantity breaks, it simply updates or adds them. No algorithm for removal.
 			// update quantity price breaks - chadd
 			// 9-29-09 - changed to while loop to allow for more than 3 discounts
@@ -1976,30 +1976,30 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			$v_discount_id_var    = 'v_discount_id_'.$xxx ;
 			$v_discount_qty_var   = 'v_discount_qty_'.$xxx;
 			$v_discount_price_var = 'v_discount_price_'.$xxx;
-		
-			while ( isset($$v_discount_id_var) ) { 
+
+			while ( isset($$v_discount_id_var) ) {
 				if ($v_products_discount_type != '0') { // if v_products_discount_type == 0 then there are no quantity breaks
-	
+
 					if ($v_products_model != "") { // we check to see if this is a product in the current db, must have product model number
 						$result = ep_query("SELECT products_id FROM ".TABLE_PRODUCTS." WHERE (products_model = '" . zen_db_input($v_products_model) . "')");
-						
+
 						if (mysql_num_rows($result) != 0)  { // found entry
 							$row3 =  mysql_fetch_array($result);
 							$v_products_id = $row3['products_id'];
-		
+
 							$sql2 = "SELECT discount_id, discount_qty, discount_price
 								FROM ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." WHERE
 								products_id = " . zen_db_input($v_products_id) . " AND discount_id = '".$xxx."'";
 							$result2 = ep_query($sql2);
 							$row2 = mysql_fetch_array($result2);
-		
+
 							if ( $row2 != '' ) { // found entry: update discount_price value
 								$query = "UPDATE ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." SET
 									discount_qty   = '".zen_db_input($$v_discount_qty_var)."',
 									discount_price = '".zen_db_input($$v_discount_price_var)."'
 									WHERE
 									products_id = '$v_products_id' AND
-									discount_id = '".$xxx."'";						
+									discount_id = '".$xxx."'";
 								$result = ep_query($query);
 							} else { // entry does not exist, add to database
 								// code to INSERT price breaks
@@ -2520,25 +2520,59 @@ if ($_GET['dross'] == 'delete') {
 													<input type="submit" name="buttoninsert" value="Insert into db">
 													<br />
 												</div>
+				<br>
+            </form>
+
+		  <?php echo zen_draw_form('custom', 'easypopulate.php', 'id="custom"', 'get'); ?>
+          <!--  <form ENCTYPE="multipart/form-data" ACTION="easypopulate.php?download=stream&dltype=full" METHOD="POST"> -->
+                <div align = "left">
+					<?php
+					$manufacturers_array = array();
+					$manufacturers_array[] = array( "id" => '', 'text' => "Manufacturers" );
+					$manufacturers_query = mysql_query("SELECT manufacturers_id, manufacturers_name FROM " . TABLE_MANUFACTURERS . " ORDER BY manufacturers_name");
+					while ($manufacturers = mysql_fetch_array($manufacturers_query)) {
+						$manufacturers_array[] = array( "id" => $manufacturers['manufacturers_id'], 'text' => $manufacturers['manufacturers_name'] );
+					}
+					$status_array = array(array( "id" => '1', 'text' => "status" ),array( "id" => '1', 'text' => "active" ),array( "id" => '0', 'text' => "inactive" ));
+					echo "Filter Complete Download by: " . zen_draw_pull_down_menu('ep_category_filter', array_merge(array( 0 => array( "id" => '', 'text' => "Categories" )), zen_get_category_tree()));
+					echo ' ' . zen_draw_pull_down_menu('ep_manufacturer_filter', $manufacturers_array) . ' ';
+					echo ' ' . zen_draw_pull_down_menu('ep_status_filter', $status_array) . ' ';
+
+					$download_array = array(array( "id" => 'download', 'text' => "download" ),array( "id" => 'stream', 'text' => "stream" ),array( "id" => 'tempfile', 'text' => "tempfile" ));
+					echo ' ' . zen_draw_pull_down_menu('download', $download_array) . ' ';
+
+					echo zen_draw_input_field('dltype', 'full', ' style="padding: 0px"', false, 'submit');
+					?>
+                    <br />
+                </div>
+				<br>
 											</form>
 										</p>
-										<b>Download EP and Froogle Files</b>
+            <b>Download Easy Populate Files</b>
 										<br /><br />
 										<!-- Download file links -  Add your custom fields here -->
-										<a href="easypopulate.php?download=stream&dltype=full">Download <b>Complete</b> .csv file to edit</a>
+            <a href="easypopulate.php?download=stream&dltype=full">Download <b>Complete Products</b></a><br />
 <?php if ($products_with_attributes == true) { ?>
 										<span class="fieldRequired"> (Attributes Included)</span>
 <?php } else { ?>
 										<span class="fieldRequired"> (Attributes Not Included)</span>
 <?php } ?>
 										<br />
-										<a href="easypopulate.php?download=stream&dltype=priceqty">Download <b>Model/Price/Qty</b> .csv file to edit</a><br />
-										<a href="easypopulate.php?download=stream&dltype=modqty">Download <b>Model/Price/Qty/Last Modified/Status</b> .csv file to edit</a><br />
-										<a href="easypopulate.php?download=stream&dltype=category">Download <b>Model/Category</b> .csv file to edit</a><br />
+										<a href="easypopulate.php?download=stream&dltype=priceqty">Download <b>Model/Price/Qty</b></a><br />
+										<a href="easypopulate.php?download=stream&dltype=pricebreaks">Download <b>Model/Price/Breaks</b></a><br />
+										<a href="easypopulate.php?download=stream&dltype=modqty">Download <b>Model/Price/Qty/Last Modified/Status</b></a><br />
+										<a href="easypopulate.php?download=stream&dltype=category">Download <b>Model/Category</b></a><br />
 										<a href="easypopulate.php?download=stream&dltype=froogle">Download <b>Froogle</b> tab-delimited .txt file</a><br />
-										<a href="easypopulate.php?download=stream&dltype=attrib">Download <b>Model/Attributes</b> .csv file</a>
+										<a href="easypopulate.php?download=stream&dltype=attrib">Download <b>Detailed Products Attributes</b> (multi-line)</a><br />
+										<a href="easypopulate.php?download=stream&dltype=attrib_basic">Download <b>Basic Products Attributes</b> (single-line)</a><br />
+										<a href="easypopulate.php?download=stream&dltype=options">Download <b>Attribute Options Names</b> </a><br />
+										<a href="easypopulate.php?download=stream&dltype=values">Download <b>Attribute Options Values</b> </a><br />
+										<a href="easypopulate.php?download=stream&dltype=optionvalues">Download <b>Attribute Options-Names-to-Values</b> </a><br />
+
+	        <?php
+/*
 										<br /><br />
-										<b>Create EP and Froogle Files in Temp Dir: <a href="../<?=$tempdir ?>"><?=$tempdir ?></a></b>
+										<b>Create Easy Populate in Temp Dir: <a href="../<?php echo $tempdir ?>"><?php echo $tempdir ?></a></b>
 										<br /><br />
 										<a href="easypopulate.php?download=tempfile&dltype=full">Create <b>Complete</b> .csv file in temp dir</a>
 <?php if ($products_with_attributes == true) { ?>
@@ -2548,10 +2582,13 @@ if ($_GET['dross'] == 'delete') {
 <?php } ?>
 										<br />
 										<a href="easypopulate.php?download=tempfile&dltype=priceqty">Create <b>Model/Price/Qty</b> .csv file in temp dir</a><br />
+										<a href="easypopulate.php?download=tempfile&dltype=pricebreaks">Create <b>Model/Price/Breaks</b> .csv file in temp dir<</a><br />
 										<a href="easypopulate.php?download=tempfile&dltype=modqty">Create <b>Model/Price/Qty/Last Modified/Status</b> .csv file in temp dir</a><br />
 										<a href="easypopulate.php?download=tempfile&dltype=category">Create <b>Model/Category</b> .csv file in temp dir</a><br />
 										<a href="easypopulate.php?download=tempfile&dltype=froogle">Create <b>Froogle</b> tab-delimited .txt file in temp dir</a><br />
-										<a href="easypopulate.php?download=tempfile&dltype=attrib">Create <b>Model/Attributes</b> .csv file in temp dir</a><br />
+										<a href="easypopulate.php?download=tempfile&dltype=attrib">Create <b>Products Attributes</b> </a><br />
+										<a href="easypopulate.php?download=tempfile&dltype=options">Create <b>Attribute Options/Values</b> </a><br />
+*/			?>
 									</td>
 								</tr>
 							</table>
