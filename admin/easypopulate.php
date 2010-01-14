@@ -1790,13 +1790,13 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 					man.manufacturers_name = '" . zen_db_input($v_manufacturers_name) . "' LIMIT 1";
 			$result = ep_query($sql);
 			if ( $row =  mysql_fetch_array($result) ){
-				$v_manufacturer_id = $row['manID'];
+				$v_manufacturers_id = $row['manID'];
 			} else {
 				//It is set to autoincrement, do not need to fetch max id
 				$sql = "INSERT INTO " . TABLE_MANUFACTURERS . "( manufacturers_name, date_added, last_modified )
 														VALUES ( '" . zen_db_input($v_manufacturers_name) . "',	CURRENT_TIMESTAMP, CURRENT_TIMESTAMP )";
 				$result = ep_query($sql);
-				$v_manufacturer_id = mysql_insert_id();
+					$v_manufacturers_id = mysql_insert_id();
 			}
 		}
 		// if the categories names are set then try to update them
