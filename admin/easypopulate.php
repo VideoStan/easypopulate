@@ -770,6 +770,114 @@ if (zen_not_null($ep_dltype)) {
 
 		break;
 // VJ product attributes end
+
+	case 'attrib_basic':
+		$filelayout[] =	'v_products_attributes_id';
+		$filelayout[] =	'v_products_id';
+		$filelayout[] =	'v_products_model'; // product model from table PRODUCTS
+		$filelayout[] =	'v_options_id';
+		$filelayout[] =	'v_products_options_name'; // options name from table PRODUCTS_OPTIONS
+		$filelayout[] =	'v_products_options_type'; // 0-drop down, 1=text , 2=radio , 3=checkbox, 4=file, 5=read only
+		$filelayout[] =	'v_options_values_id';
+		$filelayout[] =	'v_products_options_values_name'; // options values name from table PRODUCTS_OPTIONS_VALUES
+
+		// a = table PRODUCTS_ATTRIBUTES
+		// p = table PRODUCTS
+		// o = table PRODUCTS_OPTIONS
+		// v = table PRODUCTS_OPTIONS_VALUES
+		$filelayout_sql = 'SELECT
+			a.products_attributes_id            as v_products_attributes_id,
+			a.products_id                       as v_products_id,
+			p.products_model				    as v_products_model,
+			a.options_id                        as v_options_id,
+			o.products_options_id               as v_products_options_id,
+			o.products_options_name             as v_products_options_name,
+			o.products_options_type             as v_products_options_type,
+			a.options_values_id                 as v_options_values_id,
+			v.products_options_values_id        as v_products_options_values_id,
+			v.products_options_values_name      as v_products_options_values_name
+			FROM '
+			.TABLE_PRODUCTS_ATTRIBUTES.     ' as a,'
+			.TABLE_PRODUCTS.                ' as p,'
+			.TABLE_PRODUCTS_OPTIONS.        ' as o,'
+			.TABLE_PRODUCTS_OPTIONS_VALUES. ' as v
+			WHERE
+			a.products_id       = p.products_id AND
+			a.options_id        = o.products_options_id AND
+			a.options_values_id = v.products_options_values_id'
+			;
+		break;
+
+	case 'options':
+		$filelayout[] =	'v_products_options_id';
+		$filelayout[] =	'v_language_id';
+		$filelayout[] =	'v_products_options_name';
+		$filelayout[] =	'v_products_options_sort_order';
+		$filelayout[] =	'v_products_options_type';
+		$filelayout[] =	'v_products_options_length';
+		$filelayout[] =	'v_products_options_comment';
+		$filelayout[] =	'v_products_options_size';
+		$filelayout[] =	'v_products_options_images_per_row';
+		$filelayout[] =	'v_products_options_images_style';
+		$filelayout[] =	'v_products_options_rows';
+
+		// o = table PRODUCTS_OPTIONS
+		$filelayout_sql = 'SELECT
+			o.products_options_id             AS v_products_options_id,
+			o.language_id                     AS v_language_id,
+			o.products_options_name           AS v_products_options_name,
+			o.products_options_sort_order     AS v_products_options_sort_order,
+			o.products_options_type           AS v_products_options_type,
+			o.products_options_length         AS v_products_options_length,
+			o.products_options_comment        AS v_products_options_comment,
+			o.products_options_size           AS v_products_options_size,
+			o.products_options_images_per_row AS v_products_options_images_per_row,
+			o.products_options_images_style   AS v_products_options_images_style,
+			o.products_options_rows           AS v_products_options_rows '
+			.' FROM '
+			.TABLE_PRODUCTS_OPTIONS. ' AS o';
+		break;
+
+	case 'values':
+		$filelayout[] =	'v_products_options_values_id';
+		$filelayout[] =	'v_language_id';
+		$filelayout[] =	'v_products_options_values_name';
+		$filelayout[] =	'v_products_options_values_sort_order';
+
+		// v = table PRODUCTS_OPTIONS_VALUES
+		$filelayout_sql = 'SELECT
+			v.products_options_values_id         AS v_products_options_values_id,
+			v.language_id                        AS v_language_id,
+			v.products_options_values_name       AS v_products_options_values_name,
+			v.products_options_values_sort_order AS v_products_options_values_sort_order '
+			.' FROM '
+			.TABLE_PRODUCTS_OPTIONS_VALUES. ' AS v';
+		break;
+
+	case 'optionvalues':
+		$filelayout[] =	'v_products_options_values_to_products_options_id';
+		$filelayout[] =	'v_products_options_id';
+		$filelayout[] =	'v_products_options_name';
+		$filelayout[] =	'v_products_options_values_id';
+		$filelayout[] =	'v_products_options_values_name';
+
+		// o = table PRODUCTS_OPTIONS
+		// v = table PRODUCTS_OPTIONS_VALUES
+		// otv = table PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS
+		$filelayout_sql = 'SELECT
+			otv.products_options_values_to_products_options_id AS v_products_options_values_to_products_options_id,
+			otv.products_options_id           AS v_products_options_id,
+			o.products_options_name           AS v_products_options_name,
+			otv.products_options_values_id    AS v_products_options_values_id,
+			v.products_options_values_name    AS v_products_options_values_name '
+			.' FROM '
+			.TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS. ' AS otv, '
+			.TABLE_PRODUCTS_OPTIONS.        ' AS o, '
+			.TABLE_PRODUCTS_OPTIONS_VALUES. ' AS v
+			WHERE
+			otv.products_options_id        = o.products_options_id AND
+			otv.products_options_values_id = v.products_options_values_id';
+		break;
 	}
 
 	$filelayout = array_flip($filelayout);
@@ -1350,7 +1458,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			// for each language, get the description and set the vals
 			foreach ($langcode as $key => $lang){
 
-				$sql2 = 'SELECT * FROM '.TABLE_PRODUCTS_DESCRIPTION.' WHERE products_id = '. 
+				$sql2 = 'SELECT * FROM '.TABLE_PRODUCTS_DESCRIPTION.' WHERE products_id = '.
 					$row['v_products_id'] . ' AND language_id = ' . $lang['id'];
 				$result2 = ep_query($sql2);
 				$row2 =  mysql_fetch_array($result2);
@@ -1842,7 +1950,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 
 			// chadd: use this command to remove all old discount entries.
 			// $db->Execute("delete from " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . " where products_id = '" . (int)$v_products_id . "'");
-			
+
 			// this code does not check for existing quantity breaks, it simply updates or adds them. No algorithm for removal.
 			// update quantity price breaks - chadd
 			// 9-29-09 - changed to while loop to allow for more than 3 discounts
@@ -1852,30 +1960,30 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			$v_discount_id_var    = 'v_discount_id_'.$xxx ;
 			$v_discount_qty_var   = 'v_discount_qty_'.$xxx;
 			$v_discount_price_var = 'v_discount_price_'.$xxx;
-		
-			while ( isset($$v_discount_id_var) ) { 
+
+			while ( isset($$v_discount_id_var) ) {
 				if ($v_products_discount_type != '0') { // if v_products_discount_type == 0 then there are no quantity breaks
-	
+
 					if ($v_products_model != "") { // we check to see if this is a product in the current db, must have product model number
 						$result = ep_query("SELECT products_id FROM ".TABLE_PRODUCTS." WHERE (products_model = '" . zen_db_input($v_products_model) . "')");
-						
+
 						if (mysql_num_rows($result) != 0)  { // found entry
 							$row3 =  mysql_fetch_array($result);
 							$v_products_id = $row3['products_id'];
-		
+
 							$sql2 = "SELECT discount_id, discount_qty, discount_price
 								FROM ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." WHERE
 								products_id = " . zen_db_input($v_products_id) . " AND discount_id = '".$xxx."'";
 							$result2 = ep_query($sql2);
 							$row2 = mysql_fetch_array($result2);
-		
+
 							if ( $row2 != '' ) { // found entry: update discount_price value
 								$query = "UPDATE ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." SET
 									discount_qty   = '".zen_db_input($$v_discount_qty_var)."',
 									discount_price = '".zen_db_input($$v_discount_price_var)."'
 									WHERE
 									products_id = '$v_products_id' AND
-									discount_id = '".$xxx."'";						
+									discount_id = '".$xxx."'";
 								$result = ep_query($query);
 							} else { // entry does not exist, add to database
 								// code to INSERT price breaks
