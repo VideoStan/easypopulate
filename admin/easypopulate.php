@@ -1880,16 +1880,30 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				*/
 
 				$query = "UPDATE " . TABLE_PRODUCTS . " SET
-						products_price					=	'" . zen_db_input($v_products_price)."' ,
-						products_image					=	'" . zen_db_input($v_products_image)."' ,
-						products_weight					=	'" . zen_db_input($v_products_weight)."' ,
-						products_tax_class_id			=	'" . zen_db_input($v_tax_class_id)."' ,
+						products_price					=	'" . zen_db_input($v_products_price)."' ,";
+
+				if ($ep_supported_mods['uom'] == true) { // price UOM mod
+					$query .= "products_price_as = '".zen_db_input($v_products_price_as)."',";
+				}
+				if ($ep_supported_mods['upc'] == true) { // UPC Code mod
+					$query .= "products_upc = '".zen_db_input($v_products_upc)."',";
+				}
+
+				$query .= "products_image				= '" . zen_db_input($v_products_image)."' ,
+						products_weight					= '" . zen_db_input($v_products_weight)."' ,
+						products_tax_class_id			= '" . zen_db_input($v_tax_class_id)."' ,
+						products_discount_type			= '".zen_db_input($v_products_discount_type)."',
+						products_discount_type_from		= '".zen_db_input($v_products_discount_type_from)."',
+						product_is_call					= '".zen_db_input($v_product_is_call)."',
+						products_sort_order				= '".zen_db_input($v_products_sort_order)."',
+						products_quantity_order_min		= '".zen_db_input($v_products_quantity_order_min)."',
+						products_quantity_order_units	= '".zen_db_input($v_products_quantity_order_units)."',
 						products_date_available			=	'" . $v_date_avail."' ,
 						products_date_added				=	$v_date_added ,
 						products_last_modified			=	CURRENT_TIMESTAMP ,
 						products_quantity				=	'" . zen_db_input($v_products_quantity) . "' ,
 						master_categories_id			=	'" . zen_db_input($v_categories_id) . "' ,
-						manufacturers_id				=	'" . $v_manufacturer_id . "',
+						manufacturers_id				=	'" . $v_manufacturers_id . "',
 						products_status					=	'" . zen_db_input($v_db_status) . "',
 						metatags_title_status			=	'" . zen_db_input($v_metatags_title_status)."',
 						metatags_products_name_status	=	'" . zen_db_input($v_metatags_products_name_status)."',
@@ -1936,16 +1950,28 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 
 				$query = "INSERT INTO " . TABLE_PRODUCTS . " SET
 						products_model					=	'" . zen_db_input($v_products_model)."' ,
-						products_price					=	'" . zen_db_input($v_products_price)."' ,
-						products_image					=	'" . zen_db_input($v_products_image)."' ,
+						products_price					=	'" . zen_db_input($v_products_price)."' ,";
+				if ($ep_supported_mods['uom'] == true) { // price UOM mod
+					$query .= "products_price_as = '".zen_db_input($v_products_price_as)."',";
+				}
+				if ($ep_supported_mods['upc'] == true) { // UPC Code mod
+					$query .= "products_upc = '".zen_db_input($v_products_upc)."',";
+				}
+				$query .= "products_image				=	'" . zen_db_input($v_products_image)."' ,
 						products_weight					=	'" . zen_db_input($v_products_weight)."' ,
+						products_discount_type          =	'".zen_db_input($v_products_discount_type)."',
+						products_discount_type_from     =	'".zen_db_input($v_products_discount_type_from)."',
+						product_is_call                 =	'".zen_db_input($v_product_is_call)."',
+						products_sort_order             =	'".zen_db_input($v_products_sort_order)."',
+						products_quantity_order_min     =	'".zen_db_input($v_products_quantity_order_min)."',
+						products_quantity_order_units   =	'".zen_db_input($v_products_quantity_order_units)."',
 						products_tax_class_id			=	'" . zen_db_input($v_tax_class_id)."' ,
 						products_date_available			=	'" . $v_date_avail."' ,
 						products_date_added				=	$v_date_added ,
 						products_last_modified			=	CURRENT_TIMESTAMP ,
 						products_quantity				=	'" . zen_db_input($v_products_quantity) . "' ,
 						master_categories_id			=	'" . zen_db_input($v_categories_id) . "' ,
-						manufacturers_id				=	'" . $v_manufacturer_id . "',
+						manufacturers_id				=	'".$v_manufacturers_id."',
 						products_status					=	'" . zen_db_input($v_db_status) . "',
 						metatags_title_status			=	'" . zen_db_input($v_metatags_title_status)."',
 						metatags_products_name_status	=	'" . zen_db_input($v_metatags_products_name_status)."',
