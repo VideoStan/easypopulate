@@ -1759,10 +1759,14 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		}
 
 		// default the stock if they spec'd it or if it's blank
+		// @todo we should try something like this $v_db_status = $v_products_status;
 		$v_db_status = '1'; // default to active
 		if ($v_status == '0'){
 			// they told us to deactivate this item
 			$v_db_status = '0';
+		}
+		if ($v_status == '1') { // request activate this item
+			$v_db_status = '1';
 		}
 		if (EASYPOPULATE_CONFIG_ZERO_QTY_INACTIVE == 'true' && $v_products_quantity == 0) {
 			// if they said that zero qty products should be deactivated, let's deactivate if the qty is zero
