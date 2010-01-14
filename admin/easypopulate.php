@@ -1361,8 +1361,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		$display_output .= sprintf(EASYPOPULATE_DISPLAY_LOCAL_FILE_SPEC, $file['name']);
 	}
 
-	$file_location = DIR_FS_CATALOG . $tempdir . $file['name'];
-
 	//*******************************
 	//*******************************
 	// PROCESS UPLOAD FILE
@@ -1374,11 +1372,27 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 	$default_these = array(
 		'v_products_image',
 		'v_categories_id',
-		'v_products_price',
-		'v_products_quantity',
-		'v_products_weight',
-		'v_date_added',
+		'v_products_price');
 
+	if ($ep_supported_mods['uom'] == true) { // price UOM mod - chadd
+		$mod_array = array('v_products_price_as'); // to soon be changed to v_products_price_uom
+		$default_these = array_merge($default_these, $mod_array);
+	} 
+	if ($ep_supported_mods['upc'] == true) { // UPC Code mod - chadd
+		$mod_array = array('v_products_upc'); 
+		$default_these = array_merge($default_these, $mod_array);
+	} 
+	
+	// default values - 
+	$default_these = array_merge( $default_these, array('v_products_quantity',
+		'v_products_weight',
+		'v_products_discount_type',
+		'v_products_discount_type_from',
+		'v_product_is_call',
+		'v_products_sort_order',
+		'v_products_quantity_order_min',
+		'v_products_quantity_order_units',
+		'v_date_added',
 		'v_date_avail',
 		'v_instock',
 		'v_tax_class_title',
@@ -1388,7 +1402,8 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		'v_products_length',
 		'v_products_width',
 		'v_products_height',
-	);
+		'v_products_status' // added by chadd so that de-activated products are not reactivated when the column is missing
+	));
 	/*
 	*	BOF Custom Fields
 	*/
@@ -1410,13 +1425,14 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 
 	// BEGIN PROCESSING DATA
 	//FOR CSV - these lines eliminate TONS of worthless code
+	$file_location = DIR_FS_CATALOG . $tempdir . $file['name'];
 	if (!file_exists($file_location)) {
 		$display_output .="<b>ERROR: file doesn't exist</b>";
 	} else if ( !($handle = fopen($file_location, "r"))) {
 		$display_output .="<b>ERROR: Can't open file</b>";
 	} else if($filelayout = array_flip(fgetcsv($handle, 0, $csv_deliminator, $csv_enclosure))) {
 	while ($items = fgetcsv($handle, 0, $csv_deliminator, $csv_enclosure)) {
-	//foreach ($readed as $file_row)
+
 
 		// langer - we now have all of our fields for this product in $items[1], $items[2] etc where the array key is the column number
 		//echo "DESC:".$items[$filelayout['v_products_description_1']].":END<br />";
