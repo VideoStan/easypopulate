@@ -1377,13 +1377,13 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 	if ($ep_supported_mods['uom'] == true) { // price UOM mod - chadd
 		$mod_array = array('v_products_price_as'); // to soon be changed to v_products_price_uom
 		$default_these = array_merge($default_these, $mod_array);
-	} 
+	}
 	if ($ep_supported_mods['upc'] == true) { // UPC Code mod - chadd
-		$mod_array = array('v_products_upc'); 
+		$mod_array = array('v_products_upc');
 		$default_these = array_merge($default_these, $mod_array);
-	} 
-	
-	// default values - 
+	}
+
+	// default values -
 	$default_these = array_merge( $default_these, array('v_products_quantity',
 		'v_products_weight',
 		'v_products_discount_type',
@@ -1447,12 +1447,27 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			p.products_id as v_products_id,
 			p.products_model as v_products_model,
 			p.products_image as v_products_image,
-			p.products_price as v_products_price,
-			p.products_weight as v_products_weight,
+			p.products_price as v_products_price,';
+
+		if ($ep_supported_mods['uom'] == true) { // price UOM mod - chadd
+			$sql .=  'p.products_price_as as v_products_price_as,'; // to soon be changed to v_products_price_uom
+		}
+		if ($ep_supported_mods['upc'] == true) { // UPC Code mod- chadd
+			$sql .=  'p.products_upc as v_products_upc,';
+		}
+
+		$sql .= 'p.products_weight as v_products_weight,
+			p.products_discount_type as v_products_discount_type,
+			p.products_discount_type_from as v_products_discount_type_from,
+			p.product_is_call as v_product_is_call,
+			p.products_sort_order as v_products_sort_order,
+			p.products_quantity_order_min as v_products_quantity_order_min,
+			p.products_quantity_order_units	as v_products_quantity_order_units,
 			p.products_date_added as v_date_added,
 			p.products_date_available as v_date_avail,
 			p.products_tax_class_id as v_tax_class_id,
 			p.products_quantity as v_products_quantity,
+			p.products_status as v_products_status,
 			p.manufacturers_id as v_manufacturers_id,
 			subc.categories_id as v_categories_id'.
 			$custom_filelayout_sql.
