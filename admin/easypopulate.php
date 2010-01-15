@@ -278,29 +278,10 @@ if (is_array($attribute_options_select) && (count($attribute_options_select) > 0
 }
 // VJ product attributes end
 
-
-//elari check default language_id from configuration table DEFAULT_LANGUAGE
-$epdlanguage_query = ep_query("select languages_id, name FROM " . TABLE_LANGUAGES . " WHERE code = '" . DEFAULT_LANGUAGE . "'");
-if (mysql_num_rows($epdlanguage_query)) {
-    $epdlanguage = mysql_fetch_array($epdlanguage_query);
-    $epdlanguage_id   = $epdlanguage['languages_id'];
-    $epdlanguage_name = $epdlanguage['name'];
-} else {
-    echo 'No default language set!... This should not happen';
-}
-
-$langcode = array();
-$languages_query = ep_query("select languages_id, code FROM " . TABLE_LANGUAGES . " ORDER BY sort_order");
+$langcode = zen_get_languages();
 // start array at one, the rest of the code expects it that way
-$ll = 1;
-while ($ep_languages = mysql_fetch_array($languages_query)) {
-	//will be used to return language_id en language code to report in product_name_code instead of product_name_id
-	$ep_languages_array[$ll++] = array(
-				'id' => $ep_languages['languages_id'],
-				'code' => $ep_languages['code']
-				);
-}
-$langcode = $ep_languages_array;
+$langcode = array_combine(range(1, count($langcode)), array_values($langcode));
+
 
 $ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : $ep_dltype;
 
