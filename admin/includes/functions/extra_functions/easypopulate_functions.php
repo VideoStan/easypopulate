@@ -350,18 +350,4 @@ function zen_get_products_name($product_id, $language_id = 0)
 function zen_get_products_description($product_id, $language_id)
 function zen_get_products_model($products_id)
 */
-
-function register_globals_vars_check () {
-	echo phpversion();
-	echo '<br>register_globals = ', ini_get('register_globals'), '<br>';
-	print "_GET: "; print_r($_GET); echo '<br />';
-	print "_POST: "; print_r($_POST); echo '<br />';
-	print "_FILES: "; print_r($_FILES); echo '<br />';
-	print "_COOKIE: "; print_r($_COOKIE); echo '<br />';
-	print "GLOBALS: "; print_r($GLOBALS); echo '<br />';
-	print "_REQUEST: "; print_r($_REQUEST); echo '<br /><br />';
-	
-	global $HTTP_POST_FILES;
-	print "HTTP_POST_FILES: "; print_r($HTTP_POST_FILES); echo '<br />';
-}
 ?>

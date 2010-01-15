@@ -140,7 +140,6 @@ $strip_smart_tags = ((EASYPOPULATE_CONFIG_SMART_TAGS == 'true') ? true : false);
 * Test area start
 */
 //error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);//test purposes only
-//register_globals_vars_check ();// test purposes only
 //$maxrecs = 4; // for testing
 // usefull stuff: mysql_affected_rows(), mysql_num_rows().
 $ep_debug_logging_all = false; // do not comment out.. make false instead
