@@ -1,14 +1,16 @@
+Installing
+----------
 1) Change the name of the "admin" directory in this package to suit your zencart installation
-2) The temp folder is configured to reside in your store directory. If you store is not in the 
+2) The temp folder is configured to reside in your store directory. If you store is not in the
    site root (eg. /mystore/) then the temp directory must also go in this directory.
 3) If you want to re-name the uploads (temp) folder, ensure that you configure Easy Populate to
    reflect this change after installation
 4) Upload all files in their respective directories.
 5) Go to Admin -> Tools -> Easy Populate. If prompted to install Easy Populate, click on the
-   link provided. Otherwise, type in your browser address bar ?langer=install after /easypopulate.php
-   (eg. YOUR_ADMIN/easypopulate.php?langer=install). If you wish to remove and re-install the default
-   config settings, type ?langer=remove after /easypopulate.php
-   (eg. YOUR_ADMIN/easypopulate.php?langer=remove) and begin this step again.
+   link provided. Otherwise, type in your browser address bar ?epinstaller=install after /easypopulate.php
+   (eg. YOUR_ADMIN/easypopulate.php?epinstaller=install). If you wish to remove and re-install the default
+   config settings, type ?epinstaller=remove after /easypopulate.php
+   (eg. YOUR_ADMIN/easypopulate.php?epinstaller=remove) and begin this step again.
 6) Go to Admin -> Configuration -> Easy Populate, and configure the upload directory if you have
    changed it from default. Also, ensure that the correct date format is set for your upload files.
 7) If you have an Apple/MAC, then uncomment the line in the "configuration variables" section in the easypopulate.php
