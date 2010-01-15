@@ -287,32 +287,27 @@ function install_easypopulate() {
 		");
 }
 
+/**
+ * Remove Easy Populate configuration entries
+ */
 function remove_easypopulate() {
-	global $db, $ep_keys;
+	global $db;
 	
-	$sql = "SELECT
-			configuration_group_id
-		FROM
-			" . TABLE_CONFIGURATION_GROUP . "
-		WHERE
-		configuration_group_title = 'Easy Populate'";
+	$sql = "SELECT configuration_group_id
+		FROM " . TABLE_CONFIGURATION_GROUP . "
+		WHERE configuration_group_title = 'Easy Populate'";
 		
 	$result = ep_query($sql);
 	if (mysql_num_rows($result)) {
-		// we have at least 1 EP group - let's delete it
 		$ep_groups =  mysql_fetch_array($result);
-		foreach ($ep_groups as $ep_group) {
-			
-	    $db->Execute("delete from " . TABLE_CONFIGURATION_GROUP . "
-	             where configuration_group_id = '" . (int)$ep_group . "'");
-	             
+		foreach ($ep_groups as $ep_group) {	
+			$db->Execute("DELETE FROM " . TABLE_CONFIGURATION_GROUP . "
+			WHERE configuration_group_id = '" . (int)$ep_group . "'");
+			$db->Execute("DELETE FROM " . TABLE_CONFIGURATION . "
+               WHERE configuration_group_id = '" . $ep_group . "'");
 		}
 	}
-	// now delete any EP keys found in config
-	foreach ($ep_keys as $ep_key) {
-	  @$db->Execute("delete from " . TABLE_CONFIGURATION . "
-	           where configuration_key = '" . $ep_key . "'");
-	}
+	return true;
 }
 
 function ep_chmod_check($tempdir) {

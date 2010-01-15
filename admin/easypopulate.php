@@ -181,21 +181,6 @@ $has_specials == false;
 // langer - scan array in future to reveal if any mods for inclusion in downloads
 $ep_supported_mods = array();
 
-// config keys array - must contain any expired keys to ensure they are deleted on install or removal
-$ep_keys = array(
-	'EASYPOPULATE_CONFIG_TEMP_DIR',
-	'EASYPOPULATE_CONFIG_FILE_DATE_FORMAT',
-	'EASYPOPULATE_CONFIG_DEFAULT_RAW_TIME',
-	'EASYPOPULATE_CONFIG_CUSTOM_FIELDS',
-	'EASYPOPULATE_CONFIG_SPLIT_MAX',
-	'EASYPOPULATE_CONFIG_MAX_CATEGORY_LEVELS',
-	'EASYPOPULATE_CONFIG_PRICE_INC_TAX',
-	'EASYPOPULATE_CONFIG_ZERO_QTY_INACTIVE',
-	'EASYPOPULATE_CONFIG_SMART_TAGS',
-	'EASYPOPULATE_CONFIG_ADV_SMART_TAGS',
-	'EASYPOPULATE_CONFIG_DEBUG_LOGGING',
-);
-
 // default smart-tags setting when enabled. This can be added to.
 $smart_tags = array("\r\n|\r|\n" => '<br />', );
 
