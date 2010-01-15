@@ -980,8 +980,8 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 			//metaData end
 
 			// for each language, get the description and set the vals
-			$sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_DESCRIPTION .  WHERE
-					products_id = ' . $row['v_products_id'] .  AND
+			$sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_DESCRIPTION . ' WHERE
+					products_id = ' . $row['v_products_id'] . ' AND
 					language_id = ' . $lid . ' LIMIT 1';
 			$result2 = ep_query($sql2);
 			$row2 =  mysql_fetch_array($result2);
