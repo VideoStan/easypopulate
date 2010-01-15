@@ -58,7 +58,6 @@ if (!function_exists('fputcsv')) {
 
 function ep_get_uploaded_file($filename) {
 	if (isset($_FILES[$filename])) {
-		//global $_FILES;
 		$uploaded_file = array('name' => $_FILES[$filename]['name'],
 		'type' => $_FILES[$filename]['type'],
 		'size' => $_FILES[$filename]['size'],
@@ -66,23 +65,13 @@ function ep_get_uploaded_file($filename) {
 	} elseif (isset($_POST[$filename])) {
 		$uploaded_file = array('name' => $_POST[$filename],
 		);
-	} elseif (isset($GLOBALS['HTTP_POST_FILES'][$filename])) {
-		global $HTTP_POST_FILES;
-		$uploaded_file = array('name' => $HTTP_POST_FILES[$filename]['name'],
-		'type' => $HTTP_POST_FILES[$filename]['type'],
-		'size' => $HTTP_POST_FILES[$filename]['size'],
-		'tmp_name' => $HTTP_POST_FILES[$filename]['tmp_name']);
-	} elseif (isset($GLOBALS['HTTP_POST_VARS'][$filename])) {
-		global $HTTP_POST_VARS;
-		$uploaded_file = array('name' => $HTTP_POST_VARS[$filename],
-		);
 	} else {
 		$uploaded_file = array('name' => $GLOBALS[$filename . '_name'],
 		'type' => $GLOBALS[$filename . '_type'],
 		'size' => $GLOBALS[$filename . '_size'],
 		'tmp_name' => $GLOBALS[$filename]);
 	}
-return $uploaded_file;
+	return $uploaded_file;
 }
 
 // the $filename parameter is an array with the following elements:
