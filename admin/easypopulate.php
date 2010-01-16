@@ -282,6 +282,12 @@ $langcode = zen_get_languages();
 // start array at one, the rest of the code expects it that way
 $langcode = array_combine(range(1, count($langcode)), array_values($langcode));
 
+foreach ($langcode as $value) {
+	if ($value['code'] == DEFAULT_LANGUAGE) {
+		$epdlanguage_id = $value['id'];
+		break;
+	}
+}
 
 $ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : $ep_dltype;
 
@@ -481,15 +487,15 @@ if (zen_not_null($ep_dltype)) {
 			p.metatags_products_name_status as v_metatags_products_name_status,
 			p.metatags_model_status as v_metatags_model_status,
 			p.metatags_price_status as v_metatags_price_status,
-			p.metatags_title_tagline_status as v_metatags_title_tagline_status".
+			p.metatags_title_tagline_status as v_metatags_title_tagline_status'.
 			$custom_filelayout_sql.
-			" FROM
-			".TABLE_PRODUCTS." as p,
-			".TABLE_CATEGORIES." as subc,
-			".TABLE_PRODUCTS_TO_CATEGORIES." as ptoc
+			' FROM
+			' . TABLE_PRODUCTS . ' as p,
+			' . TABLE_CATEGORIES . ' as subc,
+			' . TABLE_PRODUCTS_TO_CATEGORIES . ' as ptoc
 			WHERE
 			p.products_id = ptoc.products_id AND
-			ptoc.categories_id = subc.categories_id'.$sql_filter;
+			ptoc.categories_id = subc.categories_id' . $sql_filter;
 		break;
 
 	case 'priceqty':
@@ -874,6 +880,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 //    $filestring .= " product_type=OTHER\n";
 //    $filestring .= " quoted=YES\n";
 	//}
+
 	$result = ep_query($filelayout_sql);
 
 
@@ -2500,7 +2507,7 @@ if ($_GET['dross'] == 'delete') {
 	</script>
 	<!--@todo: move this css to some other file -->
 	<style type="text/css">
-	.label {
+	label {
 		font-weight: bold;
 	}
 	</style>
