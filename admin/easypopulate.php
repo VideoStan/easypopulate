@@ -140,8 +140,6 @@ $strip_smart_tags = ((EASYPOPULATE_CONFIG_SMART_TAGS == 'true') ? true : false);
 * Test area start
 */
 //error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);//test purposes only
-//$maxrecs = 4; // for testing
-// usefull stuff: mysql_affected_rows(), mysql_num_rows().
 $ep_debug_logging_all = false; // do not comment out.. make false instead
 //$sql_fail_test == true; // used to cause an sql error on new product upload - tests error handling & logs
 /*
@@ -207,18 +205,19 @@ if (EASYPOPULATE_CONFIG_TEMP_DIR == 'EASYPOPULATE_CONFIG_TEMP_DIR' && ($_GET['ep
     $messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_INSTALL_KEYS_FAIL, '<a href="' . zen_href_link(FILENAME_EASYPOPULATE, 'epinstaller=install') . '">', '</a>'), 'warning');
 }
 
-// installation start
-if ($_GET['epinstaller'] == 'install'  ) {
-    remove_easypopulate(); // remove old configuration keys
-	install_easypopulate(); // install new configuration keys
+// START installation
+if ($_GET['epinstaller'] == 'install') {
+    remove_easypopulate();
+	install_easypopulate();
 	//$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_SUCCESS, 'success');
 	zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
 }
 
-if ($_GET['epinstaller'] == 'remove') { // remove easy populate configuration variables
+if ($_GET['epinstaller'] == 'remove') {
     remove_easypopulate();
     zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
-} // end installation/removal
+}
+// END installation
 
 /**
 * START check for existance of various mods
@@ -314,9 +313,6 @@ if (zen_not_null($ep_dltype)) {
     }
     if ($_GET['ep_status_filter']!='') {
       $sql_filter .= ' AND p.products_status = ' . (int)$_GET['ep_status_filter'];
-    }
-    if ($_GET['dltype']!='') {
-      $ep_dltype = $_GET['dltype'];
     }
 
 	switch($ep_dltype){
@@ -883,14 +879,16 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 
 	$result = ep_query($filelayout_sql);
 
-
 	// Here we need to allow for the mapping of internal field names to external field names
 	// default to all headers named like the internal ones
 	// the field mapping array only needs to cover those fields that need to have their name changed
 	if (count($fileheaders) != 0 ) {
-		$filelayout_header = $fileheaders; // if they gave us fileheaders for the dl, then use them; langer - (froogle only??)
+		// if they gave us fileheaders for the dl, then use them; only overriden by froogle atm
+		// @todo <johnny> make it configurable
+		$filelayout_header = $fileheaders; langer - (froogle only??)
 	} else {
-		$filelayout_header = $filelayout; // if no mapping was spec'd use the internal field names for header names
+		// if no mapping was specified; use the internal field names for header names
+		$filelayout_header = $filelayout;
 	}
 	//We prepare the table heading with layout values
 
