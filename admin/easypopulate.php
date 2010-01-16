@@ -7,6 +7,7 @@
  * @copyright 20??-2010
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Publice License (v2 only)
  *
+ * @todo <chadd> change v_products_price_as to v_products_price_uom
  */
 
 // START INITIALIZATION
@@ -867,7 +868,6 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 	// DOWNLOAD FILE
 	//*******************************
 	//*******************************
-	$filestring = ""; // this holds the csv file we want to download
 
 	//if ($_GET['dltype']=='froogle'){
 		// set the things froogle wants at the top of the file
@@ -879,24 +879,24 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 
 	$result = ep_query($filelayout_sql);
 
-	// Here we need to allow for the mapping of internal field names to external field names
-	// default to all headers named like the internal ones
-	// the field mapping array only needs to cover those fields that need to have their name changed
+	/**
+	 * Here we need to allow for the mapping of internal field names to external field names
+	 * default to all headers named like the internal ones
+	 * the field mapping array only needs to cover those fields that need to have their name changed
+	 */
 	if (count($fileheaders) != 0 ) {
 		// if they gave us fileheaders for the dl, then use them; only overriden by froogle atm
 		// @todo <johnny> make it configurable
-		$filelayout_header = $fileheaders; langer - (froogle only??)
+		$filelayout_header = $fileheaders;
 	} else {
 		// if no mapping was specified; use the internal field names for header names
 		$filelayout_header = $filelayout;
 	}
-	//We prepare the table heading with layout values
 
-	$filestring = array();
 	$filestring[] = array_keys($filelayout_header);
 
-	///////
 	$num_of_langs = count($langcode);
+	$filestring = array();
 	while ($row = mysql_fetch_array($result, MYSQL_ASSOC)){
 		// if the filelayout says we need a products_name, get it
 		// build the long full froogle image path
@@ -935,19 +935,20 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		$row['v_froogle_offer_id']    = $row['v_products_model'];
 //		$row['v_froogle_product_id']    = $row['v_products_model'];
 
-		// names and descriptions require that we loop thru all languages that are turned on in the store
+		// loop through all languages that are turned on in the store
 		foreach ($langcode as $key => $lang){
 			$lid = $lang['id'];
 
-			//metaData start
-				$sqlMeta = 'SELECT * FROM '.TABLE_META_TAGS_PRODUCTS_DESCRIPTION.' WHERE products_id = '.$row['v_products_id'].
-					' AND language_id = '.$lid.' LIMIT 1 ';
-				$resultMeta = ep_query($sqlMeta);
-				$rowMeta = mysql_fetch_array($resultMeta);
-				$row['v_metatags_title_' . $lid] = $rowMeta['metatags_title'];
-				$row['v_metatags_keywords_' . $lid] = $rowMeta['metatags_keywords'];
-				$row['v_metatags_description_' . $lid] = $rowMeta['metatags_description'];
-			//metaData end
+			// START product meta tags
+			$sqlMeta = 'SELECT * FROM '.TABLE_META_TAGS_PRODUCTS_DESCRIPTION.' 
+							WHERE products_id = '.$row['v_products_id'].
+							' AND language_id = '.$lid.' LIMIT 1 ';
+			$resultMeta = ep_query($sqlMeta);
+			$rowMeta = mysql_fetch_array($resultMeta);
+			$row['v_metatags_title_' . $lid] = $rowMeta['metatags_title'];
+			$row['v_metatags_keywords_' . $lid] = $rowMeta['metatags_keywords'];
+			$row['v_metatags_description_' . $lid] = $rowMeta['metatags_description'];
+			//END product meta tags
 
 			// for each language, get the description and set the vals
 			$sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_DESCRIPTION . ' WHERE
@@ -980,37 +981,36 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 			// end support for Header Controller 2.0
 		}
 
-		// BEGIN: Specials
+		// START specials
 		if (isset($filelayout['v_specials_price'])) {
-
+			$row['v_specials_price'] = '';
+			$row['v_specials_date_avail'] = '';
+			$row['v_specials_expires_date'] = '';
 			$specials_query = ep_query("SELECT
 						specials_new_products_price,
 						specials_date_available,
 						expires_date
-				FROM
-						".TABLE_SPECIALS."
-				WHERE
-				products_id = " . $row['v_products_id']);
+				FROM ".TABLE_SPECIALS."
+				WHERE products_id = " . $row['v_products_id']);
 
 			if (mysql_num_rows($specials_query)) {
 				$ep_specials = mysql_fetch_array($specials_query);
 				$row['v_specials_price'] = $ep_specials['specials_new_products_price'];
 				$row['v_specials_date_avail'] = $ep_specials['specials_date_available'];
 				$row['v_specials_expires_date'] = $ep_specials['expires_date'];
-			} else {
-				$row['v_specials_price'] = '';
-				$row['v_specials_date_avail'] = '';
-				$row['v_specials_expires_date'] = '';
 			}
-		} // END: Specials
+		} 
+		// END specials
 
-		// for the categories, we need to keep looping until we find the root category
-
-		// start with v_categories_id
-		// Get the category description
-		// set the appropriate variable name
-		// if parent_id is not null, then follow it up.
-		// we'll populate an aray first, then decide where it goes in the
+		/**
+		 * We need to keep looping until we find the root category
+		 *
+		 * Start with v_categories_id
+		 * Get the category description
+		 * Set the appropriate variable name
+		 * If parent_id is not null, then follow it up.
+		 * We'll populate an array first, then decide where it goes in the layout
+		 */
 		$thecategory_id = $row['v_categories_id'];
 		$fullcategory = ''; // this will have the entire category stack for froogle
 		for( $categorylevel=1; $categorylevel<$max_categories+1; $categorylevel++){
@@ -1203,7 +1203,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 
 		$tempcsvrow = array();
 		foreach( $filelayout as $key => $value ){
-			// only specific keys are used
+			// only the specified keys are used
 			$tempcsvrow[] = $row[$key];
 		}
 		$filestring[] = $tempcsvrow;
@@ -1211,7 +1211,6 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 	}
 
 	// Create export file name
-	//$EXPORT_TIME=time();
 	$EXPORT_TIME = strftime('%Y%b%d-%H%M%S');
 	switch ($ep_dltype) {
 		case 'full':
@@ -1269,7 +1268,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		}
 		header("Expires: 0");
 
-		$fp = fopen("php://output", "w+"); //no str_putcsv function...
+		$fp = fopen("php://output", "w+"); // @todo use str_putcsv when the php version containing it is morely widely available
 		foreach ($filestring as $line) {
 			fputcsv($fp, $line, $csv_deliminator, $csv_enclosure);
 		}
@@ -1315,10 +1314,8 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 	if ( isset($_FILES['usrfl']) ) {
 		// move the uploaded file to where we can work with it
 		$file = ep_get_uploaded_file('usrfl');
-		// langer - this copies the file to our temp dir. This is required so it can be read into file array.
-		// user not protected from uploading and overwriting a duplicate named file, too bad
+		// @todo user not protected from uploading and overwriting a duplicate named file
 
-		//$new_file_prefix = 'uploaded-'.strftime('%y%m%d-%H%I%S').'-';
 		if (is_uploaded_file($file['tmp_name'])) {
 			ep_copy_uploaded_file($file, DIR_FS_CATALOG . $tempdir);
 		}
@@ -1338,22 +1335,22 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 	//*******************************
 
 	// these are the fields that will be defaulted to the current values in the database if they are not found in the incoming file
-	// langer - why not qry products table and use result array??
+	// @todo <langer> why not query products table and use result array??
 	$default_these = array(
 		'v_products_image',
 		'v_categories_id',
 		'v_products_price');
 
-	if ($ep_supported_mods['uom'] == true) { // price UOM mod - chadd
-		$mod_array = array('v_products_price_as'); // to soon be changed to v_products_price_uom
+	if ($ep_supported_mods['uom'] == true) {
+		$mod_array = array('v_products_price_as');
 		$default_these = array_merge($default_these, $mod_array);
 	}
-	if ($ep_supported_mods['upc'] == true) { // UPC Code mod - chadd
+	if ($ep_supported_mods['upc'] == true) {
 		$mod_array = array('v_products_upc');
 		$default_these = array_merge($default_these, $mod_array);
 	}
 
-	// default values -
+	// default values
 	$default_these = array_merge( $default_these, array('v_products_quantity',
 		'v_products_weight',
 		'v_products_discount_type',
@@ -1374,27 +1371,19 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		'v_products_height',
 		'v_products_status' // added by chadd so that de-activated products are not reactivated when the column is missing
 	));
-	/*
-	*	BOF Custom Fields
-	*/
-		$custom_these = array();
-		if(count($custom_fields) > 0)
-		{
-			foreach($custom_fields as $f)
-			{
-				$custom_these[] = 'v_'.$f;
-			}
 
-			$default_these = array_merge($default_these,$custom_these);
+	// START custom fields
+	$custom_these = array();
+	if (count($custom_fields) > 0) {
+		foreach($custom_fields as $f) {
+			$custom_these[] = 'v_'.$f;
 		}
-		//print_r($default_these);
+		$default_these = array_merge($default_these,$custom_these);
+	}
+	// END custom fields
 
-	/*
-	*	EOF Custom Fields
-	*/
 
 	// BEGIN PROCESSING DATA
-	//FOR CSV - these lines eliminate TONS of worthless code
 	$file_location = DIR_FS_CATALOG . $tempdir . $file['name'];
 	if (!file_exists($file_location)) {
 		$display_output .="<b>ERROR: file doesn't exist</b>";
@@ -1419,10 +1408,10 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			p.products_image as v_products_image,
 			p.products_price as v_products_price,';
 
-		if ($ep_supported_mods['uom'] == true) { // price UOM mod - chadd
-			$sql .=  'p.products_price_as as v_products_price_as,'; // to soon be changed to v_products_price_uom
+		if ($ep_supported_mods['uom'] == true) {
+			$sql .=  'p.products_price_as as v_products_price_as,';
 		}
-		if ($ep_supported_mods['upc'] == true) { // UPC Code mod- chadd
+		if ($ep_supported_mods['upc'] == true) {
 			$sql .=  'p.products_upc as v_products_upc,';
 		}
 
