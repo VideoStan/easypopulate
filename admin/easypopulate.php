@@ -2485,70 +2485,48 @@ if ($_GET['dross'] == 'delete') {
 <html <?php echo HTML_PARAMS; ?>>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo CHARSET; ?>">
-	<title><?php echo TITLE; ?></title>
+	<title><?php echo TITLE; ?> - Easy Populate</title>
 	<link rel="stylesheet" type="text/css" href="includes/stylesheet.css">
 	<link rel="stylesheet" type="text/css" href="includes/cssjsmenuhover.css" media="all" id="hoverJS">
 	<script language="javascript" src="includes/menu.js"></script>
 	<script language="javascript" src="includes/general.js"></script>
 	<script type="text/javascript">
-		<!--
 		function init()
 		{
 		cssjsmenu('navbar');
-		if (document.getElementById)
-		{
 		var kill = document.getElementById('hoverJS');
 		kill.disabled = true;
 		}
-		}
-		// -->
 	</script>
+	<!--@todo: move this css to some other file -->
+	<style type="text/css">
+	.label {
+		font-weight: bold;
+	}
+	</style>
 </head>
 <body onLoad="init()">
-<!-- header -->
 <?php require(DIR_WS_INCLUDES . 'header.php'); ?>
 <!-- header_eof -->
-
-<!-- body -->
-	<table border="0" width="100%" cellspacing="2" cellpadding="2">
-		<tr>
-<!-- body_text -->
-			<td width="100%" valign="top">
-	<?php 	echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?>
-				<table border="0" width="100%" cellspacing="0" cellpadding="0">
-					<tr>
-						<td class="pageHeading"><?php echo "Easy Populate $curver"; ?></td>
-					</tr>
-				</table>
-	<?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?>
-				<table border="0" width="100%" cellspacing="0" cellpadding="0">
-					<tr>
-						<td valign="top">
-
-							<table width="70%" border="0" cellpadding="8" valign="top">
-								<tr>
-									<td width="100%">
-										<p>
-											<form ENCTYPE="multipart/form-data" ACTION="easypopulate.php" METHOD="POST">
-												<div align = "left">
-													<b>Upload EP File</b><br />
-													<input TYPE="hidden" name="MAX_FILE_SIZE" value="100000000">
-													<input name="usrfl" type="file" size="50">
-													<input type="submit" name="buttoninsert" value="Insert into db">
-													<br />
-												</div>
-											</form>
-											<br />
-											<form ENCTYPE="multipart/form-data" ACTION="easypopulate.php" METHOD="POST">
-												<div align = "left">
-													<b>Import from Temp Dir (<? echo $tempdir; ?>)</b><br />
-													<input TYPE="text" name="localfile" size="50">
-													<input type="submit" name="buttoninsert" value="Insert into db">
-													<br />
-												</div>
-				<br>
-            </form>
-
+<div id="ep_header">
+	<h1>Easy Populate <?php echo $curver ?></h1>
+</div>
+<div>
+	<form enctype="multipart/form-data" action="easypopulate.php" method="POST">
+		<fieldset>
+			<legend>Load comma or tab delimited files</legend>
+			<input type="hidden" name="MAX_FILE_SIZE" value="100000000">
+			<div>
+			<label for="userfl">Upload EP File</label>
+			<input name="usrfl" type="file" size="50">
+			</div>
+			<div>
+			<label for="localfile">Import from Temp Dir (<?php echo $tempdir; ?>)</label>
+			<input TYPE="text" name="localfile" size="50">
+			</div>
+			<input type="submit" name="buttoninsert" value="Insert into db">
+		</fieldset>
+	</form>
 		  <?php echo zen_draw_form('custom', 'easypopulate.php', 'id="custom"', 'get'); ?>
           <!--  <form ENCTYPE="multipart/form-data" ACTION="easypopulate.php?download=stream&dltype=full" METHOD="POST"> -->
                 <div align = "left">
@@ -2569,78 +2547,56 @@ if ($_GET['dross'] == 'delete') {
 
 					echo zen_draw_input_field('dltype', 'full', ' style="padding: 0px"', false, 'submit');
 					?>
-                    <br />
                 </div>
-				<br>
-											</form>
-										</p>
-            <b>Download Easy Populate Files</b>
-										<br /><br />
-										<!-- Download file links -  Add your custom fields here -->
-            <a href="easypopulate.php?download=stream&dltype=full">Download <b>Complete Products</b></a><br />
-<?php if ($products_with_attributes == true) { ?>
-										<span class="fieldRequired"> (Attributes Included)</span>
-<?php } else { ?>
-										<span class="fieldRequired"> (Attributes Not Included)</span>
-<?php } ?>
-										<br />
-										<a href="easypopulate.php?download=stream&dltype=priceqty">Download <b>Model/Price/Qty</b></a><br />
-										<a href="easypopulate.php?download=stream&dltype=pricebreaks">Download <b>Model/Price/Breaks</b></a><br />
-										<a href="easypopulate.php?download=stream&dltype=modqty">Download <b>Model/Price/Qty/Last Modified/Status</b></a><br />
-										<a href="easypopulate.php?download=stream&dltype=category">Download <b>Model/Category</b></a><br />
-										<a href="easypopulate.php?download=stream&dltype=froogle">Download <b>Froogle</b> tab-delimited .txt file</a><br />
-										<a href="easypopulate.php?download=stream&dltype=attrib">Download <b>Detailed Products Attributes</b> (multi-line)</a><br />
-										<a href="easypopulate.php?download=stream&dltype=attrib_basic">Download <b>Basic Products Attributes</b> (single-line)</a><br />
-										<a href="easypopulate.php?download=stream&dltype=options">Download <b>Attribute Options Names</b> </a><br />
-										<a href="easypopulate.php?download=stream&dltype=values">Download <b>Attribute Options Values</b> </a><br />
-										<a href="easypopulate.php?download=stream&dltype=optionvalues">Download <b>Attribute Options-Names-to-Values</b> </a><br />
+			</form>
 
-	        <?php
-/*
-										<br /><br />
-										<b>Create Easy Populate in Temp Dir: <a href="../<?php echo $tempdir ?>"><?php echo $tempdir ?></a></b>
-										<br /><br />
-										<a href="easypopulate.php?download=tempfile&dltype=full">Create <b>Complete</b> .csv file in temp dir</a>
-<?php if ($products_with_attributes == true) { ?>
-										<span class="fieldRequired"> (Attributes Included)</span>
-<?php } else { ?>
-										<span class="fieldRequired"> (Attributes Not Included)</span>
-<?php } ?>
-										<br />
-										<a href="easypopulate.php?download=tempfile&dltype=priceqty">Create <b>Model/Price/Qty</b> .csv file in temp dir</a><br />
-										<a href="easypopulate.php?download=tempfile&dltype=pricebreaks">Create <b>Model/Price/Breaks</b> .csv file in temp dir<</a><br />
-										<a href="easypopulate.php?download=tempfile&dltype=modqty">Create <b>Model/Price/Qty/Last Modified/Status</b> .csv file in temp dir</a><br />
-										<a href="easypopulate.php?download=tempfile&dltype=category">Create <b>Model/Category</b> .csv file in temp dir</a><br />
-										<a href="easypopulate.php?download=tempfile&dltype=froogle">Create <b>Froogle</b> tab-delimited .txt file in temp dir</a><br />
-										<a href="easypopulate.php?download=tempfile&dltype=attrib">Create <b>Products Attributes</b> </a><br />
-										<a href="easypopulate.php?download=tempfile&dltype=options">Create <b>Attribute Options/Values</b> </a><br />
-*/			?>
-									</td>
-								</tr>
-							</table>
+			<b>Download Easy Populate Files</b>
+			<?php
+			// Add your custom fields here
+			$ep_exports = array();
+			$ep_exports['full'] = 'Complete';
+			$ep_exports['priceqty'] = 'Model/Price/Qty';
+			$ep_exports['pricebreaks'] = 'Model/Price/Breaks';
+			$ep_exports['modqty'] = 'Model/Price/Qty/Last Modified/Status';
+			$ep_exports['category'] = 'Model/Category';
+			$ep_exports['attrib'] = 'Detailed Products Attributes (multi-line)';
+			$ep_exports['attrib_basic'] = 'Basic Products Attributes (single-line)';
+			$ep_exports['options'] = 'Attribute Options Names';
+			$ep_exports['values'] = 'Attribute Options Values';
+			$ep_exports['optionvalues'] = 'Attribute Options-Names-to-Values';
+			$ep_exports['froogle'] = 'Froogle';
+			?>
+			<table>
+			<thead>
+			<th>Download</th>
+			<th>Create in Temp dir (<?php echo $tempdir ?>)</th>
+			</thead>
+			<tbody>
+			<?php foreach($ep_exports as $key => $value) { ?>
+				<tr>
+					<td><a href="easypopulate.php?download=stream&dltype=<?php echo $key ?>"><?php echo $value ?></a></td>
+					<td><a href="easypopulate.php?download=tempfile&dltype=<?php echo $key ?>"><?php echo $value ?></a></td>
+				</tr>
+			<?php } ?>
+			</tbody>
+			</table>
+			<?php if ($products_with_attributes == true) { ?>
+					<span class="fieldRequired"> * Attributes Included in Complete</span>
+			<?php } else { ?>
+					<span class="fieldRequired"> * Attributes Not Included in Complete</span>
+			<?php } ?>
+			<br />
 <?php
-							echo '<br />' . $printsplit; // our files splitting matrix
-							echo $display_output; // upload results
-							if (strlen($specials_print) > strlen(EASYPOPULATE_SPECIALS_HEADING)) {
-								echo '<br />' . $specials_print . EASYPOPULATE_SPECIALS_FOOTER; // specials summary
-							}
+			echo $printsplit; // our files splitting matrix
+			echo $display_output; // upload results
+			if (strlen($specials_print) > strlen(EASYPOPULATE_SPECIALS_HEADING)) {
+				echo '<br />' . $specials_print . EASYPOPULATE_SPECIALS_FOOTER; // specials summary
+			}
 
-							include(DIR_FS_CATALOG . $tempdir . 'fileList.php');
+			include(DIR_FS_CATALOG . $tempdir . 'fileList.php');
 ?>
-
-						</td>
-					</tr>
-				</table>
-
-			</td>
-<!-- body_text_eof -->
-		</tr>
-	</table>
-<!-- body_eof -->
-	<br />
-<!-- footer -->
+</div>
 <?php require(DIR_WS_INCLUDES . 'footer.php'); ?>
-<!-- footer_eof -->
 </body>
 </html>
 <?php require(DIR_WS_INCLUDES . 'application_bottom.php'); ?>
