@@ -147,14 +147,6 @@ $ep_debug_logging_all = false; // do not comment out.. make false instead
 * Test area end
 **/
 
-//used for froogle
-function kill_breaks($thing) {
-	//kills all line breaks and tabs
-	if (is_array($thing)) return array_map("kill_breaks", $thing);
-	return str_replace(array("\r","\n","\t")," ",$thing);
-}
-
-
 /**
 * Initialise vars
 */

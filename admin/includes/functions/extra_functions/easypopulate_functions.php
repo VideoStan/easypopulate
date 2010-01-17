@@ -340,6 +340,18 @@ function ep_chmod_check($tempdir) {
 }
 
 /**
+ * Kills all line breaks and tabs
+ *
+ * Used for Froogle (Google Products)
+ *
+ * @param string $line line to kill breaks on
+ */
+function kill_breaks($line) {
+	if (is_array($line)) return array_map('kill_breaks', $line);
+	return str_replace(array("\r","\n","\t")," ",$line);
+}
+
+/**
 * The following functions are for testing purposes only
 */
 // available zen functions of use..
