@@ -893,14 +893,14 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		$filelayout_header = $filelayout;
 	}
 
+	$filestring = array();
 	$filestring[] = array_keys($filelayout_header);
 
 	$num_of_langs = count($langcode);
-	$filestring = array();
+	
 	while ($row = mysql_fetch_array($result, MYSQL_ASSOC)){
-		// if the filelayout says we need a products_name, get it
-		// build the long full froogle image path
 
+		// build the long full froogle image path
 		// check for a large image else use medium else use small else no link
 		// thanks to Tim Kroeger - www.breakmyzencart.com
 		$products_image = (($row['v_products_image'] == PRODUCTS_IMAGE_NO_IMAGE) ? '' : $row['v_products_image']);
@@ -1252,11 +1252,11 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 	}
 
 	// now either stream it to them or put it in the temp directory
-	if ($ep_dlmethod == 'stream'){
+	if ($ep_dlmethod == 'stream') {
 		//*******************************
 		// STREAM FILE
 		//*******************************
-		header("Content-type: application/csv");
+		header("Content-type: text/csv");
 		//header("Content-type: application/vnd.ms-excel"); // @todo make this configurable
 		//header("Content-disposition: attachment; filename=$EXPORT_FILE" . (($excel_safe_output == true)?".csv":".txt")); // this should check the delimiter instead!
 		header("Content-disposition: attachment; filename=$EXPORT_FILE" . (($csv_deliminator == ",")?".csv":".txt")); // this should check the delimiter instead!
