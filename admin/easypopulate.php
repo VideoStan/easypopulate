@@ -1945,23 +1945,26 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			}
 			}
 
-			// chadd: use this command to remove all old discount entries.
-			// $db->Execute("delete from " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . " where products_id = '" . (int)$v_products_id . "'");
-
-			// this code does not check for existing quantity breaks, it simply updates or adds them. No algorithm for removal.
-			// update quantity price breaks - chadd
-			// 9-29-09 - changed to while loop to allow for more than 3 discounts
-			// 9-29-09 - code has test well for first run through.
-			// initialize variables
+			/**
+			 * Update quantity price breaks
+			 *
+			 * This code does not check for existing quantity breaks, 
+			 * it simply updates or adds them. No algorithm for removal.
+			 * @todo do something about preceding comment
+			 * Use this command to remove all old discount entries.
+			 * $db->Execute("delete from " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . " where products_id = '" . (int)$v_products_id . "'");
+			 */
 			$xxx = 1;
 			$v_discount_id_var    = 'v_discount_id_'.$xxx ;
 			$v_discount_qty_var   = 'v_discount_qty_'.$xxx;
 			$v_discount_price_var = 'v_discount_price_'.$xxx;
 
 			while ( isset($$v_discount_id_var) ) {
-				if ($v_products_discount_type != '0') { // if v_products_discount_type == 0 then there are no quantity breaks
+				 // if v_products_discount_type == 0 then there are no quantity breaks
+				if ($v_products_discount_type != '0') {
 
-					if ($v_products_model != "") { // we check to see if this is a product in the current db, must have product model number
+					if ($v_products_model != "") {
+						// we check to see if this is a product in the current db, must have product model number
 						$result = ep_query("SELECT products_id FROM ".TABLE_PRODUCTS." WHERE (products_model = '" . zen_db_input($v_products_model) . "')");
 
 						if (mysql_num_rows($result) != 0)  { // found entry
@@ -1983,7 +1986,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 									discount_id = '".$xxx."'";
 								$result = ep_query($query);
 							} else { // entry does not exist, add to database
-								// code to INSERT price breaks
 								if ($$v_discount_price_var != "") { // check for empty price
 									$sql = "INSERT INTO " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . "(
 										products_id,
@@ -2055,8 +2057,10 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			// Products Descriptions End
 			//*************************
 
-			// langer - Assign product to category if linked
-			// chadd - this is buggy as instances occur when the master category id is INCORRECT!
+			/**
+			 * Assign product to category if linked
+			 * @todo <chadd> FIXME: this is buggy as instances occur when the master category id is INCORRECT!
+			 */
 			if (isset($v_categories_id)) { // find out if this product is listed in the category given
 				$result_incategory = ep_query('SELECT
 							'.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id,
@@ -2071,8 +2075,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 					// nope, this is a new category for this product
 					$res1 = ep_query('INSERT INTO '.TABLE_PRODUCTS_TO_CATEGORIES.' (products_id, categories_id)
 								VALUES ("' . $v_products_id . '", "' . $v_categories_id . '")');
-				} else {
-					// already in this category, nothing to do!
 				}
 			}
 
@@ -2251,39 +2253,36 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				$v_specials_expires_date = ($v_specials_expires_date == true) ? date("Y-m-d H:i:s",strtotime($v_specials_expires_date)) : "0001-01-01";
 
 				//Check if this product already has a special
-				$special = ep_query(  "SELECT products_id
-																FROM " . TABLE_SPECIALS . "
-																WHERE products_id = ". $v_products_id);
+				$special = ep_query("SELECT products_id
+											FROM " . TABLE_SPECIALS . "
+											WHERE products_id = ". $v_products_id);
 
 				if (mysql_num_rows($special) == 0) {
-					// not in db..
 					if ($v_specials_price == '0') {
 						// delete requested, but is not a special
 						$specials_print .= sprintf(EASYPOPULATE_SPECIALS_DELETE_FAIL, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10));
 						continue;
 					}
 
-								// insert new into specials
-								$sql =  "INSERT INTO " . TABLE_SPECIALS . "
-												(products_id,
-												specials_new_products_price,
-												specials_date_added,
-												specials_date_available,
-												expires_date,
-												status)
-												VALUES (
-														'" . (int)$v_products_id . "',
-														'" . $v_specials_price . "',
-														now(),
-														'" . $v_specials_date_avail . "',
-														'" . $v_specials_expires_date . "',
-														'1')";
-								$result = ep_query($sql);
-								$specials_print .= sprintf(EASYPOPULATE_SPECIALS_NEW, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price , $v_specials_price);
+					$sql =  "INSERT INTO " . TABLE_SPECIALS . " (
+									products_id,
+									specials_new_products_price,
+									specials_date_added,
+									specials_date_available,
+									expires_date,
+									status
+									) VALUES (
+									'" . (int)$v_products_id . "',
+									'" . $v_specials_price . "',
+									now(),
+									'" . $v_specials_date_avail . "',
+									'" . $v_specials_expires_date . "',
+									'1')";
+					$result = ep_query($sql);
+					$specials_print .= sprintf(EASYPOPULATE_SPECIALS_NEW, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price , $v_specials_price);
 
 				} else {
 					// existing product
-
 					if ($v_specials_price == '0') {
 						// delete of existing requested
 						$db->Execute("delete from " . TABLE_SPECIALS . "
@@ -2291,16 +2290,16 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 						$specials_print .= sprintf(EASYPOPULATE_SPECIALS_DELETE, $v_products_model);
 						continue;
 					}
-								// just make an update
-								$sql =  "UPDATE " . TABLE_SPECIALS . " SET
-												specials_new_products_price = '" . $v_specials_price . "',
-												specials_last_modified = now(),
-												specials_date_available = '" . $v_specials_date_avail . "',
-												expires_date = '" . $v_specials_expires_date . "',
-												status = '1'
-												WHERE products_id = '" . (int)$v_products_id . "'";
-								ep_query($sql);
-								$specials_print .= sprintf(EASYPOPULATE_SPECIALS_UPDATE, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price , $v_specials_price);
+
+					$sql =  "UPDATE " . TABLE_SPECIALS . " SET
+								specials_new_products_price = '" . $v_specials_price . "',
+								specials_last_modified = now(),
+								specials_date_available = '" . $v_specials_date_avail . "',
+								expires_date = '" . $v_specials_expires_date . "',
+								status = '1'
+								WHERE products_id = '" . (int)$v_products_id . "'";
+					$ep_query($sql);
+					$specials_print .= sprintf(EASYPOPULATE_SPECIALS_UPDATE, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price , $v_specials_price);
 				}
 				// we still have our special here..
 			}
@@ -2324,7 +2323,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 	* Post-upload tasks start
 	*/
 
-	// update price sorter
 	ep_update_prices();
 
 	// specials status = 0 if date_expires is past.
@@ -2355,7 +2353,6 @@ if ($ep_stack_sql_error == true) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_
 * langer - to add: data present in table products, but not in descriptions.. user will need product info, and decide to add description, or delete product
 */
 if ($_GET['dross'] == 'delete') {
-	// let's delete data debris as requested...
 	ep_purge_dross();
 	// now check it is really gone...
 	$dross = ep_get_dross();
@@ -2388,8 +2385,6 @@ if ($_GET['dross'] == 'delete') {
 * 5) may consider an auto-splitting feature if it can be done.
 *     Will detect speed of server, safe_mode etc and determine what splitting level is required (can be over-ridden of course)
 */
-
-// all html templating is now below here.
 ?>
 <!DOCTYPE html public "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html <?php echo HTML_PARAMS; ?>>
@@ -2417,7 +2412,6 @@ if ($_GET['dross'] == 'delete') {
 </head>
 <body onLoad="init()">
 <?php require(DIR_WS_INCLUDES . 'header.php'); ?>
-<!-- header_eof -->
 <div id="ep_header">
 	<h1>Easy Populate <?php echo $curver ?></h1>
 </div>
@@ -2490,7 +2484,7 @@ if ($_GET['dross'] == 'delete') {
 			<?php } ?>
 			</tbody>
 			</table>
-			<?php if ($products_with_attributes == true) { ?>
+			<?php if ($products_with_attributes) { ?>
 					<span class="fieldRequired"> * Attributes Included in Complete</span>
 			<?php } else { ?>
 					<span class="fieldRequired"> * Attributes Not Included in Complete</span>
@@ -2500,7 +2494,7 @@ if ($_GET['dross'] == 'delete') {
 			echo $printsplit; // our files splitting matrix
 			echo $display_output; // upload results
 			if (strlen($specials_print) > strlen(EASYPOPULATE_SPECIALS_HEADING)) {
-				echo '<br />' . $specials_print . EASYPOPULATE_SPECIALS_FOOTER; // specials summary
+				echo '<br />' . $specials_print . EASYPOPULATE_SPECIALS_FOOTER;
 			}
 
 			include(DIR_FS_CATALOG . $tempdir . 'fileList.php');
