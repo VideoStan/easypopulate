@@ -328,7 +328,7 @@ if (zen_not_null($ep_dltype)) {
 			$filelayout[] = 'v_products_name_' . $l_id;
 			$filelayout[] = 'v_products_description_' . $l_id;
 
-			if ($ep_supported_mods['psd'] == true) {
+			if ($ep_supported_mods['psd']) {
 				$filelayout[] = 'v_products_short_desc_' . $l_id;
 			}
 
@@ -351,11 +351,11 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout[] = 'v_specials_expires_date';
 		$filelayout[] = 'v_products_price';
 
-		if ($ep_supported_mods['uom'] == true) { // price UOM mod
-			$filelayout[] = 'v_products_price_as'; // to soon be changed to v_products_price_uom
+		if ($ep_supported_mods['uom']) {
+			$filelayout[] = 'v_products_price_as';
 		}
 
-		if ($ep_supported_mods['upc'] == true) { // UPC Mod
+		if ($ep_supported_mods['upc']) {
 			$filelayout[] = 'v_products_upc';
 		}
 
@@ -452,10 +452,10 @@ if (zen_not_null($ep_dltype)) {
 			p.products_image as v_products_image,
 			p.products_price as v_products_price,';
 
-		if ($ep_supported_mods['uom'] == true) { // price UOM mod
-			$filelayout_sql .=  'p.products_price_as as v_products_price_as,'; // to soon be changed to v_products_price_uom
+		if ($ep_supported_mods['uom'] == true) {
+			$filelayout_sql .=  'p.products_price_as as v_products_price_as,';
 		}
-		if ($ep_supported_mods['upc'] == true) { // UPC Code mod
+		if ($ep_supported_mods['upc']) {
 			$filelayout_sql .=  'p.products_upc as v_products_upc,';
 		}
 
@@ -494,8 +494,8 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout[] = 'v_specials_date_avail';
 		$filelayout[] = 'v_specials_expires_date';
 		$filelayout[] = 'v_products_price';
-		if ($ep_supported_mods['uom'] == true) { // price UOM mod
-			$filelayout[] = 'v_products_price_as'; // to soon be changed to v_products_price_uom
+		if ($ep_supported_mods['uom']) {
+			$filelayout[] = 'v_products_price_as';
 		}
 		$filelayout[] = 'v_products_quantity';
 
@@ -517,8 +517,8 @@ if (zen_not_null($ep_dltype)) {
 			p.products_model as v_products_model,
 			p.products_price as v_products_price,';
 
-		if ($ep_supported_mods['uom'] == true) { // price UOM mod
-			$filelayout_sql .=  'p.products_price_as as v_products_price_as,'; // to soon be changed to v_products_price_uom
+		if ($ep_supported_mods['uom']) {
+			$filelayout_sql .=  'p.products_price_as as v_products_price_as,';
 		}
 
 		$filelayout_sql .= 'p.products_tax_class_id as v_tax_class_id,
@@ -567,8 +567,8 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout[] =	'v_products_model';
 		$filelayout[] =	'v_products_price';
 
-		if ($ep_supported_mods['uom'] == true) { // price UOM mod
-			$filelayout[] = 'v_products_price_as'; // to soon be changed to v_products_price_uom
+		if ($ep_supported_mods['uom']) {
+			$filelayout[] = 'v_products_price_as';
 		}
 
 		$filelayout[] =	'v_products_discount_type';
@@ -585,8 +585,8 @@ if (zen_not_null($ep_dltype)) {
 			p.products_model         as v_products_model,
 			p.products_price         as v_products_price,';
 
-		if ($ep_supported_mods['uom'] == true) { // price UOM mod
-			$filelayout_sql .=  'p.products_price_as as v_products_price_as,'; // to soon be changed to v_products_price_uom
+		if ($ep_supported_mods['uom']) {
+			$filelayout_sql .=  'p.products_price_as as v_products_price_as,';
 		}
 
 		$filelayout_sql .= 'p.products_discount_type as v_products_discount_type,
@@ -951,7 +951,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 
 			$row['v_products_name_' . $lid] = $row2['products_name'];
 			$row['v_products_description_' . $lid]  = $row2['products_description'];
-			if ($ep_supported_mods['psd'] == true) {
+			if ($ep_supported_mods['psd']) {
 				$row['v_products_short_desc_' . $lid]   = $row2['products_short_desc'];
 			}
 			$row['v_products_url_' . $lid]    = $row2['products_url'];
@@ -1333,11 +1333,11 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		'v_categories_id',
 		'v_products_price');
 
-	if ($ep_supported_mods['uom'] == true) {
+	if ($ep_supported_mods['uom']) {
 		$mod_array = array('v_products_price_as');
 		$default_these = array_merge($default_these, $mod_array);
 	}
-	if ($ep_supported_mods['upc'] == true) {
+	if ($ep_supported_mods['upc']) {
 		$mod_array = array('v_products_upc');
 		$default_these = array_merge($default_these, $mod_array);
 	}
