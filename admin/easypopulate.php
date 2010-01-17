@@ -334,13 +334,6 @@ if (zen_not_null($ep_dltype)) {
 
 			$filelayout[] = 'v_products_url_' . $l_id;
 
-			// uncomment the head_title, head_desc, and head_keywords to use
-			// Linda's Header Tag Controller 2.0
-
-			//$filelayout[] = 'v_products_head_title_tag_'.$l_id;
-			//$filelayout[] = 'v_products_head_desc_tag_'.$l_id;
-			//$filelayout[] = 'v_products_head_keywords_tag_'.$l_id;
-
 			$fileMeta[] = 'v_metatags_title_' . $l_id;
 			$fileMeta[] = 'v_metatags_keywords_' . $l_id;
 			$fileMeta[] = 'v_metatags_description_' . $l_id;
@@ -964,13 +957,6 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 			$row['v_froogle_products_name_' . $lid] = '"' . html_entity_decode(removeTags(str_replace('"','""',$row2['products_name']))) . '"';
 			$row['v_froogle_products_description_' . $lid] = '"' . html_entity_decode(removeTags(str_replace('"','""',$row2['products_description']))) . '"';
 			*/
-			// support for Linda's Header Controller 2.0 here
-			if (isset($filelayout['v_products_head_title_tag_' . $lid])){
-				$row['v_products_head_title_tag_' . $lid]   = $row2['products_head_title_tag'];
-				$row['v_products_head_desc_tag_' . $lid]  = $row2['products_head_desc_tag'];
-				$row['v_products_head_keywords_tag_' . $lid]  = $row2['products_head_keywords_tag'];
-			}
-			// end support for Header Controller 2.0
 		}
 
 		// START specials
@@ -1468,15 +1454,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 					$row['v_products_short_desc_' . $lang['id']]  = $row2['products_short_desc'];
 				}
 				$row['v_products_url_' . $lang['id']]     = $row2['products_url'];// url assigned
-
-				// support for Linda's Header Controller 2.0 here
-				// if (array_key_exists($filelayout['v_products_head_title_tag_' . $lang['id']])) // langer - is this better?!?
-				if (isset($filelayout['v_products_head_title_tag_' . $lang['id']])) {
-					$row['v_products_head_title_tag_' . $lang['id']] = $row2['products_head_title_tag'];
-					$row['v_products_head_desc_tag_' . $lang['id']] = $row2['products_head_desc_tag'];
-					$row['v_products_head_keywords_tag_' . $lang['id']] = $row2['products_head_keywords_tag'];
-				}
-				// end support for Header Controller 2.0
 			}
 			// table descriptions values by each language assigned into array $row
 
@@ -1657,14 +1634,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 					$v_products_short_desc[$l_id] = smart_tags($items[$filelayout['v_products_short_desc_' . $l_id ]],$smart_tags,$cr_replace,$strip_smart_tags);
 				}
 				$v_products_url[$l_id] = smart_tags($items[$filelayout['v_products_url_' . $l_id ]],$smart_tags,$cr_replace,false);
-
-				// support for Linda's Header Controller 2.0 here
-				if (isset($filelayout['v_products_head_title_tag_' . $l_id])){
-					$v_products_head_title_tag[$l_id] = $items[$filelayout['v_products_head_title_tag_' . $l_id]];
-					$v_products_head_desc_tag[$l_id] = $items[$filelayout['v_products_head_desc_tag_' . $l_id]];
-					$v_products_head_keywords_tag[$l_id] = $items[$filelayout['v_products_head_keywords_tag_' . $l_id]];
-				}
-				// end support for Header Controller 2.0
 			}
 		}
 		//elari... we get the tax_clas_id from the tax_title - from zencart??
@@ -2066,33 +2035,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 									".$ep_supported_mods_sql."
 									products_url			=	'".zen_db_input($v_products_url[$key])."'
 									";
-
-						// langer - the following is redundant - one SQL string is now contructed with various optional mods
-						// support for Linda's Header Controller 2.0
-						if (isset($v_products_head_title_tag)){
-							// override the sql if we're using Linda's contrib
-							$sql =
-								"INSERT INTO ".TABLE_PRODUCTS_DESCRIPTION."
-									(products_id,
-									language_id,
-									products_name,
-									products_description,
-									products_url,
-									products_head_title_tag,
-									products_head_desc_tag,
-									products_head_keywords_tag)
-									VALUES (
-										'" . $v_products_id . "',
-										" . $key . ",
-										'" . zen_db_input($name) . "',
-										'" . zen_db_input($v_products_description[$key]) . "',
-										'". $v_products_url[$key] . "',
-										'". $v_products_head_title_tag[$key] . "',
-										'". $v_products_head_desc_tag[$key] . "',
-										'". $v_products_head_keywords_tag[$key] . "')";
-						}
-						// end support for Linda's Header Controller 2.0
-						//echo 'New product desc:'.$sql.'<br />';
 						$result = ep_query($sql);
 					} else {
 						// already in the description, let's just update it
@@ -2103,24 +2045,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 									products_url			=	'".zen_db_input($v_products_url[$key])."'
 								WHERE products_id = '$v_products_id' AND language_id = '$key'";
 
-
-						// langer - below is redundant.
-						// support for Lindas Header Controller 2.0
-						if (isset($v_products_head_title_tag)){
-							// override the sql if we're using Linda's contrib
-							$sql =
-								"UPDATE ".TABLE_PRODUCTS_DESCRIPTION." SET
-									products_name='" . zen_db_input($name) . "',
-									products_description = '" . zen_db_input($v_products_description[$key]) . "',
-									products_url = '" . $v_products_url[$key] ."',
-									products_head_title_tag = '" . $v_products_head_title_tag[$key] ."',
-									products_head_desc_tag = '" . $v_products_head_desc_tag[$key] ."',
-									products_head_keywords_tag = '" . $v_products_head_keywords_tag[$key] ."'
-								WHERE
-									products_id = '$v_products_id' AND
-									language_id = '$key'";
-						}
-						// end support for Linda's Header Controller 2.0
 						$result = ep_query($sql);
 					}
 			}
