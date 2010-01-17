@@ -16,16 +16,6 @@ require_once ('includes/application_top.php');
 @set_time_limit(1200);
 @ini_set('max_input_time', 1200);
 
-
-// CSV VARIABLES - need to make this configurable in the ADMIN
-$csv_deliminator = "\t"; // "\t" = tab AND "," = COMMA
-$csv_deliminator = ","; // "\t" = tab AND "," = COMMA
-
-$csv_enclosure   = '"'; // if want none, change to space (chadd - i think you should always us the '"').
-// define(EASYPOPULATE_CONFIG_COL_DELIMITER, "\t");
-$separator = "\t"; // tab delimited file
-$separator = ",";  // CSV - comma delimited file
-
 $excel_safe_output = true; // this  forces enclosure in quotes
 
 //*******************************
@@ -120,7 +110,8 @@ if(strlen(EASYPOPULATE_CONFIG_CUSTOM_FIELDS) > 0)
 /**
 * Config translation layer..
 */
-// note - not all config defines are in below...
+$csv_deliminator = EASYPOPULATE_CONFIG_COLUMN_DELIMITER;
+$csv_enclosure   = EASYPOPULATE_CONFIG_COLUMN_ENCLOSURE;
 $max_qty_discounts = 6;
 $tempdir = EASYPOPULATE_CONFIG_TEMP_DIR;
 $ep_date_format = EASYPOPULATE_CONFIG_FILE_DATE_FORMAT;
