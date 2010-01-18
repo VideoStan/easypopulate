@@ -1227,8 +1227,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		//*******************************
 		header("Content-type: text/csv");
 		//header("Content-type: application/vnd.ms-excel"); // @todo make this configurable
-		//header("Content-disposition: attachment; filename=$EXPORT_FILE" . (($excel_safe_output == true)?".csv":".txt")); // this should check the delimiter instead!
-		header("Content-disposition: attachment; filename=$EXPORT_FILE" . (($csv_deliminator == ",")?".csv":".txt")); // this should check the delimiter instead!
+		header("Content-disposition: attachment; filename=$EXPORT_FILE" . (($csv_deliminator == ",")?".csv":".txt"));
 		// Changed if using SSL, helps prevent program delay/timeout (add to backup.php also)
 		if ($request_type== 'NONSSL'){
 			header("Pragma: no-cache");
@@ -1237,7 +1236,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		}
 		header("Expires: 0");
 
-		$fp = fopen("php://output", "w+"); // @todo use str_putcsv when the php version containing it is morely widely available
+		$fp = fopen("php://output", "w+");
 		foreach ($filestring as $line) {
 			fputcsv($fp, $line, $csv_deliminator, $csv_enclosure);
 		}
@@ -1446,11 +1445,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				}
 				$row['v_products_url_' . $lang['id']]     = $row2['products_url'];// url assigned
 			}
-			// table descriptions values by each language assigned into array $row
-
-			// langer - outputs: $items array (file data by column #); $filelayout array (headings by column #); $row (current db TABLE_PRODUCTS & TABLE_PRODUCTS_DESCRIPTION data by heading name)
-
-
 			/**
 			* Categories start.
 			*/
@@ -1707,7 +1701,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			if ( $row =  mysql_fetch_array($result) ){
 				$v_manufacturers_id = $row['manID'];
 			} else {
-				//It is set to autoincrement, do not need to fetch max id
 				$sql = "INSERT INTO " . TABLE_MANUFACTURERS . "( manufacturers_name, date_added, last_modified )
 														VALUES ( '" . zen_db_input($v_manufacturers_name) . "',	CURRENT_TIMESTAMP, CURRENT_TIMESTAMP )";
 				$result = ep_query($sql);
@@ -1773,18 +1766,12 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				*/
 
 				$custom_query = '';
-				if(count($custom_fields) > 0)
-				{
-					foreach($custom_fields as $f)
-					{
+				if(count($custom_fields) > 0) {
+					foreach($custom_fields as $f) {
 						$custom_input = $items[$filelayout['v_'.$f]];
 						$custom_query .= ", ".$f."='".zen_db_input($custom_input)."' ";
 					}
-
-
 				}
-
-				//$custom_query =", product_is_always_free_shipping ='". zen_db_input($v_product_is_always_free_shipping)."',								products_glsalesaccount ='".zen_db_input($v_products_glsalesaccount)."',								products_family ='".zen_db_input($v_products_family)."' ";
 
 				/*
 				*	EOF Custom Fields
@@ -1838,19 +1825,11 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				*	BOF Custom Fields
 				*/
 				$custom_query = '';
-				if(count($custom_fields) > 0)
-				{
-					foreach($custom_fields as $f)
-					{
-						//$custom_input =
+				if(count($custom_fields) > 0) {
+					foreach($custom_fields as $f) {
 						$custom_query .= ", ".$f."='".zen_db_input($custom_input)."' ";
 					}
-
-
 				}
-
-				//$custom_query =", product_is_always_free_shipping ='". zen_db_input($v_product_is_always_free_shipping)."',								products_glsalesaccount ='".zen_db_input($v_products_glsalesaccount)."',								products_family ='".zen_db_input($v_products_family)."' ";
-
 				/*
 				*	EOF Custom Fields
 				*/
@@ -1889,10 +1868,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 						metatags_model_status			=	'" . zen_db_input($v_metatags_model_status)."',
 						metatags_price_status			=	'" . zen_db_input($v_metatags_price_status)."',
 						metatags_title_tagline_status	=	'" . zen_db_input($v_metatags_title_tagline_status)."' ".
-
 						$custom_query;
-
-				//echo 'New product SQL:'.$query.'<br />';
 
 				if ( ep_query($query) ) {
 					$v_products_id = mysql_insert_id();
@@ -1917,14 +1893,12 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				$sql = "SELECT `products_id` FROM ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION." WHERE (`products_id` = '$v_products_id' AND `language_id` = '$key') LIMIT 1 ";
 				$result = ep_query($sql);
 				if ($row = mysql_fetch_array($result)) {
-					//UPDATE
 					$sql = "UPDATE ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION." SET
 						`metatags_title`		=	'" . zen_db_input($v_metatags_title[$key])."',
 						`metatags_keywords`		=	'" . zen_db_input($v_metatags_keywords[$key])."',
 						`metatags_description`	=	'" . zen_db_input($v_metatags_description[$key])."'
 						WHERE (`products_id` = '$v_products_id' AND `language_id` = '$key') ";
 				} else {
-					//NEW
 					$sql = "INSERT INTO ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION." SET
 						`metatags_title`		=	'" . zen_db_input($v_metatags_title[$key])."',
 						`metatags_keywords`		=	'" . zen_db_input($v_metatags_keywords[$key])."',
@@ -2011,15 +1985,13 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 
 					$ep_supported_mods_sql = "";
 					if ($ep_supported_mods['psd'] == true) {
-						$ep_supported_mods_sql = " products_short_desc		=	'".zen_db_input($v_products_short_desc[$key])."', ";
+						$ep_supported_mods_sql = " products_short_desc = '".zen_db_input($v_products_short_desc[$key])."', ";
 					}
 
 					$sql = "SELECT * FROM ".TABLE_PRODUCTS_DESCRIPTION." WHERE products_id = $v_products_id AND	language_id = " . $key . " LIMIT 1 ";
 					$result = ep_query($sql);
 
 					if (mysql_num_rows($result) == 0) {
-						// new product description
-						//$result = ep_query($sql);
 						$sql ="INSERT INTO ".TABLE_PRODUCTS_DESCRIPTION." SET
 									products_id				=	'".$v_products_id."',
 									language_id				=	'".$key."',
@@ -2030,14 +2002,12 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 									";
 						$result = ep_query($sql);
 					} else {
-						// already in the description, let's just update it
 						$sql ="UPDATE ".TABLE_PRODUCTS_DESCRIPTION." SET
 									products_name			=	'".zen_db_input($name)."',
 									products_description	=	'".zen_db_input($v_products_description[$key])."',
 									".$ep_supported_mods_sql."
 									products_url			=	'".zen_db_input($v_products_url[$key])."'
 								WHERE products_id = '$v_products_id' AND language_id = '$key'";
-
 						$result = ep_query($sql);
 					}
 			}
@@ -2056,14 +2026,12 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				$result_incategory = ep_query('SELECT
 							'.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id,
 							'.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id
-							FROM
-								'.TABLE_PRODUCTS_TO_CATEGORIES.'
+							FROM '.TABLE_PRODUCTS_TO_CATEGORIES.'
 							WHERE
 							'.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id='.$v_products_id.' AND
 							'.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id='.$v_categories_id);
 
 				if (mysql_num_rows($result_incategory) == 0) {
-					// nope, this is a new category for this product
 					$res1 = ep_query('INSERT INTO '.TABLE_PRODUCTS_TO_CATEGORIES.' (products_id, categories_id)
 								VALUES ("' . $v_products_id . '", "' . $v_categories_id . '")');
 				}
@@ -2242,8 +2210,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				$has_specials == true;
 				$v_specials_date_avail = ($v_specials_date_avail == true) ? date("Y-m-d H:i:s",strtotime($v_specials_date_avail)) : "0001-01-01";
 				$v_specials_expires_date = ($v_specials_expires_date == true) ? date("Y-m-d H:i:s",strtotime($v_specials_expires_date)) : "0001-01-01";
-
-				//Check if this product already has a special
+\
 				$special = ep_query("SELECT products_id
 											FROM " . TABLE_SPECIALS . "
 											WHERE products_id = ". $v_products_id);
