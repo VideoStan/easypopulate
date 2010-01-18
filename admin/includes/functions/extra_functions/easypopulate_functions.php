@@ -242,6 +242,55 @@ function ep_update_attributes_sort_order() {
 	}
 }
 
+/**
+ * Return the filelayout for attributes
+ *
+ * @return array
+ */
+function ep_filelayout_attributes()
+{
+	$filelayout = array();
+	$languages = zen_get_languages();
+
+	$attribute_options_count = 1;
+	foreach ($attribute_options_array as $attribute_options_values) {
+		$key1 = 'v_attribute_options_id_' . $attribute_options_count;
+		$filelayout[] = $key1;
+
+		for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
+			$l_id = $languages[$i]['id'];
+			$key2 = 'v_attribute_options_name_' . $attribute_options_count . '_' . $l_id;
+			$filelayout[] = $key2;
+		}
+
+		$attribute_values_query = "SELECT products_options_values_id
+											FROM " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " 
+											WHERE products_options_id = '" . (int)$attribute_options_values['products_options_id'] . "' 
+											ORDER BY products_options_values_id";
+		$attribute_values_values = ep_query($attribute_values_query);
+
+		$attribute_values_count = 1;
+		while ($attribute_values = mysql_fetch_array($attribute_values_values)) {
+			$key3 = 'v_attribute_values_id_' . $attribute_options_count . '_' . $attribute_values_count;
+			$filelayout[] = $key3;
+
+			$key4 = 'v_attribute_values_price_' . $attribute_options_count . '_' . $attribute_values_count;
+			$filelayout[] = $key4;
+
+			for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
+				$l_id = $languages[$i]['id'];
+
+				$key5 = 'v_attribute_values_name_' . $attribute_options_count . '_' . $attribute_values_count . '_' . $l_id;
+				$filelayout[] = $key5;
+			}
+
+			$attribute_values_count++;
+		}
+		$attribute_options_count++;
+	}	
+	return $filelayout;
+}
+
 function write_debug_log($string) {
 	global $ep_debug_log_path;
 	$logFile = $ep_debug_log_path . 'ep_debug_log.txt';

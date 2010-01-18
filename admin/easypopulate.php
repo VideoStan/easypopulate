@@ -352,47 +352,9 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout[] = 'v_date_added';
 		$filelayout[] = 'v_products_quantity';
 
-		if ($products_with_attributes == true) {
-			//include attributes in full download if config is true
-			// VJ product attribs begin
-
-			$languages = zen_get_languages();
-
-			$attribute_options_count = 1;
-			foreach ($attribute_options_array as $attribute_options_values) {
-				$key1 = 'v_attribute_options_id_' . $attribute_options_count;
-				$filelayout[] = $key1;
-
-				for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
-					$l_id = $languages[$i]['id'];
-					$key2 = 'v_attribute_options_name_' . $attribute_options_count . '_' . $l_id;
-					$filelayout[] = $key2;
-				}
-
-				$attribute_values_query = "select products_options_values_id  from " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " where products_options_id = '" . (int)$attribute_options_values['products_options_id'] . "' order by products_options_values_id";
-				$attribute_values_values = ep_query($attribute_values_query);
-
-				$attribute_values_count = 1;
-				while ($attribute_values = mysql_fetch_array($attribute_values_values)) {
-					$key3 = 'v_attribute_values_id_' . $attribute_options_count . '_' . $attribute_values_count;
-					$filelayout[] = $key3;
-
-					$key4 = 'v_attribute_values_price_' . $attribute_options_count . '_' . $attribute_values_count;
-					$filelayout[] = $key4;
-
-					for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
-						$l_id = $languages[$i]['id'];
-
-						$key5 = 'v_attribute_values_name_' . $attribute_options_count . '_' . $attribute_values_count . '_' . $l_id;
-						$filelayout[] = $key5;
-					}
-
-					$attribute_values_count++;
-				}
-
-				$attribute_options_count++;
-			}
-		// VJ product attribs end
+		if ($products_with_attributes) {
+			$attributes_layout = ep_filelayout_attributes();
+			$filelayout = array_merge($filelayout, $attributes_layout);
 		}
 
 		$filelayout[] = 'v_manufacturers_name';
@@ -666,44 +628,8 @@ if (zen_not_null($ep_dltype)) {
 	case 'attrib':
 
 		$filelayout[] = 'v_products_model';
-
-		$languages = zen_get_languages();
-
-		$attribute_options_count = 1;
-		foreach ($attribute_options_array as $attribute_options_values) {
-			$key1 = 'v_attribute_options_id_' . $attribute_options_count;
-			$filelayout[] = $key1;
-
-			for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
-				$l_id = $languages[$i]['id'];
-
-				$key2 = 'v_attribute_options_name_' . $attribute_options_count . '_' . $l_id;
-				$filelayout[] = $key2;
-			}
-
-			$attribute_values_query = "select products_options_values_id  from " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " where products_options_id = '" . (int)$attribute_options_values['products_options_id'] . "' order by products_options_values_id";
-			$attribute_values_values = ep_query($attribute_values_query);
-
-			$attribute_values_count = 1;
-			while ($attribute_values = mysql_fetch_array($attribute_values_values)) {
-				$key3 = 'v_attribute_values_id_' . $attribute_options_count . '_' . $attribute_values_count;
-				$filelayout[] = $key3;
-
-				$key4 = 'v_attribute_values_price_' . $attribute_options_count . '_' . $attribute_values_count;
-				$filelayout[] = $key4;
-
-				for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
-					$l_id = $languages[$i]['id'];
-
-					$key5 = 'v_attribute_values_name_' . $attribute_options_count . '_' . $attribute_values_count . '_' . $l_id;
-					$filelayout[] = $key5;
-				}
-
-				$attribute_values_count++;
-			}
-
-			$attribute_options_count++;
-		}
+		$attribute_layout = ep_filelayout_attributes();
+		$filelayout = array_merge($filelayout, $attributes_layout);
 
 		$filelayout_sql = "SELECT
 			p.products_id as v_products_id,
@@ -912,11 +838,11 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 //		$row['v_froogle_product_id']    = $row['v_products_model'];
 
 		// loop through all languages that are turned on in the store
-		foreach ($langcode as $key => $lang){
+		foreach ($langcode as $key => $lang) {
 			$lid = $lang['id'];
 
 			// START product meta tags
-			$sqlMeta = 'SELECT * FROM '.TABLE_META_TAGS_PRODUCTS_DESCRIPTION.' 
+			$sqlMeta = 'SELECT * FROM '.TABLE_META_TAGS_PRODUCTS_DESCRIPTION.'
 							WHERE products_id = '.$row['v_products_id'].
 							' AND language_id = '.$lid.' LIMIT 1 ';
 			$resultMeta = ep_query($sqlMeta);
@@ -2210,7 +2136,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				$has_specials == true;
 				$v_specials_date_avail = ($v_specials_date_avail == true) ? date("Y-m-d H:i:s",strtotime($v_specials_date_avail)) : "0001-01-01";
 				$v_specials_expires_date = ($v_specials_expires_date == true) ? date("Y-m-d H:i:s",strtotime($v_specials_expires_date)) : "0001-01-01";
-\
+
 				$special = ep_query("SELECT products_id
 											FROM " . TABLE_SPECIALS . "
 											WHERE products_id = ". $v_products_id);
