@@ -1626,10 +1626,13 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			if ( $row =  mysql_fetch_array($result) ){
 				$v_manufacturers_id = $row['manID'];
 			} else {
-				$sql = "INSERT INTO " . TABLE_MANUFACTURERS . "( manufacturers_name, date_added, last_modified )
-														VALUES ( '" . zen_db_input($v_manufacturers_name) . "',	CURRENT_TIMESTAMP, CURRENT_TIMESTAMP )";
-				$result = ep_query($sql);
-					$v_manufacturers_id = mysql_insert_id();
+				$data = array();
+				$data['manufacturers_name'] = $v_manufacturers_name;
+				$data['date_added'] = 'NOW()';
+				$data['last_modified'] = 'NOW()';
+				$query = ep_db_modify(TABLE_MANUFACTURERS, $data, 'INSERT');
+				$result = ep_query($query);
+				$v_manufacturers_id = mysql_insert_id();
 			}
 		}
 		// if the categories names are set then try to update them
@@ -1652,16 +1655,23 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 					if ( $row = mysql_fetch_array($result) ){ // langer - null result here where len of $v_categories_name[] exceeds maximum in database
 						$thiscategoryid = $row['catID'];
 					} else {
+						$data = array();
 						// to add, we need to put stuff in categories and categories_description
-						$sql = "INSERT INTO ".TABLE_CATEGORIES." ( parent_id, sort_order, date_added, last_modified )
-								VALUES ( $theparent_id, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP )";
-						$result = ep_query($sql);
+						$data['parent_id'] = $theparent_id;
+						$data['sort_order'] = 0;
+						$data['date_added'] = 'NOW()';
+						$data['last_modified'] = 'NOW()';
+						$query = ep_db_modify(TABLE_CATEGORIES, $data, 'INSERT');
+						$result = ep_query($query);
 
 						$thiscategoryid = mysql_insert_id();
 
-						$sql = "INSERT INTO ".TABLE_CATEGORIES_DESCRIPTION."( categories_id, language_id, categories_name )
-								VALUES ( $thiscategoryid, '$epdlanguage_id', '".zen_db_input($thiscategoryname)."' )";
-						$result = ep_query($sql);
+						$data = array();
+						$data['categories_id'] = $thiscategoryid;
+						$data['language_id'] = $epdlanguage_id;
+						$data['categories_name'] = $thiscategoryname;
+						$query = ep_db_modify(TABLE_CATEGORIES_DESCRIPTION, $data, 'INSERT');
+						$result = ep_query($query);
 					}
 					// the current catid is the next level's parent
 					$theparent_id = $thiscategoryid;
@@ -1681,35 +1691,35 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			$v_date_added = ($v_date_added) ? date("Y-m-d H:i:s",strtotime($v_date_added)) : 'NOW()';
 
 			$product = array();
-			$product['products_model']	= zen_db_input($v_products_model);
+			$product['products_model']	= $v_products_model;
 			$product['products_date_available'] = $v_date_avail;
 			$product['products_date_added'] = $v_date_added;
 			$product['products_last_modified'] = 'NOW()';
-			$product['products_price'] = zen_db_input($v_products_price);
-			$product['products_image'] = zen_db_input($v_products_image);
-			$product['products_weight'] = zen_db_input($v_products_weight);
-			$product['products_tax_class_id'] = zen_db_input($v_tax_class_id);
-			$product['products_discount_type'] = zen_db_input($v_products_discount_type);
-			$product['products_discount_type_from'] = zen_db_input($v_products_discount_type_from);
-			$product['product_is_call'] = zen_db_input($v_product_is_call);
-			$product['products_sort_order'] = zen_db_input($v_products_sort_order);
-			$product['products_quantity_order_min'] = zen_db_input($v_products_quantity_order_min);
-			$product['products_quantity_order_units'] = zen_db_input($v_products_quantity_order_units);
-			$product['products_quantity']	= zen_db_input($v_products_quantity);
-			$product['master_categories_id'] = zen_db_input($v_categories_id);
-			$product['manufacturers_id'] = zen_db_input($v_manufacturers_id);
-			$product['products_status'] = zen_db_input($v_db_status);
-			$product['metatags_title_status'] = zen_db_input($v_metatags_title_status);
-			$product['metatags_products_name_status']	= zen_db_input($v_metatags_products_name_status);
-			$product['metatags_model_status'] = zen_db_input($v_metatags_model_status);
-			$product['metatags_price_status'] = zen_db_input($v_metatags_price_status);
-			$product['metatags_title_tagline_status']	= zen_db_input($v_metatags_title_tagline_status);
+			$product['products_price'] = $v_products_price;
+			$product['products_image'] = $v_products_image;
+			$product['products_weight'] = $v_products_weight;
+			$product['products_tax_class_id'] = $v_tax_class_id;
+			$product['products_discount_type'] = $v_products_discount_type;
+			$product['products_discount_type_from'] = $v_products_discount_type_from;
+			$product['product_is_call'] = $v_product_is_call;
+			$product['products_sort_order'] = $v_products_sort_order;
+			$product['products_quantity_order_min'] = $v_products_quantity_order_min;
+			$product['products_quantity_order_units'] = $v_products_quantity_order_units;
+			$product['products_quantity']	= $v_products_quantity;
+			$product['master_categories_id'] = $v_categories_id;
+			$product['manufacturers_id'] = $v_manufacturers_id;
+			$product['products_status'] = $v_db_status;
+			$product['metatags_title_status'] = $v_metatags_title_status;
+			$product['metatags_products_name_status']	= $v_metatags_products_name_status;
+			$product['metatags_model_status'] = $v_metatags_model_status;
+			$product['metatags_price_status'] = $v_metatags_price_status;
+			$product['metatags_title_tagline_status']	= $v_metatags_title_tagline_status;
 
 			if ($ep_supported_mods['uom']) {
-				$product['products_price_as'] = zen_db_input($v_products_price_as);
+				$product['products_price_as'] = $v_products_price_as;
 			}
 			if ($ep_supported_mods['upc']) {
-					$product['products_upc'] = zen_db_input($v_products_upc);
+					$product['products_upc'] = $v_products_upc;
 			}
 
 			/**
@@ -1718,29 +1728,15 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			 */
 			if (count($custom_fields) > 0) {
 				foreach($custom_fields as $f) {
-					$products[$f] = zen_db_input($custom_input);
+					$products[$f] = $custom_input;
 				}
 			}
-
-			$product_values = '';
-			foreach ($product as $column => $value) {
-				// @todo stupid check for a function, use preg_match later
-				if (strpos($value, '(') === false || $value == 'NULL') {
-					$product_values .= " $column = '$value' , ";
-				} else {
-					$product_values .= " $column = $value , ";
-				}
-			}
-			// Chop off the last ', '
-			$product_values = substr($product_values, 0, -2);
 
 			if ($row = mysql_fetch_array($result)) {
 				//UPDATING PRODUCT
 				$v_products_id = $row['products_id'];
 
-				$query = "UPDATE " . TABLE_PRODUCTS . " SET
-							$product_values 
-							WHERE products_id = $v_products_id";
+				$query = ep_db_modify(TABLE_PRODUCTS, $product, 'UPDATE', "products_id = $v_products_id");
 
 				if ( ep_query($query) ) {
 					$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT, $v_products_model);
@@ -1753,9 +1749,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				}
 			} else {
 				//NEW PRODUCT
-
-				$query = "INSERT INTO " . TABLE_PRODUCTS . " SET
-							$product_values";
+				$query = ep_db_modify(TABLE_PRODUCTS, $product, 'INSERT');
 
 				if ( ep_query($query) ) {
 					$v_products_id = mysql_insert_id();
@@ -1778,23 +1772,21 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			//*************************
 			if (isset($v_metatags_title)){
 			foreach ( $v_metatags_title as $key => $metaData ) {
-				$sql = "SELECT `products_id` FROM ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION." WHERE (`products_id` = '$v_products_id' AND `language_id` = '$key') LIMIT 1 ";
-				$result = ep_query($sql);
+				$data = array();
+				$data['products_id'] = $v_products_id;
+				$data['language_id'] = $key;
+				$data['metatags_title']	= $v_metatags_title[$key];
+				$data['metatags_keywords'] = $v_metatags_keywords[$key];
+				$data['metatags_description']	= $v_metatags_description[$key];
+				$query = "SELECT `products_id` FROM ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION." WHERE (`products_id` = '$v_products_id' AND `language_id` = '$key') LIMIT 1 ";
+				$result = ep_query($query);
 				if ($row = mysql_fetch_array($result)) {
-					$sql = "UPDATE ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION." SET
-						`metatags_title`		=	'" . zen_db_input($v_metatags_title[$key])."',
-						`metatags_keywords`		=	'" . zen_db_input($v_metatags_keywords[$key])."',
-						`metatags_description`	=	'" . zen_db_input($v_metatags_description[$key])."'
-						WHERE (`products_id` = '$v_products_id' AND `language_id` = '$key') ";
+					$where = "products_id = $v_products_id AND language_id = $key";
+					$query = ep_db_modify(TABLE_META_TAGS_PRODUCTS_DESCRIPTION, $data, 'UPDATE', $where);
 				} else {
-					$sql = "INSERT INTO ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION." SET
-						`metatags_title`		=	'" . zen_db_input($v_metatags_title[$key])."',
-						`metatags_keywords`		=	'" . zen_db_input($v_metatags_keywords[$key])."',
-						`metatags_description`	=	'" . zen_db_input($v_metatags_description[$key])."',
-						`products_id` 			= 	'$v_products_id',
-						`language_id` 			=	'$key' ";
+					$query = ep_db_modify(TABLE_META_TAGS_PRODUCTS_DESCRIPTION, $data, 'INSERT');
 				}
-				$result = ep_query($sql);
+				$result = ep_query($query);
 			}
 			}
 
@@ -1829,28 +1821,20 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 								products_id = " . zen_db_input($v_products_id) . " AND discount_id = '".$xxx."'";
 							$result2 = ep_query($sql2);
 							$row2 = mysql_fetch_array($result2);
-
+							$data = array();
+							$data['products_id'] = $v_products_id;
+							$data['discount_qty'] = $$v_discount_qty_var;
+							$data['discount_price'] = $$v_discount_price_var;
 							if ( $row2 != '' ) { // found entry: update discount_price value
-								$query = "UPDATE ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." SET
-									discount_qty   = '".zen_db_input($$v_discount_qty_var)."',
-									discount_price = '".zen_db_input($$v_discount_price_var)."'
-									WHERE
-									products_id = '$v_products_id' AND
-									discount_id = '".$xxx."'";
+								$data['products_id'] = $xxx;
+								$where = "products_id = $v_products_id AND discount_id = $xxx";
+								$query = ep_db_modify(TABLE_PRODUCTS_DISCOUNT_QUANTITY, $data, 'UPDATE', $where);
 								$result = ep_query($query);
 							} else { // entry does not exist, add to database
 								if ($$v_discount_price_var != "") { // check for empty price
-									$sql = "INSERT INTO " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . "(
-										products_id,
-										discount_id,
-										discount_qty,
-										discount_price
-									) VALUES (
-										'$v_products_id',
-										'".zen_db_input($$v_discount_id_var)."',
-										'".zen_db_input($$v_discount_qty_var)."',
-										'".zen_db_input($$v_discount_price_var)."')";
-									$result = ep_query($sql);
+									$data['discount_id'] = $$v_discount_id_var;
+									$query = ep_db_modify(TABLE_PRODUCTS_DISCOUNT_QUANTITY, $data, 'INSERT');
+									$result = ep_query($query);
 								} // end: check for empty price
 							} // end: update discount_price value
 						} // end: if (row count <> 0) found entry
@@ -1871,32 +1855,25 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			foreach( $v_products_name as $key => $name){
 			if ($name != ''){
 
-					$ep_supported_mods_sql = "";
-					if ($ep_supported_mods['psd'] == true) {
-						$ep_supported_mods_sql = " products_short_desc = '".zen_db_input($v_products_short_desc[$key])."', ";
-					}
-
 					$sql = "SELECT * FROM ".TABLE_PRODUCTS_DESCRIPTION." WHERE products_id = $v_products_id AND	language_id = " . $key . " LIMIT 1 ";
 					$result = ep_query($sql);
+					$data = array();
+					$data['products_id']	= $v_products_id;
+					$data['language_id']	= $key;
+					$data['products_name'] = $name;
+					$data['products_description']	= $v_products_description[$key];
+					$data['products_url'] = $v_products_url[$key];
 
+					if ($ep_supported_mods['psd']) {
+						$data['products_short_desc'] = $v_products_short_desc[$key];
+					}
 					if (mysql_num_rows($result) == 0) {
-						$sql ="INSERT INTO ".TABLE_PRODUCTS_DESCRIPTION." SET
-									products_id				=	'".$v_products_id."',
-									language_id				=	'".$key."',
-									products_name			=	'".zen_db_input($name)."',
-									products_description	=	'".zen_db_input($v_products_description[$key])."',
-									".$ep_supported_mods_sql."
-									products_url			=	'".zen_db_input($v_products_url[$key])."'
-									";
-						$result = ep_query($sql);
+						$query = ep_db_modify(TABLE_PRODUCTS_DESCRIPTION, $data, 'INSERT');
+						$result = ep_query($query);
 					} else {
-						$sql ="UPDATE ".TABLE_PRODUCTS_DESCRIPTION." SET
-									products_name			=	'".zen_db_input($name)."',
-									products_description	=	'".zen_db_input($v_products_description[$key])."',
-									".$ep_supported_mods_sql."
-									products_url			=	'".zen_db_input($v_products_url[$key])."'
-								WHERE products_id = '$v_products_id' AND language_id = '$key'";
-						$result = ep_query($sql);
+						$where = "products_id = $v_products_id AND language_id = $key";
+						$query = ep_db_modify(TABLE_PRODUCTS_DESCRIPTION, $data, 'UPDATE', $where);
+						$result = ep_query($query);
 					}
 			}
 			}
@@ -1920,8 +1897,11 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 							'.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id='.$v_categories_id);
 
 				if (mysql_num_rows($result_incategory) == 0) {
-					$res1 = ep_query('INSERT INTO '.TABLE_PRODUCTS_TO_CATEGORIES.' (products_id, categories_id)
-								VALUES ("' . $v_products_id . '", "' . $v_categories_id . '")');
+					$data = array();
+					$data['products_id'] = $v_products_id;
+					$data['categories_id'] = $v_categories_id;
+					$query = ep_db_modify(TABLE_PRODUCTS_TO_CATEGORIES, $data, 'INSERT');
+					$res1 = ep_query($query);
 				}
 			}
 
@@ -2102,6 +2082,13 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				$special = ep_query("SELECT products_id
 											FROM " . TABLE_SPECIALS . "
 											WHERE products_id = ". $v_products_id);
+				$data = array();
+				$data['products_id'] = $v_products_id;
+				$data['specials_new_products_price'] = $v_specials_price;
+				$data['specials_date_available'] = $v_specials_date_avail;
+				$data['specials_last_modified'] = 'NOW()';
+				$data['expires_date'] = $v_specials_expires_date;
+				$data['status'] = 1;
 
 				if (mysql_num_rows($special) == 0) {
 					if ($v_specials_price == '0') {
@@ -2109,22 +2096,10 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 						$specials_print .= sprintf(EASYPOPULATE_SPECIALS_DELETE_FAIL, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10));
 						continue;
 					}
+					$data['specials_date_added'] = 'NOW()';
+					$query = ep_db_modify(TABLE_SPECIALS, $data, 'INSERT');
 
-					$sql =  "INSERT INTO " . TABLE_SPECIALS . " (
-									products_id,
-									specials_new_products_price,
-									specials_date_added,
-									specials_date_available,
-									expires_date,
-									status
-									) VALUES (
-									'" . (int)$v_products_id . "',
-									'" . $v_specials_price . "',
-									now(),
-									'" . $v_specials_date_avail . "',
-									'" . $v_specials_expires_date . "',
-									'1')";
-					$result = ep_query($sql);
+					$result = ep_query($query);
 					$specials_print .= sprintf(EASYPOPULATE_SPECIALS_NEW, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price , $v_specials_price);
 
 				} else {
@@ -2136,15 +2111,8 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 						$specials_print .= sprintf(EASYPOPULATE_SPECIALS_DELETE, $v_products_model);
 						continue;
 					}
-
-					$sql =  "UPDATE " . TABLE_SPECIALS . " SET
-								specials_new_products_price = '" . $v_specials_price . "',
-								specials_last_modified = now(),
-								specials_date_available = '" . $v_specials_date_avail . "',
-								expires_date = '" . $v_specials_expires_date . "',
-								status = '1'
-								WHERE products_id = '" . (int)$v_products_id . "'";
-					$result = ep_query($sql);
+					$query = ep_db_modify(TABLE_SPECIALS, $data, 'UPDATE', "products_id = $v_products_id");
+					$result = ep_query($query);
 					$specials_print .= sprintf(EASYPOPULATE_SPECIALS_UPDATE, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price , $v_specials_price);
 				}
 				// we still have our special here..
