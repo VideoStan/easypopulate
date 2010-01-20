@@ -1286,7 +1286,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 	} else if($filelayout = array_flip(fgetcsv($handle, 0, $csv_deliminator, $csv_enclosure))) {
 	while ($items = fgetcsv($handle, 0, $csv_deliminator, $csv_enclosure)) {
 
-
 		// langer - we now have all of our fields for this product in $items[1], $items[2] etc where the array key is the column number
 		//echo "DESC:".$items[$filelayout['v_products_description_1']].":END<br />";
 
@@ -1676,66 +1675,72 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			// First we check to see if this is a product in the current db.
 			$result = ep_query("SELECT `products_id` FROM ".TABLE_PRODUCTS." WHERE (products_model = '" . zen_db_input($v_products_model) . "') LIMIT 1 ");
 
-			$v_date_avail = ($v_date_avail == true) ? date("Y-m-d H:i:s",strtotime($v_date_avail)) : "";
+			$v_date_avail = ($v_date_avail == true) ? date("Y-m-d H:i:s",strtotime($v_date_avail)) : '';
+			// if date added is null, let's keep the existing date in db..
+			if (!$v_date_added && $row['v_date_added']) { $v_date_added = $row['v_date_added']; }
+			$v_date_added = ($v_date_added) ? date("Y-m-d H:i:s",strtotime($v_date_added)) : 'NOW()';
 
-			if ( $row = mysql_fetch_array($result) ) {
+			$product = array();
+			$product['products_model']	= zen_db_input($v_products_model);
+			$product['products_date_available'] = $v_date_avail;
+			$product['products_date_added'] = $v_date_added;
+			$product['products_last_modified'] = 'NOW()';
+			$product['products_price'] = zen_db_input($v_products_price);
+			$product['products_image'] = zen_db_input($v_products_image);
+			$product['products_weight'] = zen_db_input($v_products_weight);
+			$product['products_tax_class_id'] = zen_db_input($v_tax_class_id);
+			$product['products_discount_type'] = zen_db_input($v_products_discount_type);
+			$product['products_discount_type_from'] = zen_db_input($v_products_discount_type_from);
+			$product['product_is_call'] = zen_db_input($v_product_is_call);
+			$product['products_sort_order'] = zen_db_input($v_products_sort_order);
+			$product['products_quantity_order_min'] = zen_db_input($v_products_quantity_order_min);
+			$product['products_quantity_order_units'] = zen_db_input($v_products_quantity_order_units);
+			$product['products_quantity']	= zen_db_input($v_products_quantity);
+			$product['master_categories_id'] = zen_db_input($v_categories_id);
+			$product['manufacturers_id'] = zen_db_input($v_manufacturers_id);
+			$product['products_status'] = zen_db_input($v_db_status);
+			$product['metatags_title_status'] = zen_db_input($v_metatags_title_status);
+			$product['metatags_products_name_status']	= zen_db_input($v_metatags_products_name_status);
+			$product['metatags_model_status'] = zen_db_input($v_metatags_model_status);
+			$product['metatags_price_status'] = zen_db_input($v_metatags_price_status);
+			$product['metatags_title_tagline_status']	= zen_db_input($v_metatags_title_tagline_status);
+
+			if ($ep_supported_mods['uom']) {
+				$product['products_price_as'] = zen_db_input($v_products_price_as);
+			}
+			if ($ep_supported_mods['upc']) {
+					$product['products_upc'] = zen_db_input($v_products_upc);
+			}
+
+			/**
+			 * Custom fields to add to query
+			 * @todo $custom_input doesn't seem right, it only allows one field with multiple values the way it is now
+			 */
+			if (count($custom_fields) > 0) {
+				foreach($custom_fields as $f) {
+					$products[$f] = zen_db_input($custom_input);
+				}
+			}
+
+			$product_values = '';
+			foreach ($product as $column => $value) {
+				// @todo stupid check for a function, use preg_match later
+				if (strpos($value, '(') === false || $value == 'NULL') {
+					$product_values .= " $column = '$value' , ";
+				} else {
+					$product_values .= " $column = $value , ";
+				}
+			}
+			// Chop off the last ', '
+			$product_values = substr($product_values, 0, -2);
+
+			if ($row = mysql_fetch_array($result)) {
 				//UPDATING PRODUCT
-
 				$v_products_id = $row['products_id'];
 
-				// if date added is null, let's keep the existing date in db..
-				if (!$v_date_added && $row['v_date_added']) { $v_date_added = $row['v_date_added']; }
-				$v_date_added = ($v_date_added) ? "'".date("Y-m-d H:i:s",strtotime($v_date_added))."'" : "CURRENT_TIMESTAMP";
-
-				/*
-				*	BOF Custom Fields
-				*/
-
-				$custom_query = '';
-				if(count($custom_fields) > 0) {
-					foreach($custom_fields as $f) {
-						$custom_input = $items[$filelayout['v_'.$f]];
-						$custom_query .= ", ".$f."='".zen_db_input($custom_input)."' ";
-					}
-				}
-
-				/*
-				*	EOF Custom Fields
-				*/
-
 				$query = "UPDATE " . TABLE_PRODUCTS . " SET
-						products_price					=	'" . zen_db_input($v_products_price)."' ,";
-
-				if ($ep_supported_mods['uom'] == true) { // price UOM mod
-					$query .= "products_price_as = '".zen_db_input($v_products_price_as)."',";
-				}
-				if ($ep_supported_mods['upc'] == true) { // UPC Code mod
-					$query .= "products_upc = '".zen_db_input($v_products_upc)."',";
-				}
-
-				$query .= "products_image				= '" . zen_db_input($v_products_image)."' ,
-						products_weight					= '" . zen_db_input($v_products_weight)."' ,
-						products_tax_class_id			= '" . zen_db_input($v_tax_class_id)."' ,
-						products_discount_type			= '".zen_db_input($v_products_discount_type)."',
-						products_discount_type_from		= '".zen_db_input($v_products_discount_type_from)."',
-						product_is_call					= '".zen_db_input($v_product_is_call)."',
-						products_sort_order				= '".zen_db_input($v_products_sort_order)."',
-						products_quantity_order_min		= '".zen_db_input($v_products_quantity_order_min)."',
-						products_quantity_order_units	= '".zen_db_input($v_products_quantity_order_units)."',
-						products_date_available			=	'" . $v_date_avail."' ,
-						products_date_added				=	$v_date_added ,
-						products_last_modified			=	CURRENT_TIMESTAMP ,
-						products_quantity				=	'" . zen_db_input($v_products_quantity) . "' ,
-						master_categories_id			=	'" . zen_db_input($v_categories_id) . "' ,
-						manufacturers_id				=	'" . $v_manufacturers_id . "',
-						products_status					=	'" . zen_db_input($v_db_status) . "',
-						metatags_title_status			=	'" . zen_db_input($v_metatags_title_status)."',
-						metatags_products_name_status	=	'" . zen_db_input($v_metatags_products_name_status)."',
-						metatags_model_status			=	'" . zen_db_input($v_metatags_model_status)."',
-						metatags_price_status			=	'" . zen_db_input($v_metatags_price_status)."',
-						metatags_title_tagline_status	=	'" . zen_db_input($v_metatags_title_tagline_status)."'".
-						$custom_query.
-						"WHERE ( `products_id` = '". $v_products_id . "' ) ";
+							$product_values 
+							WHERE products_id = $v_products_id";
 
 				if ( ep_query($query) ) {
 					$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT, $v_products_model);
@@ -1747,59 +1752,16 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 					$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT_FAIL, $v_products_model);
 				}
 			} else {
-				/*
-				*	BOF Custom Fields
-				*/
-				$custom_query = '';
-				if(count($custom_fields) > 0) {
-					foreach($custom_fields as $f) {
-						$custom_query .= ", ".$f."='".zen_db_input($custom_input)."' ";
-					}
-				}
-				/*
-				*	EOF Custom Fields
-				*/
-
 				//NEW PRODUCT
-				//   insert into products
-				$v_date_added = ($v_date_added) ? "'".date("Y-m-d H:i:s",strtotime($v_date_added))."'" : "CURRENT_TIMESTAMP";
 
 				$query = "INSERT INTO " . TABLE_PRODUCTS . " SET
-						products_model					=	'" . zen_db_input($v_products_model)."' ,
-						products_price					=	'" . zen_db_input($v_products_price)."' ,";
-				if ($ep_supported_mods['uom'] == true) { // price UOM mod
-					$query .= "products_price_as = '".zen_db_input($v_products_price_as)."',";
-				}
-				if ($ep_supported_mods['upc'] == true) { // UPC Code mod
-					$query .= "products_upc = '".zen_db_input($v_products_upc)."',";
-				}
-				$query .= "products_image				=	'" . zen_db_input($v_products_image)."' ,
-						products_weight					=	'" . zen_db_input($v_products_weight)."' ,
-						products_discount_type          =	'".zen_db_input($v_products_discount_type)."',
-						products_discount_type_from     =	'".zen_db_input($v_products_discount_type_from)."',
-						product_is_call                 =	'".zen_db_input($v_product_is_call)."',
-						products_sort_order             =	'".zen_db_input($v_products_sort_order)."',
-						products_quantity_order_min     =	'".zen_db_input($v_products_quantity_order_min)."',
-						products_quantity_order_units   =	'".zen_db_input($v_products_quantity_order_units)."',
-						products_tax_class_id			=	'" . zen_db_input($v_tax_class_id)."' ,
-						products_date_available			=	'" . $v_date_avail."' ,
-						products_date_added				=	$v_date_added ,
-						products_last_modified			=	CURRENT_TIMESTAMP ,
-						products_quantity				=	'" . zen_db_input($v_products_quantity) . "' ,
-						master_categories_id			=	'" . zen_db_input($v_categories_id) . "' ,
-						manufacturers_id				=	'".$v_manufacturers_id."',
-						products_status					=	'" . zen_db_input($v_db_status) . "',
-						metatags_title_status			=	'" . zen_db_input($v_metatags_title_status)."',
-						metatags_products_name_status	=	'" . zen_db_input($v_metatags_products_name_status)."',
-						metatags_model_status			=	'" . zen_db_input($v_metatags_model_status)."',
-						metatags_price_status			=	'" . zen_db_input($v_metatags_price_status)."',
-						metatags_title_tagline_status	=	'" . zen_db_input($v_metatags_title_tagline_status)."' ".
-						$custom_query;
+							$product_values";
 
 				if ( ep_query($query) ) {
 					$v_products_id = mysql_insert_id();
 					$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT, $v_products_model);
 				} else {
+
 					$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT_FAIL, $v_products_model);
 					continue; // langer - any new categories however have been created by now..Adding into product table needs to be 1st action?
 				}
@@ -2182,7 +2144,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 								expires_date = '" . $v_specials_expires_date . "',
 								status = '1'
 								WHERE products_id = '" . (int)$v_products_id . "'";
-					$ep_query($sql);
+					$result = ep_query($sql);
 					$specials_print .= sprintf(EASYPOPULATE_SPECIALS_UPDATE, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price , $v_specials_price);
 				}
 				// we still have our special here..
