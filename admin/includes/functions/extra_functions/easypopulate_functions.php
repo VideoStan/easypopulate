@@ -317,6 +317,48 @@ function ep_query($query) {
 	return $result;
 }
 
+/**
+ * Create a SQL query for INSERT and UPDATE
+ *
+ * Inspired by zen_db_perform
+ *
+ * @param string $table
+ * @param array $data list of column => value mappings
+ * @param string $action INSERT|UPDATE
+ * @param string $parameters parameters to pass to the WHERE
+ * @return string
+ * @todo should we use ep_query here?
+ * @todo use bindvars here
+ */
+function ep_db_modify($table, $data, $action = 'INSERT', $parameters = '')
+{
+   $action = strtoupper($action);
+   if ($action == 'INSERT') {
+		$query = 'INSERT INTO ' . $table . ' SET';
+	} elseif ($action == 'UPDATE') {
+		$query = 'UPDATE ' . $table . ' SET ';
+	} else {
+		return '';
+	}
+
+	if (!is_array($data)) return '';
+
+	$mysql_functions= array('CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP()',
+	'NOW()');
+	foreach ($data as $column => $value) {
+		if (in_array(strtoupper($value), $mysql_functions) || strtoupper($value) == 'NULL' || is_numeric($value)) {
+			$query .= " $column = $value , ";
+		} else {
+			$query .= " $column = '" . zen_db_input($value) . "' , ";
+		}
+	}
+	// Chop off the ') '
+	$query = substr($query, 0, -2);
+	if (!empty($parameters)) $query .=' WHERE ' . $parameters;
+
+	return $query;
+}
+
 function install_easypopulate() {
 	global $db;
 	$db->Execute("INSERT INTO " . TABLE_CONFIGURATION_GROUP . " VALUES ('', 'Easy Populate', 'Config options for Easy Populate', '1', '1')");
