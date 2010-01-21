@@ -437,6 +437,11 @@ function install_easypopulate() {
 							'key' => 'EASYPOPULATE_CONFIG_CUSTOM_FIELDS',
 							'value' => '', 
 							'description' => 'Enter a comma separated list of fields to be automatically added to import/export file(ie: products_length, products_width). Please make sure field exists in PRODUCTS table');
+	$entries[] = array('title' => 'Detect Line Endings',
+							'key' => 'EASYPOPULATE_CONFIG_DETECT_LINE_ENDINGS',
+							'value' => 'true',
+							'description' => 'Detect whether lines end with Mac/DOS/Unix line endings. See the <a target="_blank" href="http://php.net/manual/filesystem.configuration.php#ini.auto-detect-line-endings">PHP Manual</a> for more details(Default: true)',
+							'set_function' => 'zen_cfg_select_option(array(\"true\", \"false\"),');
 	$count = 1;
 	foreach($entries as $entry) {
 		$data = array();

@@ -121,6 +121,7 @@ $maxrecs = EASYPOPULATE_CONFIG_SPLIT_MAX;
 $price_with_tax = ((EASYPOPULATE_CONFIG_PRICE_INC_TAX == 'true') ? true : false);
 $max_categories = EASYPOPULATE_CONFIG_MAX_CATEGORY_LEVELS;
 $strip_smart_tags = ((EASYPOPULATE_CONFIG_SMART_TAGS == 'true') ? true : false);
+$detect_line_endings = ((EASYPOPULATE_DETECT_LINE_ENDINGS == 'true') ? true : false);
 // may make it optional for user to use their own names for these EP tasks..
 //$active = 'Active';
 //$inactive = 'Inactive';
@@ -1279,6 +1280,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 
 	// BEGIN PROCESSING DATA
 	$file_location = DIR_FS_CATALOG . $tempdir . $file['name'];
+	if ($detect_line_endings) @ini_set('auto_detect_line_endings',true);
 	if (!file_exists($file_location)) {
 		$display_output .="<b>ERROR: file doesn't exist</b>";
 	} else if ( !($handle = fopen($file_location, "r"))) {
