@@ -447,6 +447,10 @@ function install_easypopulate() {
 							'value' => 'true',
 							'description' => 'Detect whether lines end with Mac/DOS/Unix line endings. See the <a target="_blank" href="http://php.net/manual/filesystem.configuration.php#ini.auto-detect-line-endings">PHP Manual</a> for more details(Default: true)',
 							'set_function' => 'zen_cfg_select_option(array(\"true\", \"false\"),');
+	$entries[] = array('title' => 'File Processing Time Limit',
+							'key' => 'EASYPOPULATE_CONFIG_TIME_LIMIT',
+							'value' => '1200', 
+							'description' => '(In Seconds) You can change this if your script is taking too long to process. This functionality may be not always be enabled by your server administrator (Default: 1200)');
 	$count = 1;
 	foreach($entries as $entry) {
 		$data = array();
@@ -517,7 +521,7 @@ function ep_get_config()
 	$config['detect_line_endings'] = ((EASYPOPULATE_DETECT_LINE_ENDINGS == 'true') ? true : false);
 	// @todo FIXME Currently just works on TABLE_PRODUCTS
 	$config['custom_fields'] = explode(',',trim(EASYPOPULATE_CONFIG_CUSTOM_FIELDS,','));
-
+	$config['time_limit'] = EASYPOPULATE_CONFIG_TIME_LIMIT;
 	$tempdir = EASYPOPULATE_CONFIG_TEMP_DIR;
 	if (substr($tempdir, -1) != '/') $tempdir .= '/';
    if (substr($tempdir, 0, 1) == '/') $tempdir = substr($tempdir, 1);

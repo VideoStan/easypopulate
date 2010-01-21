@@ -18,12 +18,6 @@ require_once ('includes/application_top.php');
 // V A R I A B L E S
 //*******************************
 //*******************************
-$config = ep_get_config();
-// This gives us the previous behavior for configuration variables
-extract($config);
-@set_time_limit(1200);
-@ini_set('max_input_time', 1200);
-
 /**
 * Advanced Smart Tags - activated/de-activated in Zencart Admin
 */
@@ -90,7 +84,13 @@ $advanced_smart_tags = array(
 // V A R I A B L E S
 //*******************************
 //*******************************
+$config = ep_get_config();
+// Brings all the configuration variables into the current symbol table
+extract($config);
 
+// @todo move this to where the file processing actually takes place
+@set_time_limit($time_limit);
+@ini_set('max_input_time', $time_limit);
 /**
 * Initialise vars
 */
