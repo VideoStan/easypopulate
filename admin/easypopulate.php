@@ -12,19 +12,18 @@
 
 // START INITIALIZATION
 require_once ('includes/application_top.php');
-
-@set_time_limit(1200);
-@ini_set('max_input_time', 1200);
-
-$excel_safe_output = true; // this  forces enclosure in quotes
-
 //*******************************
 //*******************************
 // C O N F I G U R A T I O N
 // V A R I A B L E S
 //*******************************
 //*******************************
-
+$config = ep_get_config();
+// This gives us the previous behavior for configuration variables
+extract($config);
+@set_time_limit(1200);
+@ini_set('max_input_time', 1200);
+$ep_debug_logging_all = false; // do not comment out.. make false instead
 /**
 * Advanced Smart Tags - activated/de-activated in Zencart Admin
 */
@@ -92,43 +91,6 @@ $advanced_smart_tags = array(
 //*******************************
 //*******************************
 
-/*
-* Add your custom fields to this array
-*
-* 	these will automatically add the fields
-*	in the necessary sql statement and other arrays
-*	functions both import and export
-
-*	NOTE: Currently just works on TABLE_PRODUCTS
-*/
-$custom_fields == FALSE;
-if(strlen(EASYPOPULATE_CONFIG_CUSTOM_FIELDS) > 0)
-{
-	$custom_fields = explode(',',EASYPOPULATE_CONFIG_CUSTOM_FIELDS);
-}
-
-/**
-* Config translation layer..
-*/
-$csv_deliminator = EASYPOPULATE_CONFIG_COLUMN_DELIMITER;
-$csv_enclosure   = EASYPOPULATE_CONFIG_COLUMN_ENCLOSURE;
-$max_qty_discounts = 6;
-$tempdir = EASYPOPULATE_CONFIG_TEMP_DIR;
-$ep_date_format = EASYPOPULATE_CONFIG_FILE_DATE_FORMAT;
-$ep_raw_time = EASYPOPULATE_CONFIG_DEFAULT_RAW_TIME;
-$ep_debug_logging = ((EASYPOPULATE_CONFIG_DEBUG_LOGGING == 'true') ? true : false);
-$maxrecs = EASYPOPULATE_CONFIG_SPLIT_MAX;
-$price_with_tax = ((EASYPOPULATE_CONFIG_PRICE_INC_TAX == 'true') ? true : false);
-$max_categories = EASYPOPULATE_CONFIG_MAX_CATEGORY_LEVELS;
-$strip_smart_tags = ((EASYPOPULATE_CONFIG_SMART_TAGS == 'true') ? true : false);
-$detect_line_endings = ((EASYPOPULATE_DETECT_LINE_ENDINGS == 'true') ? true : false);
-// may make it optional for user to use their own names for these EP tasks..
-//$active = 'Active';
-//$inactive = 'Inactive';
-//$deleteit = 'Delete';
-
-$ep_debug_logging_all = false; // do not comment out.. make false instead
-
 /**
 * Initialise vars
 */
@@ -154,8 +116,7 @@ $ep_supported_mods = array();
 
 $smart_tags = array("\r\n|\r|\n" => '<br />', );
 
-if (substr($tempdir, -1) != '/') $tempdir .= '/';
-if (substr($tempdir, 0, 1) == '/') $tempdir = substr($tempdir, 1);
+
 
 $ep_debug_log_path = DIR_FS_CATALOG . $tempdir;
 
@@ -202,7 +163,7 @@ $ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIP
 * END check for existance of various mods
 */
 
-if (EASYPOPULATE_CONFIG_ADV_SMART_TAGS == 'true') $smart_tags = array_merge($advanced_smart_tags,$smart_tags);
+if ($advanced_smart_tags) $smart_tags = array_merge($advanced_smart_tags,$smart_tags);
 
 $category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
 

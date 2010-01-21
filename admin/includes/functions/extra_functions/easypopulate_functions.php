@@ -487,6 +487,39 @@ function remove_easypopulate() {
 	return true;
 }
 
+/**
+ * Simple way to share prepped config vars between pages
+ *
+ * @return array
+ */
+function ep_get_config()
+{
+	$config = array();
+	$config['csv_deliminator'] = EASYPOPULATE_CONFIG_COLUMN_DELIMITER;
+	$config['csv_enclosure']   = EASYPOPULATE_CONFIG_COLUMN_ENCLOSURE;
+	// @todo do we actually need this if we can query the qty discount table for the MAX() value?
+	// If so, we need to put it in the installer
+	$config['max_qty_discounts'] = 6;
+	$config['ep_date_format'] = EASYPOPULATE_CONFIG_FILE_DATE_FORMAT;
+	$config['ep_raw_time'] = EASYPOPULATE_CONFIG_DEFAULT_RAW_TIME;
+	$config['ep_debug_logging'] = ((EASYPOPULATE_CONFIG_DEBUG_LOGGING == 'true') ? true : false);
+	$config['maxrecs'] = EASYPOPULATE_CONFIG_SPLIT_MAX;
+	$config['price_with_tax'] = ((EASYPOPULATE_CONFIG_PRICE_INC_TAX == 'true') ? true : false);
+	$config['max_categories'] = EASYPOPULATE_CONFIG_MAX_CATEGORY_LEVELS;
+	$config['strip_smart_tags'] = ((EASYPOPULATE_CONFIG_SMART_TAGS == 'true') ? true : false);
+	$config['advanced_smart_tags'] = ((EASYPOPULATE_CONFIG_ADV_SMART_TAGS == 'true') ? true : false);
+	$config['detect_line_endings'] = ((EASYPOPULATE_DETECT_LINE_ENDINGS == 'true') ? true : false);
+	// @todo FIXME Currently just works on TABLE_PRODUCTS
+	$config['custom_fields'] = explode(',',trim(EASYPOPULATE_CONFIG_CUSTOM_FIELDS,','));
+
+	$tempdir = EASYPOPULATE_CONFIG_TEMP_DIR;
+	if (substr($tempdir, -1) != '/') $tempdir .= '/';
+   if (substr($tempdir, 0, 1) == '/') $tempdir = substr($tempdir, 1);
+	$config['tempdir'] = $tempdir;
+
+	return $config;
+}
+
 function ep_chmod_check($tempdir) {
 	global $messageStack;
 	
