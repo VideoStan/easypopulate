@@ -127,17 +127,7 @@ $detect_line_endings = ((EASYPOPULATE_DETECT_LINE_ENDINGS == 'true') ? true : fa
 //$inactive = 'Inactive';
 //$deleteit = 'Delete';
 
-// attributes array?
-
-/**
-* Test area start
-*/
-//error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);//test purposes only
 $ep_debug_logging_all = false; // do not comment out.. make false instead
-//$sql_fail_test == true; // used to cause an sql error on new product upload - tests error handling & logs
-/*
-* Test area end
-**/
 
 /**
 * Initialise vars
@@ -152,18 +142,16 @@ $ep_dlmethod = NULL;
 $chmod_check = true;
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
 $specials_print = EASYPOPULATE_SPECIALS_HEADING;
-$replace_quotes = false; // langer - this is probably redundant now...retain here for now..
 $products_with_attributes = false; // langer - this will be redundant after html renovation
 // maybe below can go in array eg $ep_processed['attributes'] = true, etc.. cold skip all post-upload tasks on check if isset var $ep_processed.
 $has_attributes == false;
 $has_specials == false;
 
 
-// all mods go in this array as 'name' => 'true' if exist. eg $ep_supported_mods['psd'] => true means it exists.
-// langer - scan array in future to reveal if any mods for inclusion in downloads
+// all mods go in this array as 'name' => 'true' if exist. eg $ep_supported_mods['psd'] = true; means it exists.
+// @todo scan array in future to reveal if any mods for inclusion in downloads
 $ep_supported_mods = array();
 
-// default smart-tags setting when enabled. This can be added to.
 $smart_tags = array("\r\n|\r|\n" => '<br />', );
 
 if (substr($tempdir, -1) != '/') $tempdir .= '/';
@@ -205,21 +193,17 @@ if ($_GET['epinstaller'] == 'remove') {
 // END installation
 
 /**
-* START check for existance of various mods
+* START check for existence of various mods
 */
 $ep_supported_mods['psd'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_short_desc');
 $ep_supported_mods['uom'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_as'); // uom = unit of measure
 $ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
-
-// others go here..
-
 /**
 * END check for existance of various mods
 */
 
 if (EASYPOPULATE_CONFIG_ADV_SMART_TAGS == 'true') $smart_tags = array_merge($advanced_smart_tags,$smart_tags);
 
-// maximum length for a category in this database
 $category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
 
 // model name length error handling
@@ -237,8 +221,7 @@ if (!isset($model_varchar)) {
 
 // START: Create File Layout for Download Types
 
-// VJ product attributes begin
-// this creates our attributes array
+// START Create attributes array
 $attribute_options_array = array();
 
 if (is_array($attribute_options_select) && (count($attribute_options_select) > 0)) {
@@ -260,7 +243,7 @@ if (is_array($attribute_options_select) && (count($attribute_options_select) > 0
 		$attribute_options_array[] = array('products_options_id' => $attribute_options['products_options_id']);
 	}
 }
-// VJ product attributes end
+// END Create attributes array
 
 $langcode = zen_get_languages();
 // start array at one, the rest of the code expects it that way
@@ -277,7 +260,6 @@ $ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : $ep_dltype;
 
 if (zen_not_null($ep_dltype)) {
 	// if dltype is set, then create the filelayout.  Otherwise filelayout is read from the uploaded file.
-	// depending on the type of the download the user wanted, create a file layout for it.
 
 	$filelayout = array();
 	$fileheaders = array();
@@ -360,7 +342,7 @@ if (zen_not_null($ep_dltype)) {
 
 		$filelayout[] = 'v_manufacturers_name';
 
-		// build the categories name section of the array based on the number of categores the user wants to have
+		// build the categories name options based on the max categories configuration setting
 		for($i=1;$i<$max_categories+1;$i++){
 			$filelayout[] = 'v_categories_name_' . $i;
 		}
@@ -368,28 +350,15 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout[] = 'v_tax_class_title';
 		$filelayout[] = 'v_status';
 
-		/*
-		*
-		*	BOF Added custom fields
-		*
-		*/
+		//	START custom fields
 		$custom_layout_sql = ' ';
-		if(count($custom_fields) > 0)
-		{
-
-			foreach($custom_fields as $f)
-			{
+		if(count($custom_fields) > 0) {
+			foreach($custom_fields as $f) {
 				$filelayout[] = 'v_'.$f;
 				$custom_filelayout_sql .= ', p.'.$f.' as v_'.$f.' ';
 			}
 		}
-
-		//$custom_filelayout_sql = ', p.product_is_always_free_shipping as v_product_is_always_free_shipping, p.products_glsalesaccount as v_products_glsalesaccount, p.products_family as v_products_family ';
-		/*
-		*
-		*	EOF Added custom fields
-		*
-		*/
+		// END custom fields
 
 		$filelayout = array_merge($filelayout, $fileMeta);
 
@@ -474,15 +443,15 @@ if (zen_not_null($ep_dltype)) {
 		break;
 
 	case 'modqty':
-
-		// uncomment the customer_price and customer_group to support multi-price per product contrib
 		$filelayout[] = 'v_products_model';
 		$filelayout[] = 'v_products_price';
 		$filelayout[] = 'v_products_quantity';
 		$filelayout[] = 'v_last_modified';
 		$filelayout[] = 'v_status';
 
-		/*
+		/**
+		 * uncomment the customer_price and customer_group to support multi-price per product contrib
+		 * @todo modularize this
 		$filelayout[] = 'v_customer_price_1';
 		$filelayout[] = 'v_customer_group_id_1';
 		$filelayout[] = 'v_customer_price_2';
@@ -493,7 +462,7 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout[] = 'v_customer_group_id_4';
 		$filelayout[] = 'v_last_modified';
 		$filelayout[] = 'v_status';
-		//*/
+		*/
 
 		$filelayout_sql = 'SELECT
 			p.products_id as v_products_id,
@@ -507,7 +476,7 @@ if (zen_not_null($ep_dltype)) {
 
 		break;
 
-	// Chadd: quantity price breaks file layout
+	// @todo <chadd> quantity price breaks file layout
 	// 09-30-09 Need a configuration variable to set the MAX discounts level
 	//          then I will be able to generate $filelayout() dynamically
 	case 'pricebreaks':
@@ -520,7 +489,7 @@ if (zen_not_null($ep_dltype)) {
 
 		$filelayout[] =	'v_products_discount_type';
 		$filelayout[] =	'v_products_discount_type_from';
-		// discount quantities base on $max_qty_discounts
+
 		for ($i=1;$i<$max_qty_discounts+1;$i++) {
 			$filelayout[] = 'v_discount_id_' . $i;
 			$filelayout[] = 'v_discount_qty_' . $i;
@@ -546,7 +515,7 @@ if (zen_not_null($ep_dltype)) {
 		// The file layout is dynamically made depending on the number of languages
 		$filelayout[] = 'v_products_model';
 
-		// build the categories name section of the array based on the number of categores the user wants to have
+		// build the categories name section of the array based on the number of categories the user wants to have
 		for($i=1;$i<$max_categories+1;$i++){
 			$filelayout[] = 'v_categories_name_' . $i;
 		}
@@ -566,13 +535,8 @@ if (zen_not_null($ep_dltype)) {
 		break;
 
 	case 'froogle':
-		// this is going to be a little interesting because we need
-		// a way to map from internal names to external names
-		//
-		// Before it didn't matter, but with froogle needing particular headers,
+		// Map easypopulate field names to froogle names
 		// The file layout is dynamically made depending on the number of languages
-
-		//phazei - made it simpler to see the mapping of headers
 
 		$filetemp = array();
 
@@ -625,7 +589,6 @@ if (zen_not_null($ep_dltype)) {
 			";
 		break;
 
-// VJ product attributes begin
 	case 'attrib':
 
 		$filelayout[] = 'v_products_model';
@@ -640,7 +603,6 @@ if (zen_not_null($ep_dltype)) {
 			";
 
 		break;
-// VJ product attributes end
 
 	case 'attrib_basic':
 		$filelayout[] =	'v_products_attributes_id';
@@ -788,7 +750,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 	 * the field mapping array only needs to cover those fields that need to have their name changed
 	 */
 	if (count($fileheaders) != 0 ) {
-		// if they gave us fileheaders for the dl, then use them; only overriden by froogle atm
+		// if they gave us fileheaders for the dl, then use them; only overridden by froogle atm
 		// @todo <johnny> make it configurable
 		$filelayout_header = $fileheaders;
 	} else {
@@ -838,7 +800,6 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		$row['v_froogle_offer_id']    = $row['v_products_model'];
 //		$row['v_froogle_product_id']    = $row['v_products_model'];
 
-		// loop through all languages that are turned on in the store
 		foreach ($langcode as $key => $lang) {
 			$lid = $lang['id'];
 
@@ -1264,19 +1225,14 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		'v_products_length',
 		'v_products_width',
 		'v_products_height',
-		'v_products_status' // added by chadd so that de-activated products are not reactivated when the column is missing
+		'v_products_status'
 	));
 
-	// START custom fields
-	$custom_these = array();
 	if (count($custom_fields) > 0) {
 		foreach($custom_fields as $f) {
-			$custom_these[] = 'v_'.$f;
+			$default_these[] = 'v_'.$f;
 		}
-		$default_these = array_merge($default_these,$custom_these);
 	}
-	// END custom fields
-
 
 	// BEGIN PROCESSING DATA
 	$file_location = DIR_FS_CATALOG . $tempdir . $file['name'];
@@ -1287,16 +1243,9 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		$display_output .="<b>ERROR: Can't open file</b>";
 	} else if($filelayout = array_flip(fgetcsv($handle, 0, $csv_deliminator, $csv_enclosure))) {
 	while ($items = fgetcsv($handle, 0, $csv_deliminator, $csv_enclosure)) {
-
-		// langer - we now have all of our fields for this product in $items[1], $items[2] etc where the array key is the column number
-		//echo "DESC:".$items[$filelayout['v_products_description_1']].":END<br />";
-
-		//echo 'MODEL'.$items[$filelayout['v_products_model']].'END<br />';
+		// we now have all of our fields for this product in $items[1], $items[2] etc where the array key is the column number
 		// all headings in $filelayout['columnheading'] = columnnumber, and row values are in $items[$filelayout] = 'value'
 
-		// langer - inputs: $items array (file data by column #); $filelayout array (headings by column #)
-
-		// now do a query to get the record's current contents
 		$sql = 'SELECT
 			p.products_id as v_products_id,
 			p.products_model as v_products_model,
@@ -1338,7 +1287,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 
 		$product_is_new = true;
 
-		// langer - inputs: $items array (file data by column #); $filelayout array (headings by column #); $row (current db TABLE_PRODUCTS data by heading name)
 		while ( $row = mysql_fetch_array($result) ) {
 			$product_is_new = false;
 
@@ -1347,7 +1295,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			* $row at present consists of current product data for above fields only (in $sql)
 			*/
 
-			// since we have a row, the item already exists.
 			// let's check and delete it if requested
 			if ($items[$filelayout['v_status']] == 9) {
 				$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_DELETED, $items[$filelayout['v_products_model']]);
@@ -1363,23 +1310,21 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 					$row['v_products_id'] . ' AND language_id = ' . $lang['id'];
 				$result2 = ep_query($sql2);
 				$row2 =  mysql_fetch_array($result2);
-				// Need to report from ......_name_1 not ..._name_0
-				$row['v_products_name_' . $lang['id']]    = $row2['products_name'];// name assigned
-				$row['v_products_description_' . $lang['id']]   = $row2['products_description'];// description assigned
-				// if short descriptions exist
-				if ($ep_supported_mods['psd'] == true) {
-					$row['v_products_short_desc_' . $lang['id']]  = $row2['products_short_desc'];
+				$row['v_products_name_' . $lang['id']] = $row2['products_name'];
+				$row['v_products_description_' . $lang['id']] = $row2['products_description'];
+				if ($ep_supported_mods['psd']) {
+					$row['v_products_short_desc_' . $lang['id']] = $row2['products_short_desc'];
 				}
-				$row['v_products_url_' . $lang['id']]     = $row2['products_url'];// url assigned
+				$row['v_products_url_' . $lang['id']] = $row2['products_url'];
 			}
-			/**
-			* Categories start.
-			*/
 
-			// start with v_categories_id
-			// Get the category description
-			// set the appropriate variable name
-			// if parent_id is not null, then follow it up.
+			/**
+			 * START Categories
+			 * Start with v_categories_id
+			 * Get the category description
+			 * Set the appropriate variable name
+			 * If parent_id is not null, then follow it up.
+			 */
 			$thecategory_id = $row['v_categories_id'];// master category id
 
 			for($categorylevel=1; $categorylevel<$max_categories+1; $categorylevel++){
@@ -1397,13 +1342,12 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 					// now get the parent ID if there was one
 					$sql3 = "SELECT parent_id
 						FROM ".TABLE_CATEGORIES."
-						WHERE
-							categories_id = " . $thecategory_id;
+						WHERE categories_id = " . $thecategory_id;
 					$result3 = ep_query($sql3);
 					$row3 =  mysql_fetch_array($result3);
 					$theparent_id = $row3['parent_id'];
 					if ($theparent_id != ''){
-						// there was a parent ID, lets set thecategoryid to get the next level
+						// there was a parent ID, lets set $thecategory_id to get the next level
 						$thecategory_id = $theparent_id;
 					} else {
 						// we have found the top level category for this item,
@@ -1421,9 +1365,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 					$row['v_categories_name_' . $newlevel++] = $temprow['v_categories_name_' . $categorylevel];
 				}
 			}
-			/**
-			* Categories path for existing product retrieved from db in $row array
-			*/
 
 			/**
 			* retrieve current manufacturer name from db for this product if exist
@@ -1440,10 +1381,10 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			}
 
 			/**
-			* get tax info for this product
-			*/
-			//We check the value of tax class and title instead of the id
-			//Then we add the tax to price if $price_with_tax is set to true
+			 * Get tax info for this product
+			 * We check the value of tax class and title instead of the id
+			 *Then we add the tax to price if $price_with_tax is set to true
+			 */
 			$row_tax_multiplier = ep_get_tax_class_rate($row['v_tax_class_id']);
 			$row['v_tax_class_title'] = zen_get_tax_class_title($row['v_tax_class_id']);
 			if ($price_with_tax){
@@ -1466,7 +1407,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 
 		}
 		/**
-		* langer - We have now set our PRODUCT_TABLE vars for existing products, and got our default descriptions & categories in $row still
+		* We have now set our PRODUCT_TABLE vars for existing products, and got our default descriptions & categories in $row still
 		* new products start here!
 		*/
 
@@ -1481,12 +1422,9 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		}
 		if ($product_is_new == true) {
 			if (!zen_not_null(trim($items[$filelayout['v_categories_name_1']])) && zen_not_null($items[$filelayout['v_products_model']])) {
-			// let's skip this new product without a master category..
-			$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NOT_FOUND, $items[$filelayout['v_products_model']], ' new');
-			continue;
-			} else {
-				// minimum test for new product - model(already tested below), name, price, category, taxclass(?), status (defaults to active)
-				// to add
+				// let's skip this new product without a master category..
+				$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NOT_FOUND, $items[$filelayout['v_products_model']], ' new');
+				continue;
 			}
 		} else { // not new product
 			if (!zen_not_null(trim($items[$filelayout['v_categories_name_1']])) && isset($filelayout['v_categories_name_1'])) {
@@ -1591,7 +1529,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		}
 
 		// default the stock if they spec'd it or if it's blank
-		// @todo we should try something like this $v_db_status = $v_products_status;
+		// @todo <chadd> we should try something like this $v_db_status = $v_products_status;
 		$v_db_status = '1'; // default to active
 		if ($v_status == '0'){
 			// they told us to deactivate this item
@@ -1601,7 +1539,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			$v_db_status = '1';
 		}
 		if (EASYPOPULATE_CONFIG_ZERO_QTY_INACTIVE == 'true' && $v_products_quantity == 0) {
-			// if they said that zero qty products should be deactivated, let's deactivate if the qty is zero
 			$v_db_status = '0';
 		}
 
@@ -1921,13 +1858,11 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				$attribute_options_count = 1;
 				$v_attribute_options_id_var = 'v_attribute_options_id_' . $attribute_options_count;
 
-				// langer - isset & not empty $v_attribute_options_id_1 or v_attribute_options_id_2 etc
 				while (isset($$v_attribute_options_id_var) && $$v_attribute_options_id_var != '') {
 					// langer - above was: && !empty($$v_attribute_options_id_var)) - this broke because 0 is a legitimate options id value
 					// which appears to be not required unless user removes it...
 
 					// remove product attribute options linked to this product before proceeding further
-					// this is useful for removing attributes linked to a product
 					$attributes_clean_query = "delete from " . TABLE_PRODUCTS_ATTRIBUTES . " where products_id = '" . (int)$v_products_id . "' and options_id = '" . (int)$$v_attribute_options_id_var . "'";
 					ep_query($attributes_clean_query);
 
@@ -1977,7 +1912,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 					$attribute_values_count = 1;
 					$v_attribute_values_id_var = 'v_attribute_values_id_' . $attribute_options_count . '_' . $attribute_values_count;
 
-					// while (isset($$v_attribute_values_id_var) && !empty($$v_attribute_values_id_var))
 					// langer - allowed for 0 value for attributes id also (like options id)... just in case it is possible
 					while (isset($$v_attribute_values_id_var) && $$v_attribute_values_id_var != '') {
 						$attribute_values_query = "SELECT products_options_values_name FROM " . TABLE_PRODUCTS_OPTIONS_VALUES . " WHERE products_options_values_id = '" . (int)$$v_attribute_values_id_var . "'";
@@ -1986,7 +1920,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 						// options_values table update begin
 						// langer - does once initially for each model, for all attributes and languages in upload file
 						if ($attribute_rows == 1) {
-							// insert into options_values table if no option exists
 							if (mysql_num_rows($attribute_values_values) <= 0) {
 								for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
 									$lid = $languages[$i]['id'];
@@ -2012,11 +1945,10 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 										$attribute_values_update_lang_query = "select products_options_values_name from " . TABLE_PRODUCTS_OPTIONS_VALUES . " where products_options_values_id = '" . (int)$$v_attribute_values_id_var . "' and language_id ='" . (int)$lid . "'";
 										$attribute_values_update_lang_values = ep_query($attribute_values_update_lang_query);
 
-										// if options_values name doesn't exist for particular language, insert value
 										if (mysql_num_rows($attribute_values_update_lang_values) <= 0) {
 											$attribute_values_lang_insert_query = "insert into " . TABLE_PRODUCTS_OPTIONS_VALUES . " (products_options_values_id, language_id, products_options_values_name) values ('" . (int)$$v_attribute_values_id_var . "', '" . (int)$lid . "', '" . zen_db_input($$v_attribute_values_name_var) . "')";
 											$attribute_values_lang_insert = ep_query($attribute_values_lang_insert_query);
-										} else { // if options_values name exists for particular language, update table
+										} else {
 											$attribute_values_update_query = "update " . TABLE_PRODUCTS_OPTIONS_VALUES . " set products_options_values_name = '" . zen_db_input($$v_attribute_values_name_var) . "' where products_options_values_id ='" . (int)$$v_attribute_values_id_var . "' and language_id = '" . (int)$lid . "'";
 											$attribute_values_update = ep_query($attribute_values_update_query);
 										}
@@ -2036,11 +1968,10 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 							$attribute_values_price_prefix = ($$v_attribute_values_price_var < 0) ? '-' : '+';
 
 							// options_values_prices table update begin
-							// insert into options_values_prices table if no price exists
 							if (mysql_num_rows($attribute_prices_values) <= 0) {
 								$attribute_prices_insert_query = "insert into " . TABLE_PRODUCTS_ATTRIBUTES . " (products_id, options_id, options_values_id, options_values_price, price_prefix) values ('" . (int)$v_products_id . "', '" . (int)$$v_attribute_options_id_var . "', '" . (int)$$v_attribute_values_id_var . "', '" . (float)$$v_attribute_values_price_var . "', '" . zen_db_input($attribute_values_price_prefix) . "')";
 								$attribute_prices_insert = ep_query($attribute_prices_insert_query);
-							} else { // update options table, if options already exists
+							} else {
 								$attribute_prices_update_query = "update " . TABLE_PRODUCTS_ATTRIBUTES . " set options_values_price = '" . $$v_attribute_values_price_var . "', price_prefix = '" . $attribute_values_price_prefix . "' where products_id = '" . (int)$v_products_id . "' and options_id = '" . (int)$$v_attribute_options_id_var . "' and options_values_id ='" . (int)$$v_attribute_values_id_var . "'";
 								$attribute_prices_update = ep_query($attribute_prices_update_query);
 							}
@@ -2107,7 +2038,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				} else {
 					// existing product
 					if ($v_specials_price == '0') {
-						// delete of existing requested
 						$db->Execute("delete from " . TABLE_SPECIALS . "
 									 where products_id = '" . (int)$v_products_id . "'");
 						$specials_print .= sprintf(EASYPOPULATE_SPECIALS_DELETE, $v_products_model);
@@ -2142,13 +2072,11 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 	ep_update_prices();
 
 	// specials status = 0 if date_expires is past.
-	if ($has_specials == true) { // specials were in upload so check for expired specials
+	if ($has_specials == true) {
 		zen_expire_specials();
 	}
 
-	// update attributes sort order when all processed
 	if ($has_attributes == true) {
-		// attributes were in upload
 		ep_update_attributes_sort_order();
 	}
 
@@ -2160,13 +2088,12 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 
 // END FILE UPLOADS
 
-// if we had an SQL error anywhere, let's tell the user..maybe they can sort out why
 if ($ep_stack_sql_error == true) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
 
 /**
 * this is a rudimentary date integrity check for references to any non-existant product_id entries
 * this check ought to be last, so it checks the tasks just performed as a quality check of EP...
-* langer - to add: data present in table products, but not in descriptions.. user will need product info, and decide to add description, or delete product
+* @todo langer  data present in table products, but not in descriptions.. user will need product info, and decide to add description, or delete product
 */
 if ($_GET['dross'] == 'delete') {
 	ep_purge_dross();
@@ -2193,14 +2120,16 @@ if ($_GET['dross'] == 'delete') {
 }
 
 /**
-* Changes planned for below
-* 1) 1 input field for local and server updating
-* 2) default to update directly from HDD, with option to upload to temp, or update from temp
-* 3) List temp files with upload, delete, etc options
-* 4) Auto detecting of mods - display list of (only) installed mods, with check-box to include in download
-* 5) may consider an auto-splitting feature if it can be done.
-*     Will detect speed of server, safe_mode etc and determine what splitting level is required (can be over-ridden of course)
-*/
+ * Changes planned for GUI
+ * @todo <johnny> process data via xhr method
+ * @todo <johnny> show results via xhr method
+ * @todo <langer> 1 input field for local and server updating
+ * @todo <langer> default to update directly from HDD, with option to upload to temp, or update from temp
+ * @todo <langer> List temp files with upload, delete, etc options
+ * @todo <langer> Auto detecting of mods - display list of (only) installed mods, with check-box to include in download
+ * @todo <langer> may consider an auto-splitting feature if it can be done.
+ *     Will detect speed of server, safe_mode etc and determine what splitting level is required (can be over-ridden of course)
+ */
 ?>
 <!DOCTYPE html public "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html <?php echo HTML_PARAMS; ?>>
