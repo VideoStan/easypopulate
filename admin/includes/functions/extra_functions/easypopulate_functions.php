@@ -428,10 +428,15 @@ function install_easypopulate() {
 							'value' => 'false', 
 							'description' => 'Allow the use of complex regular expressions to format descriptions, making headings bold, add bullets, etc. Configuration is in ADMIN/easypopulate.php (default: false)',
 							'set_function' => 'zen_cfg_select_option(array(\"true\", \"false\"),');
-	$entries[] = array('title' => 'Debug Logging',
+	$entries[] = array('title' => 'Log Errors',
 							'key' => 'EASYPOPULATE_CONFIG_DEBUG_LOGGING',
 							'value' => 'true', 
-							'description' => 'Allow Easy Populate to generate an error log on errors only (default: true)',
+							'description' => 'Log Errors  (default: true)',
+							'set_function' => 'zen_cfg_select_option(array(\"true\", \"false\"),');
+	$entries[] = array('title' => 'Log All Queries',
+							'key' => 'EASYPOPULATE_CONFIG_LOG_QUERIES',
+							'value' => 'false',
+							'description' => 'Log all SQL queries - useful for debugging (default: false)',
 							'set_function' => 'zen_cfg_select_option(array(\"true\", \"false\"),');
 	$entries[] = array('title' => 'Custom Products Fields',
 							'key' => 'EASYPOPULATE_CONFIG_CUSTOM_FIELDS',
@@ -503,6 +508,7 @@ function ep_get_config()
 	$config['ep_date_format'] = EASYPOPULATE_CONFIG_FILE_DATE_FORMAT;
 	$config['ep_raw_time'] = EASYPOPULATE_CONFIG_DEFAULT_RAW_TIME;
 	$config['ep_debug_logging'] = ((EASYPOPULATE_CONFIG_DEBUG_LOGGING == 'true') ? true : false);
+	$config['log_queries'] = ((EASYPOPULATE_CONFIG_LOG_QUERIES == 'true') ? true : false);
 	$config['maxrecs'] = EASYPOPULATE_CONFIG_SPLIT_MAX;
 	$config['price_with_tax'] = ((EASYPOPULATE_CONFIG_PRICE_INC_TAX == 'true') ? true : false);
 	$config['max_categories'] = EASYPOPULATE_CONFIG_MAX_CATEGORY_LEVELS;

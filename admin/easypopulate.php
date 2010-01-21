@@ -23,7 +23,7 @@ $config = ep_get_config();
 extract($config);
 @set_time_limit(1200);
 @ini_set('max_input_time', 1200);
-$ep_debug_logging_all = false; // do not comment out.. make false instead
+
 /**
 * Advanced Smart Tags - activated/de-activated in Zencart Admin
 */
@@ -116,13 +116,12 @@ $ep_supported_mods = array();
 
 $smart_tags = array("\r\n|\r|\n" => '<br />', );
 
-
-
+$ep_debug_logging_all = $log_queries;
 $ep_debug_log_path = DIR_FS_CATALOG . $tempdir;
-
-if ($ep_debug_logging_all == true) {
-$fp = fopen($ep_debug_log_path . 'ep_debug_log.txt','w'); // new blank log file on each page impression for full testing log (too big otherwise!!)
-fclose($fp);
+if ($log_queries) {
+	// new blank log file on each page impression for full testing log (too big otherwise!!)
+	$fp = fopen($ep_debug_log_path . 'ep_debug_log.txt','w');
+	fclose($fp);
 }
 
 /**
