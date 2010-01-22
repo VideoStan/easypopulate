@@ -519,6 +519,7 @@ function ep_get_config()
 	$config['strip_smart_tags'] = ((EASYPOPULATE_CONFIG_SMART_TAGS == 'true') ? true : false);
 	$config['advanced_smart_tags'] = ((EASYPOPULATE_CONFIG_ADV_SMART_TAGS == 'true') ? true : false);
 	$config['detect_line_endings'] = ((EASYPOPULATE_DETECT_LINE_ENDINGS == 'true') ? true : false);
+	$config['deactivate_on_zero_qty'] = ((EASYPOPULATE_CONFIG_ZERO_QTY_INACTIVE == 'true') ? true : false);
 	// @todo FIXME Currently just works on TABLE_PRODUCTS
 	$config['custom_fields'] = explode(',',trim(EASYPOPULATE_CONFIG_CUSTOM_FIELDS,','));
 	$config['time_limit'] = EASYPOPULATE_CONFIG_TIME_LIMIT;

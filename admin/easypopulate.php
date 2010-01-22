@@ -1498,7 +1498,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		if ($v_status == '1') { // request activate this item
 			$v_db_status = '1';
 		}
-		if (EASYPOPULATE_CONFIG_ZERO_QTY_INACTIVE == 'true' && $v_products_quantity == 0) {
+		if ($deactivate_on_zero_qty && $v_products_quantity == 0) {
 			$v_db_status = '0';
 		}
 
