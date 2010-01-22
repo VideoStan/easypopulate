@@ -994,7 +994,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 				$sql2 = 'SELECT discount_id, discount_qty, discount_price FROM '.
 					TABLE_PRODUCTS_DISCOUNT_QUANTITY.' WHERE products_id = '.
 					$row['v_products_id'].' AND discount_id='.$discount_index;
-				$result2 = ep_4_query($sql2);
+				$result2 = ep_query($sql2);
 				$row2    = mysql_fetch_array($result2);
 				$row['v_discount_id_'.$discount_index]    = $row2['discount_id'];
 				$row['v_discount_price_'.$discount_index] = $row2['discount_price'];
