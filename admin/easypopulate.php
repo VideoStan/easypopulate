@@ -12,25 +12,24 @@
 
 // START INITIALIZATION
 require_once ('includes/application_top.php');
-//*******************************
-//*******************************
-// C O N F I G U R A T I O N
-// V A R I A B L E S
-//*******************************
-//*******************************
-/**
-* Advanced Smart Tags - activated/de-activated in Zencart Admin
-*/
 
-// only activate advanced tags if you really know what you are doing, and understand regular expressions. Disable if things go awry.
-// If you wish to add your own smart-tags below, please ensure that you understand the following:
-// 1) ensure that the expressions you use avoid repetitive behaviour from one upload to the next using existing data, as you may end up with this sort of thing:
-//   <b><b><b><b>thing</b></b></b></b> ...etc for each update. This is caused for each output that qualifies as an input for any expression..
-// 2) remember to place the tags in the order that you want them to occur, as each is done in turn and may remove characters you rely on for a later tag
-// 3) the $smart_tags array above is the last to be executed, so you have all of your carriage-returns and line-breaks to play with below
-// 4) make sure you escape the following metacharacters if you are using them as string literals: ^  $  \  *  +  ?  (  )  |  .  [  ]  / etc..
-// The following examples should get your blood going... comment out those you do not want after enabling $strip_advanced_smart_tags = true above
-// for regex help see: http://www.quanetic.com/regex.php or http://www.regular-expressions.info
+/**
+ * Configure Advanced Smart Tags - activated/de-activated in Zencart Admin
+ *
+ * @todo move this somewhere that doesn't require the user to edit this file to make upgrades easier
+ *
+ * Only activate advanced tags if you really know what you are doing, and understand regular expressions. 
+ * Disable if things go awry.
+ * If you wish to add your own smart-tags below, please ensure that you understand the following:
+ *
+ * 1) ensure that the expressions you use avoid repetitive behaviour from one upload to the next using existing data, as you may end up with this sort of thing:
+ *   <b><b><b><b>thing</b></b></b></b> ...etc for each update. This is caused for each output that qualifies as an input for any expression..
+ * 2) remember to place the tags in the order that you want them to occur, as each is done in turn and may remove characters you rely on for a later tag
+ * 3) the $smart_tags array above is the last to be executed, so you have all of your carriage-returns and line-breaks to play with below
+ * 4) make sure you escape the following metacharacters if you are using them as string literals: ^  $  \  *  +  ?  (  )  |  .  [  ]  / etc..
+ * The following examples should get your blood going... comment out those you do not want after enabling $strip_advanced_smart_tags = true above
+ * for regex help see: http://www.quanetic.com/regex.php or http://www.regular-expressions.info
+ */
 $advanced_smart_tags = array(
 										// replaces "Description:" at beginning of new lines with <br /> and same in bold
 										"\r\nDescription:|\rDescription:|\nDescription:" => '<br /><b>Description:</b>',
@@ -76,14 +75,9 @@ $advanced_smart_tags = array(
 										// ensures "Description:" followed by single <br /> is fllowed by double <br />
 										"<b>Description:<\/b><br \/>" => '<br /><b>Description:</b><br /><br />',
 										);
-
-//*******************************
-//*******************************
-// E N D
-// C O N F I G U R A T I O N
-// V A R I A B L E S
-//*******************************
-//*******************************
+/**
+ * Initialise vars
+ */
 $config = ep_get_config();
 // Brings all the configuration variables into the current symbol table
 extract($config);
@@ -91,11 +85,7 @@ extract($config);
 // @todo move this to where the file processing actually takes place
 @set_time_limit($time_limit);
 @ini_set('max_input_time', $time_limit);
-/**
-* Initialise vars
-*/
 
-// Current EP Version
 $curver = '1.2.5.7.csv';
 
 $display_output = '';
@@ -105,7 +95,7 @@ $chmod_check = true;
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
 $specials_print = EASYPOPULATE_SPECIALS_HEADING;
 $products_with_attributes = false; // langer - this will be redundant after html renovation
-// maybe below can go in array eg $ep_processed['attributes'] = true, etc.. cold skip all post-upload tasks on check if isset var $ep_processed.
+// @todo CHECK: maybe below can go in array eg $ep_processed['attributes'] = true, etc.. cold skip all post-upload tasks on check if isset var $ep_processed.
 $has_attributes == false;
 $has_specials == false;
 
@@ -133,7 +123,6 @@ if ($chmod_check == false) { // test for temporary folder and that it is writabl
     // $messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_FAIL, 'caution');
 }
 
-// /temp is the default folder - check if it exists & has writeable permissions
 if (EASYPOPULATE_CONFIG_TEMP_DIR == 'EASYPOPULATE_CONFIG_TEMP_DIR' && ($_GET['epinstaller'] != 'install')) { // admin area config not installed
     $messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_INSTALL_KEYS_FAIL, '<a href="' . zen_href_link(FILENAME_EASYPOPULATE, 'epinstaller=install') . '">', '</a>'), 'warning');
 }
@@ -182,6 +171,7 @@ if (!isset($model_varchar)) {
 // START: Create File Layout for Download Types
 
 // START Create attributes array
+// @todo this seems like the wrong place for this code, why is it here?
 $attribute_options_array = array();
 
 if (is_array($attribute_options_select) && (count($attribute_options_select) > 0)) {
@@ -574,10 +564,6 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout[] =	'v_options_values_id';
 		$filelayout[] =	'v_products_options_values_name'; // options values name from table PRODUCTS_OPTIONS_VALUES
 
-		// a = table PRODUCTS_ATTRIBUTES
-		// p = table PRODUCTS
-		// o = table PRODUCTS_OPTIONS
-		// v = table PRODUCTS_OPTIONS_VALUES
 		$filelayout_sql = 'SELECT
 			a.products_attributes_id            as v_products_attributes_id,
 			a.products_id                       as v_products_id,
@@ -614,7 +600,6 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout[] =	'v_products_options_images_style';
 		$filelayout[] =	'v_products_options_rows';
 
-		// o = table PRODUCTS_OPTIONS
 		$filelayout_sql = 'SELECT
 			o.products_options_id             AS v_products_options_id,
 			o.language_id                     AS v_language_id,
@@ -637,7 +622,6 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout[] =	'v_products_options_values_name';
 		$filelayout[] =	'v_products_options_values_sort_order';
 
-		// v = table PRODUCTS_OPTIONS_VALUES
 		$filelayout_sql = 'SELECT
 			v.products_options_values_id         AS v_products_options_values_id,
 			v.language_id                        AS v_language_id,
@@ -654,9 +638,6 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout[] =	'v_products_options_values_id';
 		$filelayout[] =	'v_products_options_values_name';
 
-		// o = table PRODUCTS_OPTIONS
-		// v = table PRODUCTS_OPTIONS_VALUES
-		// otv = table PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS
 		$filelayout_sql = 'SELECT
 			otv.products_options_values_to_products_options_id AS v_products_options_values_to_products_options_id,
 			otv.products_options_id           AS v_products_options_id,
@@ -681,8 +662,7 @@ if (zen_not_null($ep_dltype)) {
 
 //*******************************
 //*******************************
-// E N D
-// INITIALIZATION
+// END INITIALIZATION
 //*******************************
 //*******************************
 
@@ -872,7 +852,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 				$row['v_categories_name_' . $newlevel++] = $temprow['v_categories_name_' . $categorylevel];
 			}
 		}
-		// if the filelayout says we need a manufacturers name, get it
+
 		if (isset($filelayout['v_manufacturers_name'])){
 			$row['v_manufacturers_name'] = '';
 			if (!empty($row['v_manufacturers_id'])) {
@@ -966,7 +946,6 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		if ($ep_dltype == 'froogle'){
 			// For froogle, we check the specials prices for any applicable specials, and use that price
 			// by grabbing the specials id descending, we always get the most recently added special price
-			// I'm checking status because I think you can turn off specials
 			$sql2 = "SELECT
 					specials_new_products_price
 				FROM
@@ -1008,15 +987,6 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		$row_tax_multiplier     = ep_get_tax_class_rate($row['v_tax_class_id']);
 		$row['v_tax_class_title']   = zen_get_tax_class_title($row['v_tax_class_id']);
 		$row['v_products_price']  = round($row['v_products_price'] + ($price_with_tax * $row['v_products_price'] * $row_tax_multiplier / 100),2);
-
-		// Now set the status to a word the user specd in the config vars
-
-		// disabled below to make uploads & downloads consistant - Numeric only
-		/*if ( $row['v_status'] == '1' ){
-			$row['v_status'] = $active;
-		} else {
-			$row['v_status'] = $inactive;
-		} */
 
 		$tempcsvrow = array();
 		foreach( $filelayout as $key => $value ){
@@ -1121,14 +1091,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 
 	$display_output .= EASYPOPULATE_DISPLAY_HEADING;
 
-	//*******************************
-	//*******************************
-	// UPLOAD AND INSERT FILE
-	//*******************************
-	//*******************************
-
 	if ( isset($_FILES['usrfl']) ) {
-		// move the uploaded file to where we can work with it
 		$file = ep_get_uploaded_file('usrfl');
 		// @todo user not protected from uploading and overwriting a duplicate named file
 
@@ -1156,7 +1119,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		'v_products_image',
 		'v_categories_id',
 		'v_products_price');
-
 	if ($ep_supported_mods['uom']) {
 		$mod_array = array('v_products_price_as');
 		$default_these = array_merge($default_these, $mod_array);
@@ -1165,8 +1127,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		$mod_array = array('v_products_upc');
 		$default_these = array_merge($default_these, $mod_array);
 	}
-
-	// default values
 	$default_these = array_merge( $default_these, array('v_products_quantity',
 		'v_products_weight',
 		'v_products_discount_type',
@@ -1296,10 +1256,8 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 							language_id = " . $epdlanguage_id ;
 					$result2 = ep_query($sql2);
 					$row2 = mysql_fetch_array($result2);
-					// only set it if we found something
 					$temprow['v_categories_name_' . $categorylevel] = $row2['categories_name'];
 
-					// now get the parent ID if there was one
 					$sql3 = "SELECT parent_id
 						FROM ".TABLE_CATEGORIES."
 						WHERE categories_id = " . $thecategory_id;
@@ -1372,7 +1330,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		*/
 
 		/**
-		* langer - let's have some data error checking..
+		* Data error checking
 		* inputs: $items; $filelayout; $product_is_new (no reliance on $row)
 		*/
 		if ($items[$filelayout['v_status']] == 9 && zen_not_null($items[$filelayout['v_products_model']])) {
@@ -1457,17 +1415,17 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		//And we recalculate price without the included tax...
 		//Since it seems display is made before, the displayed price will still include tax
 		//This is same problem for the tax_clas_id that display tax_class_title
-		if ($price_with_tax == true){
+		if ($price_with_tax) {
 			$v_products_price = round( $v_products_price / (1 + ( $row_tax_multiplier * $price_with_tax/100) ), 4);
 		}
 
 		// if they give us one category, they give us all 6 categories
-		// langer - this does not appear to support more than 7 categories??
+		// @todo this does not appear to support more than 7 categories??
 		unset ($v_categories_name); // default to not set.
 
 		if (isset($filelayout['v_categories_name_1'])) { // does category 1 column exist in our file..
 
-			$category_strlen_long = FALSE;// checks cat length does not exceed db, else exclude product from upload
+			$category_strlen_long = false;// checks cat length does not exceed db, else exclude product from upload
 			$newlevel = 1;
 			for($categorylevel=6; $categorylevel>0; $categorylevel--) {
 				if ($items[$filelayout['v_categories_name_' . $categorylevel]] != '') {
@@ -1478,7 +1436,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			while( $newlevel < $max_categories+1){
 				$v_categories_name[$newlevel++] = ''; // default the remaining items to nothing
 			}
-			if ($category_strlen_long == TRUE) {
+			if ($category_strlen_long) {
 				$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NAME_LONG, $v_products_model, $category_strlen_max);
 				continue;
 			}
@@ -1748,8 +1706,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			//*************************
 			// Products Descriptions Start
 			//*************************
-
-			// the following is common in both the updating an existing product and creating a new product
 			if (isset($v_products_name)){
 			foreach( $v_products_name as $key => $name){
 			if ($name != ''){
@@ -1777,7 +1733,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			}
 			}
 			}
-
 			//*************************
 			// Products Descriptions End
 			//*************************
@@ -1807,7 +1762,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			///************************
 			// VJ product attribs begin
 			//*************************
-
 			if (isset($v_attribute_options_id_1)){
 				$has_attributes = true;
 				$attribute_rows = 1; // master row count
@@ -1949,8 +1903,6 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				$attribute_rows++;
 
 			}
-
-
 			//*************************
 			// VJ product attribs end
 			//*************************
@@ -1966,7 +1918,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 					// could alternatively make status inactive, and still upload..
 					continue;
 				}
-				// column is in upload file, and price is in field (not empty)
+
 				// if null (set further above), set forever, else get raw date
 				$has_specials == true;
 				$v_specials_date_avail = ($v_specials_date_avail == true) ? date("Y-m-d H:i:s",strtotime($v_specials_date_avail)) : "0001-01-01";
@@ -2031,8 +1983,7 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 
 	ep_update_prices();
 
-	// specials status = 0 if date_expires is past.
-	if ($has_specials == true) {
+	if ($has_specials) {
 		zen_expire_specials();
 	}
 
