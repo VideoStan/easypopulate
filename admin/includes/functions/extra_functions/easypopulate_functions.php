@@ -101,15 +101,15 @@ function ep_get_tax_title_class_id($tax_class_title) {
 	return $tax_class_id ;
 }
 
-function print_el($item2) {
-	//$output_display = " | " . substr(strip_tags($item2), 0, 10);
-	$output_display = substr(strip_tags($item2), 0, 10) . " | ";
-	return $output_display;
-}
-
-function print_el1($item2) {
-	$output_display = sprintf("| %'.4s ", substr(strip_tags($item2), 0, 80));
-	return $output_display;
+/**
+ * Print a table row of item values
+ *
+ * @param string $value 
+ * @
+ */
+function print_el($value)
+{
+	return substr(strip_tags($value), 0, 10);
 }
 
 function smart_tags($string,$tags,$crsub,$doit) {
