@@ -1017,8 +1017,8 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		break;
 		case 'froogle':
 			$EXPORT_FILE = "Froogle-EP" . $EXPORT_TIME;
-			$csv_deliminator = "\t";
-			$csv_enclosure = ' ';
+			$col_delimiter = "\t";
+			$col_enclosure = ' ';
 			$filestring = array_map("kill_breaks", $filestring);
 		break;
 		case 'attrib':
@@ -1045,7 +1045,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		//*******************************
 		header("Content-type: text/csv");
 		//header("Content-type: application/vnd.ms-excel"); // @todo make this configurable
-		header("Content-disposition: attachment; filename=$EXPORT_FILE" . (($csv_deliminator == ",")?".csv":".txt"));
+		header("Content-disposition: attachment; filename=$EXPORT_FILE" . (($col_delimiter == ",")?".csv":".txt"));
 		// Changed if using SSL, helps prevent program delay/timeout (add to backup.php also)
 		if ($request_type== 'NONSSL'){
 			header("Pragma: no-cache");
@@ -1056,7 +1056,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 
 		$fp = fopen("php://output", "w+");
 		foreach ($filestring as $line) {
-			fputcsv($fp, $line, $csv_deliminator, $csv_enclosure);
+			fputcsv($fp, $line, $col_delimiter, $col_enclosure);
 		}
 
 		die();
@@ -1064,10 +1064,10 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		//*******************************
 		// PUT FILE IN TEMP DIR
 		//*******************************
-		$tmpfpath = DIR_FS_CATALOG . '' . $tempdir . "$EXPORT_FILE" . (($csv_deliminator == ",")?".csv":".txt");
+		$tmpfpath = DIR_FS_CATALOG . '' . $tempdir . "$EXPORT_FILE" . (($col_delimiter == ",")?".csv":".txt");
 		$fp = fopen( $tmpfpath, "w+");
 		foreach ($filestring as $line) {
-			fputcsv($fp, $line, $csv_deliminator, $csv_enclosure);
+			fputcsv($fp, $line, $col_delimiter, $col_enclosure);
 		}
 		fclose($fp);
 		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $EXPORT_FILE, $tempdir), 'success');
@@ -1161,8 +1161,8 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		$display_output .="<b>ERROR: file doesn't exist</b>";
 	} else if ( !($handle = fopen($file_location, "r"))) {
 		$display_output .="<b>ERROR: Can't open file</b>";
-	} else if($filelayout = array_flip(fgetcsv($handle, 0, $csv_deliminator, $csv_enclosure))) {
-	while ($items = fgetcsv($handle, 0, $csv_deliminator, $csv_enclosure)) {
+	} else if($filelayout = array_flip(fgetcsv($handle, 0, $col_delimiter, $col_enclosure))) {
+	while ($items = fgetcsv($handle, 0, $col_delimiter, $col_enclosure)) {
 		// we now have all of our fields for this product in $items[1], $items[2] etc where the array key is the column number
 		// all headings in $filelayout['columnheading'] = columnnumber, and row values are in $items[$filelayout] = 'value'
 

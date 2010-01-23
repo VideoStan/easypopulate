@@ -504,8 +504,8 @@ function remove_easypopulate() {
 function ep_get_config()
 {
 	$config = array();
-	$config['csv_deliminator'] = EASYPOPULATE_CONFIG_COLUMN_DELIMITER;
-	$config['csv_enclosure']   = EASYPOPULATE_CONFIG_COLUMN_ENCLOSURE;
+	$config['col_delimiter'] = EASYPOPULATE_CONFIG_COLUMN_DELIMITER;
+	$config['col_enclosure']   = EASYPOPULATE_CONFIG_COLUMN_ENCLOSURE;
 	// @todo do we actually need this if we can query the qty discount table for the MAX() value?
 	// If so, we need to put it in the installer
 	$config['max_qty_discounts'] = 6;
