@@ -88,12 +88,11 @@ extract($config);
 
 $curver = '1.2.5.7.csv';
 
-$display_output = '';
+$output = array();
 $ep_dltype = NULL;
 $ep_dlmethod = NULL;
 $chmod_check = true;
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
-$specials_print = EASYPOPULATE_SPECIALS_HEADING;
 $products_with_attributes = false; // langer - this will be redundant after html renovation
 // @todo CHECK: maybe below can go in array eg $ep_processed['attributes'] = true, etc.. cold skip all post-upload tasks on check if isset var $ep_processed.
 $has_attributes == false;
@@ -1088,9 +1087,6 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 //*******************************
 
 if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
-
-	$display_output .= EASYPOPULATE_DISPLAY_HEADING;
-
 	if ( isset($_FILES['usrfl']) ) {
 		$file = ep_get_uploaded_file('usrfl');
 		// @todo user not protected from uploading and overwriting a duplicate named file
@@ -1098,13 +1094,13 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		if (is_uploaded_file($file['tmp_name'])) {
 			ep_copy_uploaded_file($file, DIR_FS_CATALOG . $tempdir);
 		}
-		$display_output .= sprintf(EASYPOPULATE_DISPLAY_UPLOADED_FILE_SPEC, $file['tmp_name'], $file['name'], $file['size']);
+		$output['info'] = sprintf(EASYPOPULATE_DISPLAY_UPLOADED_FILE_SPEC, $file['tmp_name'], $file['name'], $file['size']);
 
 	}
 
 	if ( isset($_POST['localfile']) ){
 		$file = ep_get_uploaded_file('localfile');
-		$display_output .= sprintf(EASYPOPULATE_DISPLAY_LOCAL_FILE_SPEC, $file['name']);
+		$output['info'] = sprintf(EASYPOPULATE_DISPLAY_LOCAL_FILE_SPEC, $file['name']);
 	}
 
 	//*******************************
@@ -1154,13 +1150,15 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		}
 	}
 
+	$output['specials'] = array();
+	$output['errors'] = array();
 	// BEGIN PROCESSING DATA
 	$file_location = DIR_FS_CATALOG . $tempdir . $file['name'];
 	if ($detect_line_endings) @ini_set('auto_detect_line_endings',true);
 	if (!file_exists($file_location)) {
-		$display_output .="<b>ERROR: file doesn't exist</b>";
+		$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
 	} else if ( !($handle = fopen($file_location, "r"))) {
-		$display_output .="<b>ERROR: Can't open file</b>";
+		$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED;
 	} else if($filelayout = array_flip(fgetcsv($handle, 0, $col_delimiter, $col_enclosure))) {
 	while ($items = fgetcsv($handle, 0, $col_delimiter, $col_enclosure)) {
 		// we now have all of our fields for this product in $items[1], $items[2] etc where the array key is the column number
@@ -1208,8 +1206,10 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		$product_is_new = true;
 
 		while ( $row = mysql_fetch_array($result) ) {
+			$output_class = 'success';
+			$output_message = '';
+			$output_data = array();
 			$product_is_new = false;
-
 			/*
 			* Get current products descriptions and categories for this model from database
 			* $row at present consists of current product data for above fields only (in $sql)
@@ -1217,7 +1217,8 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 
 			// let's check and delete it if requested
 			if ($items[$filelayout['v_status']] == 9) {
-				$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_DELETED, $items[$filelayout['v_products_model']]);
+				$output_status = EASYPOPULATE_DISPLAY_RESULT_DELETED;
+				$output_class = 'success deleted';
 				ep_remove_product($items[$filelayout['v_products_model']]);
 				continue 2;
 			}
@@ -1335,24 +1336,25 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		*/
 		if ($items[$filelayout['v_status']] == 9 && zen_not_null($items[$filelayout['v_products_model']])) {
 			// new delete got this far, so cant exist in db. Cant delete what we don't have...
-			$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_DELETE_NOT_FOUND, $items[$filelayout['v_products_model']]);
+			$output_class = 'fail';
+			$output_status = EASYPOPULATE_DISPLAY_RESULT_DELETE_NOT_FOUND;
 			continue;
 		}
 		if ($product_is_new == true) {
 			if (!zen_not_null(trim($items[$filelayout['v_categories_name_1']])) && zen_not_null($items[$filelayout['v_products_model']])) {
 				// let's skip this new product without a master category..
-				$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NOT_FOUND, $items[$filelayout['v_products_model']], ' new');
+				$output_class = 'fail';
+				$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
+				$output_message = sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NOT_FOUND, ' new');
 				continue;
 			}
 		} else { // not new product
 			if (!zen_not_null(trim($items[$filelayout['v_categories_name_1']])) && isset($filelayout['v_categories_name_1'])) {
 				// let's skip this existing product without a master category but has the column heading
 				// or should we just update it to result of $row (it's current category..)??
-				$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NOT_FOUND, $items[$filelayout['v_products_model']], '');
-				foreach ($items as $col => $langer) {
-					if ($col == $filelayout['v_products_model']) continue;
-					$display_output .= print_el($langer);
-				}
+				$output_class = 'fail';
+				$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
+				$output_message  = sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NOT_FOUND, '');
 				continue;
 			}
 		}
@@ -1437,7 +1439,9 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				$v_categories_name[$newlevel++] = ''; // default the remaining items to nothing
 			}
 			if ($category_strlen_long) {
-				$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NAME_LONG, $v_products_model, $category_strlen_max);
+				$output_class = 'fail';
+				$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
+				$output_message = sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NAME_LONG, $category_strlen_max);
 				continue;
 			}
 		}
@@ -1469,7 +1473,9 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 		}
 
 		if (strlen($v_products_model) > $modelsize ){
-			$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_MODEL_NAME_LONG, $v_products_model);
+			$output_class = 'fail';
+			$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
+			$output_message = EASYPOPULATE_DISPLAY_RESULT_MODEL_NAME_LONG;
 			continue;
 		}
 
@@ -1596,13 +1602,12 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				$query = ep_db_modify(TABLE_PRODUCTS, $product, 'UPDATE', "products_id = $v_products_id");
 
 				if ( ep_query($query) ) {
-					$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT, $v_products_model);
-					foreach ($items as $col => $langer) {
-						if ($col == $filelayout['v_products_model']) continue;
-						$display_output .= print_el($langer);
-					}
+					$output_class = 'updated success';
+					$output_status = EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT;
 				} else {
-					$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT_FAIL, $v_products_model);
+					$output_class = 'updated fail';
+					$output_status =  EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT_FAIL;
+					$output_message = EASYPOPULATE_DISPLAY_RESULT_SQL_ERROR;
 				}
 			} else {
 				//NEW PRODUCT
@@ -1610,17 +1615,14 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 
 				if ( ep_query($query) ) {
 					$v_products_id = mysql_insert_id();
-					$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT, $v_products_model);
+					$output_class = 'new success';
+					$output_status = EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT;
 				} else {
-
-					$display_output .= sprintf(EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT_FAIL, $v_products_model);
+					$output_class = 'new fail';
+					$output_status = EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT_FAIL;
+					$output_message = EASYPOPULATE_DISPLAY_RESULT_SQL_ERROR;
 					continue; // langer - any new categories however have been created by now..Adding into product table needs to be 1st action?
 				}
-				foreach ($items as $col => $langer) {
-					if ($col == $filelayout['v_products_model']) continue;
-					$display_output .= print_el($langer);
-				}
-
 			}
 
 
@@ -1912,8 +1914,12 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 			* if a null value in specials price, do not add or update. If price = 0, let's delete it
 			*/
 			if (isset($v_specials_price) && zen_not_null($v_specials_price)) {
+				$specials_message = '';
+				$specials_status = '';
 				if ($v_specials_price >= $v_products_price) {
-					$specials_print .= sprintf(EASYPOPULATE_SPECIALS_PRICE_FAIL, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10));
+					$specials_class = 'fail';
+					$specials_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
+					$specials_message = EASYPOPULATE_SPECIALS_PRICE_FAIL;
 					//available function: zen_set_specials_status($specials_id, $status)
 					// could alternatively make status inactive, and still upload..
 					continue;
@@ -1938,43 +1944,45 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 				if (mysql_num_rows($special) == 0) {
 					if ($v_specials_price == '0') {
 						// delete requested, but is not a special
-						$specials_print .= sprintf(EASYPOPULATE_SPECIALS_DELETE_FAIL, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10));
+						$specials_class = 'fail notfound';
+						$specials_status = EASYPOPULATE_DISPLAY_RESULT_DELETE_NOT_FOUND;
+						$specials_message = EASYPOPULATE_SPECIALS_DELETE_FAIL;
 						continue;
 					}
 					$data['specials_date_added'] = 'NOW()';
 					$query = ep_db_modify(TABLE_SPECIALS, $data, 'INSERT');
 
 					$result = ep_query($query);
-					$specials_print .= sprintf(EASYPOPULATE_SPECIALS_NEW, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price , $v_specials_price);
-
+					$specials_class = 'new success';
+					$specials_status = EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT;
 				} else {
 					// existing product
 					if ($v_specials_price == '0') {
 						$db->Execute("delete from " . TABLE_SPECIALS . "
 									 where products_id = '" . (int)$v_products_id . "'");
-						$specials_print .= sprintf(EASYPOPULATE_SPECIALS_DELETE, $v_products_model);
+						$specials_class = 'delete success';
+						$specials_status = EASYPOPULATE_DISPLAY_RESULT_DELETED;
 						continue;
 					}
 					$query = ep_db_modify(TABLE_SPECIALS, $data, 'UPDATE', "products_id = $v_products_id");
 					$result = ep_query($query);
-					$specials_print .= sprintf(EASYPOPULATE_SPECIALS_UPDATE, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price , $v_specials_price);
+					$specials_class = 'updated success';
+					$specials_status = EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT;
 				}
 				// we still have our special here..
+				$specials_data = array($v_products_model, $v_products_name[$epdlanguage_id], $v_products_price , $v_specials_price);
+				$output['specials'][] = array('status' => $specials_status, 'class' => $specials_class, 'message' => $specials_message, 'data' => $specials_data);
 			}
 			// end specials for this product
-
 		} else {
 			// this record is missing the product_model
-			$display_output .= EASYPOPULATE_DISPLAY_RESULT_NO_MODEL;
-			foreach ($items as $col => $langer) {
-				if ($col == $filelayout['v_products_model']) continue;
-				$display_output .= print_el($langer);
-			}
+			$output_class = 'fail nomodel';
+			$output_message = EASYPOPULATE_DISPLAY_RESULT_NO_MODEL;
 		}
+		$output_data = array_values($items);
+		$output['items'][] = array('status' => $output_status, 'class' => $output_class, 'message' => $output_message, 'data' => $output_data);
 		// end of row insertion code
 	}
-	$display_output .= EASYPOPULATE_DISPLAY_RESULT_UPLOAD_COMPLETE;
-
 	}
 
 	/**
@@ -2049,8 +2057,8 @@ if ($_GET['dross'] == 'delete') {
 	<title><?php echo TITLE; ?> - Easy Populate</title>
 	<link rel="stylesheet" type="text/css" href="includes/stylesheet.css">
 	<link rel="stylesheet" type="text/css" href="includes/cssjsmenuhover.css" media="all" id="hoverJS">
-	<script language="javascript" src="includes/menu.js"></script>
-	<script language="javascript" src="includes/general.js"></script>
+	<script language="javascript" type="text/javascript" src="includes/menu.js"></script>
+	<script language="javascript" type="text/javascript" src="includes/general.js"></script>
 	<script type="text/javascript">
 		function init()
 		{
@@ -2062,6 +2070,19 @@ if ($_GET['dross'] == 'delete') {
 	<!--@todo: move this css to some other file -->
 	<style type="text/css">
 	label {
+		font-weight: bold;
+	}
+	.results_table {
+		border-collapse: collapse;
+		border:1px solid #000;
+	}
+	.results_table .fail {
+		background-color: #E68080;
+	}
+	.results_table .success {
+		background-color: #85C285;
+	}
+	td.status {
 		font-weight: bold;
 	}
 	</style>
@@ -2078,11 +2099,11 @@ if ($_GET['dross'] == 'delete') {
 			<input type="hidden" name="MAX_FILE_SIZE" value="100000000">
 			<div>
 			<label for="userfl">Upload EP File</label>
-			<input name="usrfl" type="file" size="50">
+			<input id="userfl" name="usrfl" type="file" size="50">
 			</div>
 			<div>
 			<label for="localfile">Import from Temp Dir (<?php echo $tempdir; ?>)</label>
-			<input TYPE="text" name="localfile" size="50">
+			<input type="text" id="localfile" name="localfile" size="50">
 			</div>
 			<input type="submit" name="buttoninsert" value="Insert into db">
 		</fieldset>
@@ -2128,14 +2149,16 @@ if ($_GET['dross'] == 'delete') {
 			?>
 			<table>
 			<thead>
-			<th>Download</th>
-			<th>Create in Temp dir (<?php echo $tempdir ?>)</th>
+			<tr>
+				<th>Download</th>
+				<th>Create in Temp dir (<?php echo $tempdir ?>)</th>
+			</tr>
 			</thead>
 			<tbody>
 			<?php foreach($ep_exports as $key => $value) { ?>
 				<tr>
-					<td><a href="easypopulate.php?download=stream&dltype=<?php echo $key ?>"><?php echo $value ?></a></td>
-					<td><a href="easypopulate.php?download=tempfile&dltype=<?php echo $key ?>"><?php echo $value ?></a></td>
+					<td><a href="easypopulate.php?download=stream&amp;dltype=<?php echo $key ?>"><?php echo $value ?></a></td>
+					<td><a href="easypopulate.php?download=tempfile&amp;dltype=<?php echo $key ?>"><?php echo $value ?></a></td>
 				</tr>
 			<?php } ?>
 			</tbody>
@@ -2146,15 +2169,66 @@ if ($_GET['dross'] == 'delete') {
 					<span class="fieldRequired"> * Attributes Not Included in Complete</span>
 			<?php } ?>
 			<br />
-<?php
-			echo $printsplit; // our files splitting matrix
-			echo $display_output; // upload results
-			if (strlen($specials_print) > strlen(EASYPOPULATE_SPECIALS_HEADING)) {
-				echo '<br />' . $specials_print . EASYPOPULATE_SPECIALS_FOOTER;
-			}
-
-			include(DIR_FS_CATALOG . $tempdir . 'fileList.php');
-?>
+			<?php if (isset($output['info'])) echo '<p>' . $output['info'] . '</p>'; ?>
+			<?php if (!empty($output['errors'])) { ?>
+				<p>Errors:</p>
+				<?php foreach ($output['errors'] as $error) { ?>
+					<p class="fail"><?php echo $error; ?></p>
+				<?php } ?>
+			<?php } ?>
+			<?php if (!empty($output['items'])) { ?>
+			<div><h2><?php echo EASYPOPULATE_DISPLAY_HEADING; ?></h2></div>
+			<table id="uploaded_products" class="results_table">
+				<thead>
+				<tr>
+					<th><?php echo EASYPOPULATE_DISPLAY_STATUS; ?></th>
+					<th><?php echo EASYPOPULATE_DISPLAY_MESSAGE; ?></th>
+					<!-- @todo make sure the headers line up with the text in all cases -->
+					<?php foreach (array_keys($filelayout) as $header) { ?>
+						<th><?php echo $header ?></th>
+					<?php } ?>
+				</tr>
+				</thead>
+				<?php foreach ($output['items'] as $item) { ?>
+					<tr class="<?php echo $item['class'] ?>">
+						<td class="status"><?php echo $item['status'] ?></td>
+						<td class="message"><?php echo $item['message'] ?></td>
+						<?php foreach ($item['data'] as $data) { ?>
+							<td><?php echo print_el($data); ?></td>	
+						<?php } ?>
+					</tr>
+				<?php } ?>
+			</table>
+			<div><h2><?php echo EASYPOPULATE_DISPLAY_RESULT_UPLOAD_COMPLETE; ?></h2></div>
+			<?php } ?>
+			<?php if (!empty($output['specials'])) { ?>
+			<div><h2><?php echo EASYPOPULATE_SPECIALS_HEADING ?></h2></div>
+			<table id="uploaded_specials" class="results_table">
+				<thead>
+				<tr>
+					<th><?php echo EASYPOPULATE_DISPLAY_STATUS; ?></th>
+					<th><?php echo EASYPOPULATE_DISPLAY_MESSAGE; ?></th>
+					<th><?php echo EASYPOPULATE_DISPLAY_MODEL; ?></th>
+					<th><?php echo EASYPOPULATE_DISPLAY_NAME; ?></th>
+					<th><?php echo EASYPOPULATE_DISPLAY_PRICE; ?></th>
+					<th><?php echo EASYPOPULATE_SPECIALS_PRICE; ?></th>
+				</tr>
+				</thead>
+				<?php foreach ($output['specials'] as $item) { ?>
+					<tr class="<?php echo $item['class'] ?>">
+						<td class="status"><?php echo $item['status'] ?></td>
+						<td class="message"><?php echo $item['message'] ?></td>
+						<?php foreach ($item['data'] as $data) { ?>
+							<td><?php echo print_el($data); ?></td>
+						<?php } ?>
+					</tr>
+				<?php } ?>
+			</table>
+			<?php } ?>
+			<?php
+			$localfileslist = DIR_FS_CATALOG . $tempdir . 'fileList.php';
+			if (file_exists($localfileslist)) include($localfileslist);
+			?>
 </div>
 <?php require(DIR_WS_INCLUDES . 'footer.php'); ?>
 </body>

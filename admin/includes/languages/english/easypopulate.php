@@ -8,27 +8,33 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Publice License (v2 only)
  */
 
-/**
- * $display_output defines
- */
-// file uploads display - output via $display_output
-define('EASYPOPULATE_DISPLAY_SPLIT_LOCATION','You can also download your split files from your %s directory<br />');
-define('EASYPOPULATE_DISPLAY_HEADING','<br /><b><u>Upload Results</u></b><br />');
-define('EASYPOPULATE_DISPLAY_UPLOADED_FILE_SPEC','<p class=smallText>File uploaded.<br />Temporary filename: %s<br /><b>User filename: %s</b><br />Size: %s<br />'); // open paragraph
-define('EASYPOPULATE_DISPLAY_LOCAL_FILE_SPEC','<p class=smallText><b>Filename: %s</b><br />'); // open paragraph
+define('EASYPOPULATE_DISPLAY_SPLIT_LOCATION','You can also download your split files from your %s directory');
 
-// upload results display - output via $display_output
-define('EASYPOPULATE_DISPLAY_RESULT_DELETED','<br /><font color="fuchsia"><b>DELETED! - Model:</b> %s</font>');
-define('EASYPOPULATE_DISPLAY_RESULT_DELETE_NOT_FOUND','<br /><font color="darkviolet"><b>NOT FOUND! - Model:</b> %s - cant delete...</font>');
-define('EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NOT_FOUND', '<br /><font color="red"><b>SKIPPED! - Model:</b> %s - No category provided for this%s product</font>');
-define('EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Model:</b> %s - Category name(s) too long (max. %s)</font>');
-define('EASYPOPULATE_DISPLAY_RESULT_MODEL_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Model: </b>%s - model name too long</font>');
-define('EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT', '<br /><font color="green"><b>NEW PRODUCT! - Model:</b> %s</font> | ');
-define('EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT_FAIL', '<br /><font color="red"><b>ADD NEW PRODUCT FAILED! - Model:</b> %s - SQL error. Check Easy Populate error log in uploads directory</font>');
-define('EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT', '<br /><font color="mediumblue"><b>UPDATED! - Model:</b> %s</font> | ');
-define('EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT_FAIL', '<br /><font color="red"><b>UPDATE PRODUCT FAILED! - Model:</b> %s - SQL error. Check Easy Populate error log in uploads directory</font>');
-define('EASYPOPULATE_DISPLAY_RESULT_NO_MODEL', '<br /><font color="red"><b>No model field in record. This line was not imported</b></font>');
-define('EASYPOPULATE_DISPLAY_RESULT_UPLOAD_COMPLETE','<br /><b>Upload Complete</b></p>'); // close paragraph above
+define('EASYPOPULATE_DISPLAY_FILE_NOT_EXIST','File does not exist');
+define('EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED','Could not open file');
+define('EASYPOPULATE_DISPLAY_UPLOADED_FILE_SPEC','File uploaded.<br />Temporary filename: %s<br /><b>User filename: %s</b><br />Size: %s');
+define('EASYPOPULATE_DISPLAY_LOCAL_FILE_SPEC','<b>Filename: %s</b>');
+
+// product results
+define('EASYPOPULATE_DISPLAY_HEADING', 'Products Summary');
+define('EASYPOPULATE_DISPLAY_MODEL', 'Model');
+define('EASYPOPULATE_DISPLAY_MESSAGE', 'Message');
+define('EASYPOPULATE_DISPLAY_STATUS', 'Status');
+define('EASYPOPULATE_DISPLAY_NAME', 'Name');
+define('EASYPOPULATE_DISPLAY_PRICE', 'Price');
+define('EASYPOPULATE_DISPLAY_RESULT_DELETED','DELETED');
+define('EASYPOPULATE_DISPLAY_RESULT_DELETE_NOT_FOUND','NOT FOUND');
+define('EASYPOPULATE_DISPLAY_RESULT_SKIPPED','SKIPPED');
+define('EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NOT_FOUND', 'No category provided for this%s product');
+define('EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NAME_LONG','Category name(s) too long (max. %s)');
+define('EASYPOPULATE_DISPLAY_RESULT_MODEL_NAME_LONG','Model name too long');
+define('EASYPOPULATE_DISPLAY_RESULT_SQL_ERROR', 'SQL error. Check Easy Populate error log in uploads directory');
+define('EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT', 'ADDED');
+define('EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT_FAIL', 'ADD FAILED');
+define('EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT', 'UPDATED');
+define('EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT_FAIL', 'UPDATE FAILED');
+define('EASYPOPULATE_DISPLAY_RESULT_NO_MODEL', 'No model field in record. This line was not imported');
+define('EASYPOPULATE_DISPLAY_RESULT_UPLOAD_COMPLETE', 'Upload Complete');
 
 
 /**
@@ -62,25 +68,19 @@ define('EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS', 'File <b>%s</b> successfully
 * $printsplit defines
 */
 // splitting files results text - in $printsplit
-define('EASYPOPULATE_FILE_SPLITS_HEADING', '<b><u>Upload split files in turn</u></b><br /><br />');
+define('EASYPOPULATE_FILE_SPLITS_HEADING', 'Upload split files in turn');
 define('EASYPOPULATE_FILE_SPLIT_COMPLETED', 'Upload done of ');
-define('EASYPOPULATE_FILE_SPLITS_DONE', 'All done!<br />');
+define('EASYPOPULATE_FILE_SPLITS_DONE', 'All done!');
 define('EASYPOPULATE_FILE_SPLIT_PENDING', 'Pending Upload of ');
 define('EASYPOPULATE_FILE_SPLIT_ANCHOR_TEXT', 'Upload ');
 // misc
 define('EASYPOPULATE_FILE_SPLITS_PREFIX', 'Split-');
 
-/**
-* $specials_print defines
-*/
-// results of specials in $specials_print
-define('EASYPOPULATE_SPECIALS_HEADING', '<b><u>Specials Summary</u></b><p class=smallText>'); // open paragraph
-define('EASYPOPULATE_SPECIALS_PRICE_FAIL', '<font color="red"><b>SKIPPED! - Model:</b> %s - specials price higher than normal price...</font><br />');
-define('EASYPOPULATE_SPECIALS_NEW', '<font color="green"><b>NEW! - Model:</b> %s</font> | %s | %s | <font color="green"><b>%s</b></font> |<br />');
-define('EASYPOPULATE_SPECIALS_UPDATE', '<font color="mediumblue"><b>UPDATED! - Model:</b> %s</font> | %s | %s | <font color="green"><b>%s</b></font> |<br />');
-define('EASYPOPULATE_SPECIALS_DELETE', '<font color="fuchsia"><b>DELETED! - Model:</b> %s</font> | %s |<br />');
-define('EASYPOPULATE_SPECIALS_DELETE_FAIL', '<font color="darkviolet"><b>NOT FOUND! - Model:</b> %s - cant delete special...</font><br />');
-define('EASYPOPULATE_SPECIALS_FOOTER', '</p>'); // close paragraph
+// Specials results
+define('EASYPOPULATE_SPECIALS_HEADING', 'Specials Summary');
+define('EASYPOPULATE_SPECIALS_PRICE', 'Specials Price');
+define('EASYPOPULATE_SPECIALS_PRICE_FAIL', 'Specials price higher than normal price');
+define('EASYPOPULATE_SPECIALS_DELETE_FAIL', 'Can\t delete special');
 
 // error log defines - for ep_debug_log.txt
 //define('EASYPOPULATE_ERRORLOG_SQL_ERROR', 'MySQL error %s: %s\nWhen executing:\n%sn');
