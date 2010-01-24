@@ -497,11 +497,13 @@ function remove_easypopulate() {
 }
 
 /**
- * Simple way to share prepped config vars between pages
+ * Get all Easy Populate config vars or a single one
  *
- * @return array
+ * @param string $config get a specific config var (optional)
+ * @return array|string all config vars | single var
+ * @todo cache the config array
  */
-function ep_get_config()
+function ep_get_config($var = '')
 {
 	$config = array();
 	$config['col_delimiter'] = EASYPOPULATE_CONFIG_COLUMN_DELIMITER;
@@ -528,7 +530,11 @@ function ep_get_config()
    if (substr($tempdir, 0, 1) == '/') $tempdir = substr($tempdir, 1);
 	$config['tempdir'] = $tempdir;
 
-	return $config;
+	if (!empty($var)) {
+		return $config[$var];
+	} else {
+		return $config;
+	}
 }
 
 function ep_chmod_check($tempdir) {
