@@ -106,10 +106,9 @@ $ep_supported_mods = array();
 $smart_tags = array("\r\n|\r|\n" => '<br />', );
 
 $ep_debug_logging_all = $log_queries;
-$ep_debug_log_path = DIR_FS_CATALOG . $tempdir;
 if ($log_queries) {
 	// new blank log file on each page impression for full testing log (too big otherwise!!)
-	$fp = fopen($ep_debug_log_path . 'ep_debug_log.txt','w');
+	$fp = fopen($temp_path . 'ep_debug_log.txt','w');
 	fclose($fp);
 }
 
@@ -117,7 +116,7 @@ if ($log_queries) {
 * Pre-flight checks start here
 */
 
-$chmod_check = ep_chmod_check($tempdir);
+$chmod_check = ep_chmod_check($temp_path);
 if ($chmod_check == false) { // test for temporary folder and that it is writable
     // $messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_FAIL, 'caution');
 }
@@ -1063,7 +1062,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		//*******************************
 		// PUT FILE IN TEMP DIR
 		//*******************************
-		$tmpfpath = DIR_FS_CATALOG . '' . $tempdir . "$EXPORT_FILE" . (($col_delimiter == ",")?".csv":".txt");
+		$tmpfpath = $temp_path . "$EXPORT_FILE" . (($col_delimiter == ",")?".csv":".txt");
 		$fp = fopen( $tmpfpath, "w+");
 		foreach ($filestring as $line) {
 			fputcsv($fp, $line, $col_delimiter, $col_enclosure);
@@ -1086,29 +1085,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 //*******************************
 //*******************************
 
-if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
-	if ( isset($_FILES['usrfl']) ) {
-		$file = ep_get_uploaded_file('usrfl');
-		// @todo user not protected from uploading and overwriting a duplicate named file
-
-		if (is_uploaded_file($file['tmp_name'])) {
-			ep_copy_uploaded_file($file, DIR_FS_CATALOG . $tempdir);
-		}
-		$output['info'] = sprintf(EASYPOPULATE_DISPLAY_UPLOADED_FILE_SPEC, $file['tmp_name'], $file['name'], $file['size']);
-
-	}
-
-	if ( isset($_POST['localfile']) ){
-		$file = ep_get_uploaded_file('localfile');
-		$output['info'] = sprintf(EASYPOPULATE_DISPLAY_LOCAL_FILE_SPEC, $file['name']);
-	}
-
-	//*******************************
-	//*******************************
-	// PROCESS UPLOAD FILE
-	//*******************************
-	//*******************************
-
+if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 	// these are the fields that will be defaulted to the current values in the database if they are not found in the incoming file
 	// @todo <langer> why not query products table and use result array??
 	$default_these = array(
@@ -1153,8 +1130,14 @@ if ( isset($_POST['localfile']) || isset($_FILES['usrfl']) ) {
 	$output['specials'] = array();
 	$output['errors'] = array();
 	// BEGIN PROCESSING DATA
-	$file_location = DIR_FS_CATALOG . $tempdir . $file['name'];
+	// @todo more error checking here
+	$uploaded_file = !empty($_POST['local_file']) ? $_POST['local_file'] : $_FILES['uploaded_file'];
+	$file = ep_handle_uploaded_file($uploaded_file);
+	$file_location = $temp_path . $file['name'];
 	if ($detect_line_endings) @ini_set('auto_detect_line_endings',true);
+
+	$output['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $file['name'], $file['size']);
+
 	if (!file_exists($file_location)) {
 		$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
 	} else if ( !($handle = fopen($file_location, "r"))) {
@@ -2098,12 +2081,12 @@ if ($_GET['dross'] == 'delete') {
 			<legend>Load comma or tab delimited files</legend>
 			<input type="hidden" name="MAX_FILE_SIZE" value="100000000">
 			<div>
-			<label for="userfl">Upload EP File</label>
-			<input id="userfl" name="usrfl" type="file" size="50">
+			<label for="uploaded_file">Upload EP File</label>
+			<input id="uploaded_file" name="uploaded_file" type="file" size="50">
 			</div>
 			<div>
-			<label for="localfile">Import from Temp Dir (<?php echo $tempdir; ?>)</label>
-			<input type="text" id="localfile" name="localfile" size="50">
+			<label for="local_file">Import from Temp Dir (<?php echo $tempdir; ?>)</label>
+			<input type="text" id="local_file" name="local_file" size="50">
 			</div>
 			<input type="submit" name="buttoninsert" value="Insert into db">
 		</fieldset>
@@ -2226,7 +2209,7 @@ if ($_GET['dross'] == 'delete') {
 			</table>
 			<?php } ?>
 			<?php
-			$localfileslist = DIR_FS_CATALOG . $tempdir . 'fileList.php';
+			$localfileslist = $temp_path . 'fileList.php';
 			if (file_exists($localfileslist)) include($localfileslist);
 			?>
 </div>

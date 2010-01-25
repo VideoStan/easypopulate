@@ -57,30 +57,22 @@ if (!function_exists('fputcsv')) {
     }
 }
 
-function ep_get_uploaded_file($filename) {
-	if (isset($_FILES[$filename])) {
-		$uploaded_file = array('name' => $_FILES[$filename]['name'],
-		'type' => $_FILES[$filename]['type'],
-		'size' => $_FILES[$filename]['size'],
-		'tmp_name' => $_FILES[$filename]['tmp_name']);
-	} elseif (isset($_POST[$filename])) {
-		$uploaded_file = array('name' => $_POST[$filename],
-		);
+function ep_handle_uploaded_file($file)
+{
+	$temp_path = ep_get_config('temp_path');
+	// $_FILES
+	if (is_array($file)) {
+		if (is_uploaded_file($file['tmp_name'])) {
+			$target = $temp_path . $file['name'];
+			move_uploaded_file($file['tmp_name'], $target);
+		}
 	} else {
-		$uploaded_file = array('name' => $GLOBALS[$filename . '_name'],
-		'type' => $GLOBALS[$filename . '_type'],
-		'size' => $GLOBALS[$filename . '_size'],
-		'tmp_name' => $GLOBALS[$filename]);
+		// $_POST
+		$name = $file;
+		$size = filesize($temp_path . $name);
+		$file = array('name' => $name, size => $size);
 	}
-	return $uploaded_file;
-}
-
-// the $filename parameter is an array with the following elements:
-// name, type, size, tmp_name
-function ep_copy_uploaded_file($filename, $target) {
-	if (substr($target, -1) != '/') $target .= '/';
-	$target .= $filename['name'];
-	move_uploaded_file($filename['tmp_name'], $target);
+	return $file;
 }
 
 function ep_get_tax_class_rate($tax_class_id) {
@@ -525,11 +517,12 @@ function ep_get_config($var = '')
 	// @todo FIXME Currently just works on TABLE_PRODUCTS
 	$config['custom_fields'] = explode(',',trim(EASYPOPULATE_CONFIG_CUSTOM_FIELDS,','));
 	$config['time_limit'] = EASYPOPULATE_CONFIG_TIME_LIMIT;
+
 	$tempdir = EASYPOPULATE_CONFIG_TEMP_DIR;
 	if (substr($tempdir, -1) != '/') $tempdir .= '/';
    if (substr($tempdir, 0, 1) == '/') $tempdir = substr($tempdir, 1);
 	$config['tempdir'] = $tempdir;
-
+	$config['temp_path'] = DIR_FS_CATALOG . $tempdir;
 	if (!empty($var)) {
 		return $config[$var];
 	} else {
@@ -537,18 +530,18 @@ function ep_get_config($var = '')
 	}
 }
 
-function ep_chmod_check($tempdir) {
+function ep_chmod_check($temp_path) {
 	global $messageStack;
 	
-	if (!@file_exists(DIR_FS_CATALOG . $tempdir . ".")) {
+	if (!@file_exists($temp_path . ".")) {
 		// directory does not exist, or may be unwritable
-		@chmod(DIR_FS_CATALOG . $tempdir, 0700); // attempt to make writable - supress error as dir may not exist..
-		if (!@file_exists(DIR_FS_CATALOG . $tempdir . ".")) {
+		@chmod($temp_path, 0700); // attempt to make writable - supress error as dir may not exist..
+		if (!@file_exists($tempdir . ".")) {
 			// still can't see it... let's try chmod 777
-			@chmod(DIR_FS_CATALOG . $tempdir, 0777); // attempt to make chmod 777 - supress error as dir may not exist..
-			if (!@file_exists(DIR_FS_CATALOG . $tempdir . ".")) {
+			@chmod($temp_path, 0777); // attempt to make chmod 777 - supress error as dir may not exist..
+			if (!@file_exists($temp_path . ".")) {
 				// still can't see it, so it is probably not there, or is windows server..
-				$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $tempdir, DIR_FS_CATALOG), 'warning');
+				$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG), 'warning');
 				$chmod_check = false;
 			} else {
 				// succeeded only with chmod 777 - add msg to ensure index.html is included to prevent file browsing

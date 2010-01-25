@@ -12,8 +12,7 @@ define('EASYPOPULATE_DISPLAY_SPLIT_LOCATION','You can also download your split f
 
 define('EASYPOPULATE_DISPLAY_FILE_NOT_EXIST','File does not exist');
 define('EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED','Could not open file');
-define('EASYPOPULATE_DISPLAY_UPLOADED_FILE_SPEC','File uploaded.<br />Temporary filename: %s<br /><b>User filename: %s</b><br />Size: %s');
-define('EASYPOPULATE_DISPLAY_LOCAL_FILE_SPEC','<b>Filename: %s</b>');
+define('EASYPOPULATE_DISPLAY_FILE_SPEC','File uploaded.<br /><b>File Name: %s</b><br />Size: %s');
 
 // product results
 define('EASYPOPULATE_DISPLAY_HEADING', 'Products Summary');
