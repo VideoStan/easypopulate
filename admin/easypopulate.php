@@ -116,9 +116,9 @@ if ($log_queries) {
 * Pre-flight checks start here
 */
 
-$chmod_check = ep_chmod_check($temp_path);
-if ($chmod_check == false) { // test for temporary folder and that it is writable
-    // $messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_FAIL, 'caution');
+$chmod_check = is_dir($temp_path) && is_writable($temp_path);
+if (!$chmod_check) {
+	$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG), 'warning');
 }
 
 if (EASYPOPULATE_CONFIG_TEMP_DIR == 'EASYPOPULATE_CONFIG_TEMP_DIR' && ($_GET['epinstaller'] != 'install')) { // admin area config not installed

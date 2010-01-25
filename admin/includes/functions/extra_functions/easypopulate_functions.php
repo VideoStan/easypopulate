@@ -530,35 +530,6 @@ function ep_get_config($var = '')
 	}
 }
 
-function ep_chmod_check($temp_path) {
-	global $messageStack;
-	
-	if (!@file_exists($temp_path . ".")) {
-		// directory does not exist, or may be unwritable
-		@chmod($temp_path, 0700); // attempt to make writable - supress error as dir may not exist..
-		if (!@file_exists($tempdir . ".")) {
-			// still can't see it... let's try chmod 777
-			@chmod($temp_path, 0777); // attempt to make chmod 777 - supress error as dir may not exist..
-			if (!@file_exists($temp_path . ".")) {
-				// still can't see it, so it is probably not there, or is windows server..
-				$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG), 'warning');
-				$chmod_check = false;
-			} else {
-				// succeeded only with chmod 777 - add msg to ensure index.html is included to prevent file browsing
-				$messageStack->add(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_PERMISSIONS_SUCCESS_777, 'success');
-				$chmod_check = true;
-			}
-		} else {
-			// we successfully changed to writable @ chmod 700
-			$messageStack->add(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_PERMISSIONS_SUCCESS, 'success');
-			$chmod_check = true;
-		}
-	} else {
-		$chmod_check = true;
-	}
-	return $chmod_check;
-}
-
 /**
  * Kills all line breaks and tabs
  *
