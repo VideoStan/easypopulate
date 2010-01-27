@@ -5,7 +5,7 @@
  * @package easypopulate
  * @author langer
  * @copyright 2005-2009
- * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Publice License (v2 only)
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  */
 
 define('EASYPOPULATE_DISPLAY_SPLIT_LOCATION','You can also download your split files from your %s directory');
