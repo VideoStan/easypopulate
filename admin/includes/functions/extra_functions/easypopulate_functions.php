@@ -2,12 +2,12 @@
 /**
  * EasyPopulate functions 
  *
- * A set of utility functions used by the EasyPopulate admin page
+ * A set of utility functions used by EasyPopulate
  *
  * @package easypopulate
  * @author langer
  * @copyright ????-2009
- * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Publice License (v2 only)
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  * @todo document these functions
  * @todo handle tab and other characters that need to be escaped for EASYPOPULATE_CONFIG_COLUMN_DELIMITER
  */
@@ -60,19 +60,15 @@ if (!function_exists('fputcsv')) {
 function ep_handle_uploaded_file($file)
 {
 	$temp_path = ep_get_config('temp_path');
-	// $_FILES
-	if (is_array($file)) {
+	if (is_array($file) && !empty($file)) {
 		if (is_uploaded_file($file['tmp_name'])) {
 			$target = $temp_path . $file['name'];
 			move_uploaded_file($file['tmp_name'], $target);
 		}
-	} else {
-		// $_POST
-		$name = $file;
-		$size = filesize($temp_path . $name);
-		$file = array('name' => $name, size => $size);
+	} else if (is_string($file) && !empty($file)) {
+		$target = $temp_path . $file;
 	}
-	return $file;
+	return $target;
 }
 
 function ep_get_tax_class_rate($tax_class_id) {
