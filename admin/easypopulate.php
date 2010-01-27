@@ -5,13 +5,14 @@
  * @package easypopulate
  * @author langer
  * @copyright 20??-2010
- * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Publice License (v2 only)
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  *
  * @todo <chadd> change v_products_price_as to v_products_price_uom
  */
 
 // START INITIALIZATION
 require_once ('includes/application_top.php');
+require(DIR_WS_CLASSES . 'easypopulate.php');
 
 /**
  * Configure Advanced Smart Tags - activated/de-activated in Zencart Admin
@@ -1129,24 +1130,26 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 
 	$output['specials'] = array();
 	$output['errors'] = array();
+	$output['info'] = '';
 	// BEGIN PROCESSING DATA
 	// @todo more error checking here
 	$uploaded_file = !empty($_POST['local_file']) ? $_POST['local_file'] : $_FILES['uploaded_file'];
-	$file = ep_handle_uploaded_file($uploaded_file);
-	$file_location = $temp_path . $file['name'];
-	if ($detect_line_endings) @ini_set('auto_detect_line_endings',true);
+	$file_location = ep_handle_uploaded_file($uploaded_file);
 
-	$output['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $file['name'], $file['size']);
+	$fileInfo = new SplFileInfo($file_location);
 
-	if (!file_exists($file_location)) {
-		$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
-	} else if ( !($handle = fopen($file_location, "r"))) {
-		$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED;
-	} else if($filelayout = array_flip(fgetcsv($handle, 0, $col_delimiter, $col_enclosure))) {
-	while ($items = fgetcsv($handle, 0, $col_delimiter, $col_enclosure)) {
-		// we now have all of our fields for this product in $items[1], $items[2] etc where the array key is the column number
-		// all headings in $filelayout['columnheading'] = columnnumber, and row values are in $items[$filelayout] = 'value'
+	$output['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $fileInfo->getFileName(), $fileInfo->getSize());
 
+	$fileInfo->setFileClass(EPFileUploadFactory::get('BNFUSA'));
+	$file = $fileInfo->openFile('r');
+	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
+	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED;
+
+	if ($filelayout = $file->getFileLayout()) {
+	$file->seek(1);
+	$itemcount = 0;
+	while ($file->valid()) {
+		$items = $file->mapRow();
 		$sql = 'SELECT
 			p.products_id as v_products_id,
 			p.products_model as v_products_model,
@@ -1965,6 +1968,8 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 		$output_data = array_values($items);
 		$output['items'][] = array('status' => $output_status, 'class' => $output_class, 'message' => $output_message, 'data' => $output_data);
 		// end of row insertion code
+		$itemcount++;
+		$file->next();
 	}
 	}
 
@@ -2160,7 +2165,7 @@ if ($_GET['dross'] == 'delete') {
 				<?php } ?>
 			<?php } ?>
 			<?php if (!empty($output['items'])) { ?>
-			<div><h2><?php echo EASYPOPULATE_DISPLAY_HEADING; ?></h2></div>
+			<div><h2><?php echo EASYPOPULATE_DISPLAY_HEADING; ?></h2> Items Uploaded(<?php echo $itemcount);?>)</div>
 			<table id="uploaded_products" class="results_table">
 				<thead>
 				<tr>
