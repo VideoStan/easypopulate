@@ -2165,7 +2165,7 @@ if ($_GET['dross'] == 'delete') {
 				<?php } ?>
 			<?php } ?>
 			<?php if (!empty($output['items'])) { ?>
-			<div><h2><?php echo EASYPOPULATE_DISPLAY_HEADING; ?></h2> Items Uploaded(<?php echo $itemcount);?>)</div>
+			<div><h2><?php echo EASYPOPULATE_DISPLAY_HEADING; ?></h2> Items Uploaded(<?php echo $itemcount;?>)</div>
 			<table id="uploaded_products" class="results_table">
 				<thead>
 				<tr>
