@@ -1140,7 +1140,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 
 	$output['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $fileInfo->getFileName(), $fileInfo->getSize());
 
-	$fileInfo->setFileClass(EPFileUploadFactory::get('BNFUSA'));
+	$fileInfo->setFileClass(EPFileUploadFactory::get('Standard'));
 	$file = $fileInfo->openFile('r');
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED;
