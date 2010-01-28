@@ -279,13 +279,13 @@ function ep_filelayout_attributes()
 	return $filelayout;
 }
 
-function write_debug_log($string) {
-	global $ep_debug_log_path;
-	$logFile = $ep_debug_log_path . 'ep_debug_log.txt';
-  $fp = fopen($logFile,'ab');
-  fwrite($fp, $string);
-  fclose($fp);
-  return;
+function write_debug_log($string)
+{
+	$logFile = ep_get_config('debug_log_path') . 'ep_debug_log.txt';
+	$fp = fopen($logFile,'ab');
+	fwrite($fp, $string);
+	fclose($fp);
+	return;
 }
 
 function ep_query($query) {
@@ -519,6 +519,7 @@ function ep_get_config($var = '')
    if (substr($tempdir, 0, 1) == '/') $tempdir = substr($tempdir, 1);
 	$config['tempdir'] = $tempdir;
 	$config['temp_path'] = DIR_FS_CATALOG . $tempdir;
+	$config['debug_log_path'] = $config['temp_path'];
 	if (!empty($var)) {
 		return $config[$var];
 	} else {
