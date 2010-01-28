@@ -79,8 +79,14 @@ class EPUploadStandard extends SplFileObject
 	 */
 	public function get($column)
 	{
-		$line = $this->current();
-		return $line[$this->filelayout[$column]];
+		$line = $this->getRow();
+		return $line[$column];
+	}
+
+	function getRow()
+	{
+		$row = array_pad($this->current(), count($this->filelayout), '');
+		return array_combine(array_keys($this->filelayout), array_values($row));
 	}
 
 	/**
@@ -88,7 +94,7 @@ class EPUploadStandard extends SplFileObject
 	 */
 	public function mapRow()
 	{
-		return $this->current();
+		return $this->getRow();
 	}
 }
 ?>

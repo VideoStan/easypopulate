@@ -1145,7 +1145,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			".TABLE_PRODUCTS_TO_CATEGORIES." as ptoc
 			WHERE
 			p.products_id = ptoc.products_id AND
-			p.products_model = '" . zen_db_input($items[$filelayout['v_products_model']]) . "' AND
+			p.products_model = '" . zen_db_input($items['v_products_model']) . "' AND
 			ptoc.categories_id = subc.categories_id";
 
 		$result = ep_query($sql);
@@ -1163,10 +1163,10 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			*/
 
 			// let's check and delete it if requested
-			if ($items[$filelayout['v_status']] == 9) {
+			if ($items['v_status'] == 9) {
 				$output_status = EASYPOPULATE_DISPLAY_RESULT_DELETED;
 				$output_class = 'success deleted';
-				ep_remove_product($items[$filelayout['v_products_model']]);
+				ep_remove_product($item['v_products_model']);
 				continue 2;
 			}
 
@@ -1274,14 +1274,14 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 		* Data error checking
 		* inputs: $items; $filelayout; $product_is_new (no reliance on $row)
 		*/
-		if ($items[$filelayout['v_status']] == 9 && zen_not_null($items[$filelayout['v_products_model']])) {
+		if ($items['v_status'] == 9 && zen_not_null($items['v_products_model'])) {
 			// new delete got this far, so cant exist in db. Cant delete what we don't have...
 			$output_class = 'fail';
 			$output_status = EASYPOPULATE_DISPLAY_RESULT_DELETE_NOT_FOUND;
 			continue;
 		}
 		if ($product_is_new == true) {
-			if (!zen_not_null(trim($items[$filelayout['v_categories_name_1']])) && zen_not_null($items[$filelayout['v_products_model']])) {
+			if (!zen_not_null(trim($items['v_categories_name_1'])) && zen_not_null($items['v_products_model'])) {
 				// let's skip this new product without a master category..
 				$output_class = 'fail';
 				$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
@@ -1289,7 +1289,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 				continue;
 			}
 		} else { // not new product
-			if (!zen_not_null(trim($items[$filelayout['v_categories_name_1']])) && isset($filelayout['v_categories_name_1'])) {
+			if (!zen_not_null(trim($items['v_categories_name_1'])) && isset($filelayout['v_categories_name_1'])) {
 				// let's skip this existing product without a master category but has the column heading
 				// or should we just update it to result of $row (it's current category..)??
 				$output_class = 'fail';
@@ -1308,17 +1308,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 		* output is: $v_products_model = "modelofthing", $v_products_description_1 = "descofthing", etc for each file heading
 		* any existing (default) data assigned above is overwritten here with the new vals from file
 		*/
-
-		// this is an important loop.  What it does is go thru all the fields in the incoming file and set the internal vars.
-		// Internal vars not set here are either set in the loop above for existing records, or not set at all (null values)
-		// the array values are handled separately, although they will set variables in this loop, we won't use them.
-		// $key is column heading name, $value is column number for the heading..
-		// langer - this would appear to over-write our defaults with null values in $items if they exist
-		// in other words, if we have a file heading, then you want all listed models updated in this field
-		// add option here - update all null values, or ignore null values???
-		foreach($filelayout as $key => $value){
-			$$key = $items[$value];
-		}
+		extract($items);
 
 		// so how to handle these?  we shouldn't build the array unless it's been giving to us.
 		// The assumption is that if you give us names and descriptions, then you give us name and description for all applicable languages
@@ -1327,23 +1317,23 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 
 			//metaTags
 			if ( isset($filelayout['v_metatags_title_' . $l_id ]) ) {
-				$v_metatags_title[$l_id] = $items[$filelayout['v_metatags_title_' . $l_id]];
-				$v_metatags_keywords[$l_id] = $items[$filelayout['v_metatags_keywords_' . $l_id]];
-				$v_metatags_description[$l_id] = $items[$filelayout['v_metatags_description_' . $l_id]];
+				$v_metatags_title[$l_id] = $items['v_metatags_title_' . $l_id];
+				$v_metatags_keywords[$l_id] = $items['v_metatags_keywords_' . $l_id];
+				$v_metatags_description[$l_id] = $items['v_metatags_description_' . $l_id];
 			}
 			//metaTags
 
 
 			if (isset($filelayout['v_products_name_' . $l_id ])){ // do for each language in our upload file if exist
 				// convert language names from _1, _2, etc; into arrays [1], [2], etc
-				$v_products_name[$l_id] = smart_tags($items[$filelayout['v_products_name_' . $l_id]],$smart_tags,$cr_replace,false);
-				//$v_products_description[$l_id] = smart_tags($items[$filelayout['v_products_description_' . $l_id ]],$smart_tags,$cr_replace,$strip_smart_tags);
-				$v_products_description[$l_id] = $items[$filelayout['v_products_description_' . $l_id ]];
+				$v_products_name[$l_id] = smart_tags($items['v_products_name_' . $l_id],$smart_tags,$cr_replace,false);
+				//$v_products_description[$l_id] = smart_tags($items['v_products_description_' . $l_id ],$smart_tags,$cr_replace,$strip_smart_tags);
+				$v_products_description[$l_id] = $items['v_products_description_' . $l_id ];
 				// if short descriptions exist
 				if ($ep_supported_mods['psd'] == true) {
-					$v_products_short_desc[$l_id] = smart_tags($items[$filelayout['v_products_short_desc_' . $l_id ]],$smart_tags,$cr_replace,$strip_smart_tags);
+					$v_products_short_desc[$l_id] = smart_tags($items['v_products_short_desc_' . $l_id ],$smart_tags,$cr_replace,$strip_smart_tags);
 				}
-				$v_products_url[$l_id] = smart_tags($items[$filelayout['v_products_url_' . $l_id ]],$smart_tags,$cr_replace,false);
+				$v_products_url[$l_id] = smart_tags($items['v_products_url_' . $l_id ],$smart_tags,$cr_replace,false);
 			}
 		}
 		//elari... we get the tax_clas_id from the tax_title - from zencart??
@@ -1370,9 +1360,9 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			$category_strlen_long = false;// checks cat length does not exceed db, else exclude product from upload
 			$newlevel = 1;
 			for($categorylevel=6; $categorylevel>0; $categorylevel--) {
-				if ($items[$filelayout['v_categories_name_' . $categorylevel]] != '') {
-					if (strlen($items[$filelayout['v_categories_name_' . $categorylevel]]) > $category_strlen_max) $category_strlen_long = TRUE;
-					$v_categories_name[$newlevel++] = $items[$filelayout['v_categories_name_' . $categorylevel]]; // adding the category name values to $v_categories_name array
+				if ($items['v_categories_name_' . $categorylevel] != '') {
+					if (strlen($items['v_categories_name_' . $categorylevel]) > $category_strlen_max) $category_strlen_long = TRUE;
+					$v_categories_name[$newlevel++] = $items['v_categories_name_' . $categorylevel]; // adding the category name values to $v_categories_name array
 				}// null categories are not assigned
 			}
 			while( $newlevel < $max_categories+1){
