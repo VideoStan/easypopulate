@@ -2167,10 +2167,34 @@ if ($_GET['dross'] == 'delete') {
 				<?php } ?>
 			</table>
 			<?php } ?>
-			<?php
-			$localfileslist = $temp_path . 'fileList.php';
-			if (file_exists($localfileslist)) include($localfileslist);
-			?>
+			<?php if (is_dir($temp_path)) { ?>
+			<div><h2>Uploaded Files</h2></div>
+			<form enctype="multipart/form-data" action="easypopulate.php" method="POST">
+			<input type="hidden" name="local_file" />
+			<table>
+				<thead>
+				<tr>
+					<th>Import</th>
+					<th>File</th>
+					<th>Size</th>
+					<th>Last Modified</th>
+				</tr>
+				</thead>
+				<?php $linkBase = HTTP_SERVER . '/' . $tempdir; ?>
+				<!-- @todo replace the onclick with unobtrusive js when i get to jquery -->
+				<?php foreach (new DirectoryIterator($temp_path) as $tempFile) { ?>
+				<?php if (!$tempFile->isDot() && ($tempFile->getFilename() != 'index.html')) { ?>
+					<tr>
+						<td><input type="submit" onclick="this.form.local_file.value='<?php echo $tempFile->getFileName() ?>';" value="Import" /></td>
+						<td><a href="<?php echo $linkBase . $tempFile->getFileName(); ?>"> <?php echo $tempFile->getFileName(); ?></a></td>
+						<td><?php echo round(($tempFile->getSize() / 1024)); ?> KB</td>
+						<td><?php echo strftime(DATE_FORMAT_LONG, $tempFile->getMTime()); ?></td>
+					</tr>
+				<?php } ?>
+				<?php } ?>
+			</table>
+			</form>
+			<?php } ?>
 </div>
 <?php require(DIR_WS_INCLUDES . 'footer.php'); ?>
 </body>
