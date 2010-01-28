@@ -1087,46 +1087,6 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 //*******************************
 
 if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
-	// these are the fields that will be defaulted to the current values in the database if they are not found in the incoming file
-	// @todo <langer> why not query products table and use result array??
-	$default_these = array(
-		'v_products_image',
-		'v_categories_id',
-		'v_products_price');
-	if ($ep_supported_mods['uom']) {
-		$mod_array = array('v_products_price_as');
-		$default_these = array_merge($default_these, $mod_array);
-	}
-	if ($ep_supported_mods['upc']) {
-		$mod_array = array('v_products_upc');
-		$default_these = array_merge($default_these, $mod_array);
-	}
-	$default_these = array_merge( $default_these, array('v_products_quantity',
-		'v_products_weight',
-		'v_products_discount_type',
-		'v_products_discount_type_from',
-		'v_product_is_call',
-		'v_products_sort_order',
-		'v_products_quantity_order_min',
-		'v_products_quantity_order_units',
-		'v_date_added',
-		'v_date_avail',
-		'v_instock',
-		'v_tax_class_title',
-		'v_manufacturers_name',
-		'v_manufacturers_id',
-		'v_products_dim_type',
-		'v_products_length',
-		'v_products_width',
-		'v_products_height',
-		'v_products_status'
-	));
-
-	if (count($custom_fields) > 0) {
-		foreach($custom_fields as $f) {
-			$default_these[] = 'v_'.$f;
-		}
-	}
 
 	$output['specials'] = array();
 	$output['errors'] = array();
@@ -1150,6 +1110,8 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 	$itemcount = 0;
 	while ($file->valid()) {
 		$items = $file->mapRow();
+
+		// @todo we should just select * and stop using this v_*
 		$sql = 'SELECT
 			p.products_id as v_products_id,
 			p.products_model as v_products_model,
@@ -1177,7 +1139,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			p.products_status as v_products_status,
 			p.manufacturers_id as v_manufacturers_id,
 			subc.categories_id as v_categories_id'.
-			$custom_filelayout_sql.
 			" FROM
 			".TABLE_PRODUCTS." as p,
 			".TABLE_CATEGORIES." as subc,
@@ -1297,19 +1258,12 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			}
 
 			/**
-			* langer - the following defaults all of our current data from our db ($row array) to our update variables (called internal variables here)
-			* for each $default_these - this limits it just to TABLE_PRODUCTS fields defined in this array!
-			* eg $v_products_price = $row['v_products_price'];
-			* perhaps we should build onto this array with each $row assignment routing above, so as to default all data to existing database
-			*/
-
-			// now create the internal variables that will be used
-			// the $$thisvar is on purpose: it creates a variable named what ever was in $thisvar and sets the value
-			// sets them to $row value, which is the existing value for these fields in the database
-			foreach ($default_these as $thisvar){
-				$$thisvar = $row[$thisvar];
-			}
-
+			 * langer - the following defaults all of our current data from our db ($row array) to our update variables (called internal variables here)
+			 * eg $v_products_price = $row['v_products_price'];
+			 * perhaps we should build onto this array with each $row assignment routing above, so as to default all data to existing database
+			 * @todo <johnny> we shouln't use extract, just keeping for compatibility with the current code
+			 */
+			extract($row);
 		}
 		/**
 		* We have now set our PRODUCT_TABLE vars for existing products, and got our default descriptions & categories in $row still
