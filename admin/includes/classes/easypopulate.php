@@ -90,7 +90,8 @@ class EPUploadStandard extends SplFileObject
 	 */
 	function rewind()
 	{
-		$this->seek(1);
+		parent::rewind();
+		$this->next();
 	}
 
 	/**
