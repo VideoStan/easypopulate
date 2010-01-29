@@ -87,7 +87,8 @@ extract($config);
 @set_time_limit($time_limit);
 @ini_set('max_input_time', $time_limit);
 
-$curver = '1.2.5.7.csv';
+// @todo move this define to somewhere not dependent on the admin interface being loaded
+define('EASYPOPULATE_VERSION', '3.9.5');
 
 $output = array();
 $ep_dltype = NULL;
@@ -2021,7 +2022,7 @@ if ($_GET['dross'] == 'delete') {
 <body onLoad="init()">
 <?php require(DIR_WS_INCLUDES . 'header.php'); ?>
 <div id="ep_header">
-	<h1>Easy Populate <?php echo $curver ?></h1>
+	<h1>Easy Populate <?php echo EASYPOPULATE_VERSION ?></h1>
 </div>
 <div>
 	<form enctype="multipart/form-data" action="easypopulate.php" method="POST">
