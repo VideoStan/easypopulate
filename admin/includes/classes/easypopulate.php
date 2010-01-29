@@ -79,22 +79,42 @@ class EPUploadStandard extends SplFileObject
 	 */
 	public function get($column)
 	{
-		$line = $this->getRow();
+		$line = $this->current();
 		return $line[$column];
 	}
 
-	function getRow()
+	/**
+	 * Rewind to the first data row
+	 *
+	 * @return void
+	 */
+	function rewind()
 	{
-		$row = array_pad($this->current(), count($this->filelayout), '');
+		$this->seek(1);
+	}
+
+	/**
+	 * Get the current line array indexed by filelayout column names
+	 *
+	 * The keys are provided by the file handler and the data is padded to match
+	 * the size of the filelayout, so we get defined but empty values
+	 *
+	 * @return array
+	 * @todo should the values be an empty string or NULL?
+	 */
+	function current()
+	{
+		if (empty($this->filelayout)) return parent::current();
+		$row = array_pad(parent::current(), count($this->filelayout), '');
 		return array_combine(array_keys($this->filelayout), array_values($row));
 	}
 
 	/**
 	 * Map row values to columns
 	 */
-	public function mapRow()
+	public function handleRow($item)
 	{
-		return $this->getRow();
+		return $item;
 	}
 }
 ?>

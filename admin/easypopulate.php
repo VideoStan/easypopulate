@@ -1108,8 +1108,8 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 	if ($filelayout = $file->getFileLayout()) {
 	$file->seek(1);
 	$itemcount = 0;
-	while ($file->valid()) {
-		$items = $file->mapRow();
+	foreach ($file as $items) {
+		$items = $file->handleRow($items);
 
 		// @todo we should just select * and stop using this v_*
 		$sql = 'SELECT
@@ -1913,7 +1913,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 		$output['items'][] = array('status' => $output_status, 'class' => $output_class, 'message' => $output_message, 'data' => $output_data);
 		// end of row insertion code
 		$itemcount++;
-		$file->next();
 	}
 	}
 
