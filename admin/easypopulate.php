@@ -1544,59 +1544,30 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 
 			/**
 			 * Update quantity price breaks
-			 *
-			 * This code does not check for existing quantity breaks, 
-			 * it simply updates or adds them. No algorithm for removal.
-			 * @todo do something about preceding comment
-			 * Use this command to remove all old discount entries.
-			 * $db->Execute("delete from " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . " where products_id = '" . (int)$v_products_id . "'");
+			 * if v_products_discount_type == 0 then there are no quantity breaks
 			 */
-			$xxx = 1;
-			$v_discount_id_var    = 'v_discount_id_'.$xxx ;
-			$v_discount_qty_var   = 'v_discount_qty_'.$xxx;
-			$v_discount_price_var = 'v_discount_price_'.$xxx;
-
-			while ( isset($$v_discount_id_var) ) {
-				 // if v_products_discount_type == 0 then there are no quantity breaks
-				if ($v_products_discount_type != '0') {
-
-					if ($v_products_model != "") {
-						// we check to see if this is a product in the current db, must have product model number
-						$result = ep_query("SELECT products_id FROM ".TABLE_PRODUCTS." WHERE (products_model = '" . zen_db_input($v_products_model) . "')");
-
-						if (mysql_num_rows($result) != 0)  { // found entry
-							$row3 =  mysql_fetch_array($result);
-							$v_products_id = $row3['products_id'];
-
-							$sql2 = "SELECT discount_id, discount_qty, discount_price
-								FROM ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." WHERE
-								products_id = " . zen_db_input($v_products_id) . " AND discount_id = '".$xxx."'";
-							$result2 = ep_query($sql2);
-							$row2 = mysql_fetch_array($result2);
-							$data = array();
-							$data['products_id'] = $v_products_id;
-							$data['discount_qty'] = $$v_discount_qty_var;
-							$data['discount_price'] = $$v_discount_price_var;
-							if ( $row2 != '' ) { // found entry: update discount_price value
-								$data['products_id'] = $xxx;
-								$where = "products_id = $v_products_id AND discount_id = $xxx";
-								$query = ep_db_modify(TABLE_PRODUCTS_DISCOUNT_QUANTITY, $data, 'UPDATE', $where);
-								$result = ep_query($query);
-							} else { // entry does not exist, add to database
-								if ($$v_discount_price_var != "") { // check for empty price
-									$data['discount_id'] = $$v_discount_id_var;
-									$query = ep_db_modify(TABLE_PRODUCTS_DISCOUNT_QUANTITY, $data, 'INSERT');
-									$result = ep_query($query);
-								} // end: check for empty price
-							} // end: update discount_price value
-						} // end: if (row count <> 0) found entry
-					} // if ($v_products_model)
-				} // if ($v_products_discount_type != '0')
-				$xxx++;
-				$v_discount_id_var    = 'v_discount_id_'.$xxx ;
-				$v_discount_qty_var   = 'v_discount_qty_'.$xxx;
-				$v_discount_price_var = 'v_discount_price_'.$xxx;
-			} // while (isset($$v_discount_id_var)
+			if (isset($items['v_products_discount_type']) && !empty($items['v_products_discount_type'])) {
+				$sql = "SELECT `products_id` FROM ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." WHERE (`products_id` = '$v_products_id') LIMIT 1 ";
+				$result = ep_query($sql);
+				if ($row = mysql_fetch_array($result)) {
+					$sql = "DELETE FROM ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." WHERE (`products_id` = '$v_products_id') ";
+					$result = ep_query($sql);
+				}
+				for ($discount = 1; ; $discount++) {
+					if (!isset($items['v_discount_qty_' .$discount])) break;
+					if (!isset($items['v_discount_price_' .$discount])) break;
+					if (empty($items['v_discount_qty_' .$discount])) continue;
+					if (empty($items['v_discount_price_' .$discount])) continue;
+					// Easier to start over than try to update individual discounts
+					$data = array();
+					$data['discount_id'] = $discount;
+					$data['products_id'] = $v_products_id;
+					$data['discount_qty'] = $items['v_discount_qty_' .$discount];
+					$data['discount_price'] = $items['v_discount_price_' .$discount];
+					$sql = ep_db_modify(TABLE_PRODUCTS_DISCOUNT_QUANTITY, $data, 'INSERT');
+					$result = ep_query($sql);
+				}
+			}
 
 			//*************************
 			// Products Descriptions Start
@@ -1872,6 +1843,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			$output_class = 'fail nomodel';
 			$output_message = EASYPOPULATE_DISPLAY_RESULT_NO_MODEL;
 		}
+
 		$output_data = array_values($items);
 		$output['items'][] = array('status' => $output_status, 'class' => $output_class, 'message' => $output_message, 'data' => $output_data);
 		// end of row insertion code
