@@ -82,6 +82,7 @@ class EPUploadBNFUSA extends EPUploadStandard
 
 		// Everything below here is dynamic, there is no matching field in the file
 		$filelayout[] = 'v_products_image';
+		$filelayout[] = 'v_products_discount_type';
 		/*$filelayout[] = 'v_categories_name_1';
 		$filelayout[] = 'v_categories_name_2';
 		$filelayout[] = 'v_categories_name_3';
@@ -124,7 +125,8 @@ class EPUploadBNFUSA extends EPUploadStandard
 		if (empty($item['v_categories_name_3'])) {
 			unset($item['v_categories_name_3']);
 		}
-		
+		$item['v_products_discount_type'] = 2;
+
 		$model = $item['v_products_model'];
 		$item['v_products_image'] = 'products/' . $model . '/' . $model . '_800.jpg';
 		$desc = $item['x_size_color_desc'];
