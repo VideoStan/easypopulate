@@ -334,6 +334,11 @@ function install_easypopulate() {
 							'key' => 'EASYPOPULATE_CONFIG_TEMP_DIR',
 							'value' => 'tempEP/', 
 							'description' => 'Name of directory for your uploads (default: tempEP/).');
+	$entries[] = array('title' => 'Default Upload File Format',
+							'key' => 'EASYPOPULATE_CONFIG_UPLOAD_FILE_FORMAT',
+							'value' => 'Standard',
+							'description' => 'Upload file format (default: Standard).',
+							'set_function' => 'zen_cfg_select_option(array("Standard", "BNFUSA"),');
 	$entries[] = array('title' => 'Upload File Date Format',
 							'key' => 'EASYPOPULATE_CONFIG_FILE_DATE_FORMAT',
 							'value' => 'm-d-y', 
@@ -468,7 +473,7 @@ function ep_get_config($var = '')
 	// @todo FIXME Currently just works on TABLE_PRODUCTS
 	$config['custom_fields'] = explode(',',trim(EASYPOPULATE_CONFIG_CUSTOM_FIELDS,','));
 	$config['time_limit'] = EASYPOPULATE_CONFIG_TIME_LIMIT;
-
+	$config['upload_file_format'] = EASYPOPULATE_CONFIG_UPLOAD_FILE_FORMAT;
 	$tempdir = EASYPOPULATE_CONFIG_TEMP_DIR;
 	if (substr($tempdir, -1) != '/') $tempdir .= '/';
    if (substr($tempdir, 0, 1) == '/') $tempdir = substr($tempdir, 1);

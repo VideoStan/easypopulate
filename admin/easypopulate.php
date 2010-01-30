@@ -1060,8 +1060,11 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 	$fileInfo = new SplFileInfo($file_location);
 
 	$output['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $fileInfo->getFileName(), $fileInfo->getSize());
-
-	$fileInfo->setFileClass(EPFileUploadFactory::get('Standard'));
+	// @todo add this to the gui with the default value selected
+	if (empty($upload_file_format) || !isset($upload_file_format)) {
+		$upload_file_format = 'Standard';
+	}
+	$fileInfo->setFileClass(EPFileUploadFactory::get($upload_file_format));
 	$file = $fileInfo->openFile('r');
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED;
