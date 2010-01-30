@@ -1808,7 +1808,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 						// options_values price update begin
 						$v_attribute_values_price_var = 'v_attribute_values_price_' . $attribute_options_count . '_' . $attribute_values_count;
 						 // @todo, this check doesn't seem right, it is always fails.hiding it until i can make it error out
-						if (true /*isset($$v_attribute_values_price_var) && ($$v_attribute_values_price_var != ''*/)) {
+						if (true /*isset($$v_attribute_values_price_var) && ($$v_attribute_values_price_var != '')*/) {
 							$attribute_prices_query = "select options_values_price, price_prefix from " . TABLE_PRODUCTS_ATTRIBUTES . " where products_id = '" . (int)$v_products_id . "' and options_id ='" . (int)$$v_attribute_options_id_var . "' and options_values_id = '" . (int)$$v_attribute_values_id_var . "'";
 							$attribute_prices_values = ep_query($attribute_prices_query);
 
