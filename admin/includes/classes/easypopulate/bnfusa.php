@@ -64,14 +64,17 @@ class EPUploadBNFUSA extends EPUploadStandard
 		$rename['v_products_price']			= 'Each Price';
 		$rename['v_products_quantity']		= 'Available Inventory';
 		$rename['v_discount_price_1']			= 'Column 2 Price';
-		$rename['v_discount_qty_1']			= 'Column 2 Break'; 
-		$rename['v_discount_price_2']			= 'Column 3 Price'; 
-		$rename['v_discount_qty_2']			= 'Column 3 Break'; 
-		$rename['v_discount_price_3']			= 'Column 4 Price'; 
-		$rename['v_discount_qty_3']			= 'Column 4 Break'; 
-		$rename['v_discount_price_4']			= 'Column 5 Price'; 
-		$rename['v_discount_qty_4']			= 'Column 5 Break'; 
-		$rename['v_products_weight']			= 'Each Weight (lbs.)'; 
+		$rename['v_discount_qty_1']			= 'Column 2 Break';
+		$rename['v_discount_price_2']			= 'Column 3 Price';
+		$rename['v_discount_qty_2']			= 'Column 3 Break';
+		$rename['v_discount_price_3']			= 'Column 4 Price';
+		$rename['v_discount_qty_3']			= 'Column 4 Break';
+		$rename['v_discount_price_4']			= 'Column 5 Price';
+		$rename['v_discount_qty_4']			= 'Column 5 Break';
+		$rename['v_products_weight']			= 'Each Weight (lbs.)';
+		$rename['v_categories_name_1']		= 'Major Category';
+		$rename['v_categories_name_2']		= 'Minor Category';
+		$rename['v_categories_name_3']		= 'Item Status';
 		$rename['x_size_color_desc']			= 'Item Size-Color Desc'; 
 		$rename['x_size_color_numeric']		= 'Size-Color Key Numeric';
 		$rename['x_item_categories_numeric'] = 'Item Categories (numeric)';
@@ -79,11 +82,11 @@ class EPUploadBNFUSA extends EPUploadStandard
 
 		// Everything below here is dynamic, there is no matching field in the file
 		$filelayout[] = 'v_products_image';
-		$filelayout[] = 'v_categories_name_1';
+		/*$filelayout[] = 'v_categories_name_1';
 		$filelayout[] = 'v_categories_name_2';
 		$filelayout[] = 'v_categories_name_3';
 		$filelayout[] = 'v_categories_name_4';
-		$filelayout[] = 'v_categories_name_5';
+		$filelayout[] = 'v_categories_name_5';*/
 
 		$filelayout[] = 'v_attribute_options_id_1';
 		$filelayout[] = 'v_attribute_options_name_1_1';
@@ -112,15 +115,18 @@ class EPUploadBNFUSA extends EPUploadStandard
 
 	public function handleRow(array $item)
 	{
-		$foo = explode(',', trim($item['Item Categories']));	
+		/*$foo = explode(',', trim($item['Item Categories']));
 		$count = 1;
 		foreach ($foo as $cat) {
 			$item['v_categories_name_' . $count] = $cat;
 			$count++;
+		}*/
+		if (empty($item['v_categories_name_3'])) {
+			unset($item['v_categories_name_3']);
 		}
 		
 		$model = $item['v_products_model'];
-		$item['v_products_image'] = 'products/' . $model . '/' . $model . '_800.jpg'
+		$item['v_products_image'] = 'products/' . $model . '/' . $model . '_800.jpg';
 		$desc = $item['x_size_color_desc'];
 		$name = '';
 		if (!empty($desc)) {
