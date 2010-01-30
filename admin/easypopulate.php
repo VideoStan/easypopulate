@@ -1111,7 +1111,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 	$itemcount = 0;
 	foreach ($file as $items) {
 		$items = $file->handleRow($items);
-
+die(var_dump($items));
 		// @todo we should just select * and stop using this v_*
 		$sql = 'SELECT
 			p.products_id as v_products_id,
@@ -2170,7 +2170,7 @@ if ($_GET['dross'] == 'delete') {
 					<th>Last Modified</th>
 				</tr>
 				</thead>
-				<?php $linkBase = HTTP_SERVER . '/' . $tempdir; ?>
+				<?php $linkBase = HTTP_SERVER .  DIR_WS_CATALOG . $tempdir; ?>
 				<!-- @todo replace the onclick with unobtrusive js when i get to jquery -->
 				<?php foreach (new DirectoryIterator($temp_path) as $tempFile) { ?>
 				<?php if (!$tempFile->isDot() && ($tempFile->getFilename() != 'index.html')) { ?>
