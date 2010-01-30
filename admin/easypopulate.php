@@ -155,7 +155,7 @@ if ($advanced_smart_tags) $smart_tags = array_merge($advanced_smart_tags,$smart_
 
 $category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
 
-// model name length error handling
+// model name length error handling @todo fix this
 $model_varchar = zen_field_length(TABLE_PRODUCTS, 'products_model');
 if (!isset($model_varchar)) {
 	$messageStack->add(EASYPOPULATE_MSGSTACK_MODELSIZE_DETECT_FAIL, 'warning');
@@ -997,47 +997,14 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 
 	}
 
-	// Create export file name
-	$EXPORT_TIME = strftime('%Y%b%d-%H%M%S');
 	switch ($ep_dltype) {
-		case 'full':
-		$EXPORT_FILE = "Full-EP" . $EXPORT_TIME;
-		break;
-		case 'priceqty':
-		$EXPORT_FILE = "PriceQty-EP" . $EXPORT_TIME;
-		break;
-		case 'modqty':
-		$EXPORT_FILE = "ModifiedDate-EP" . $EXPORT_TIME;
-		break;
-		case 'pricebreaks':
-		$EXPORT_FILE = "PriceBreaks-EP" . $EXPORT_TIME;
-		break;
-		case 'category':
-		$EXPORT_FILE = "Category-EP" . $EXPORT_TIME;
-		break;
 		case 'froogle':
-			$EXPORT_FILE = "Froogle-EP" . $EXPORT_TIME;
 			$col_delimiter = "\t";
 			$col_enclosure = ' ';
 			$filestring = array_map("kill_breaks", $filestring);
 		break;
-		case 'attrib':
-		$EXPORT_FILE = "Attrib-Full-EP" . $EXPORT_TIME;
-		break;
-		case 'attrib_basic':
-		$EXPORT_FILE = "Attrib-Basic-EP" . $EXPORT_TIME;
-		break;
-		case 'options':
-		$EXPORT_FILE = "Options-EP" . $EXPORT_TIME;
-		break;
-		case 'values':
-		$EXPORT_FILE = "Values-EP" . $EXPORT_TIME;
-		break;
-		case 'optionvalues':
-		$EXPORT_FILE = "OptVals-EP" . $EXPORT_TIME;
-		break;
 	}
-
+	$export_file = 'EP-' . $ep_dltype . strftime('%Y%b%d-%H%M%S');
 	// now either stream it to them or put it in the temp directory
 	if ($ep_dlmethod == 'stream') {
 		//*******************************
@@ -1045,7 +1012,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		//*******************************
 		header("Content-type: text/csv");
 		//header("Content-type: application/vnd.ms-excel"); // @todo make this configurable
-		header("Content-disposition: attachment; filename=$EXPORT_FILE" . (($col_delimiter == ",")?".csv":".txt"));
+		header("Content-disposition: attachment; filename=$export_file" . (($col_delimiter == ",")?".csv":".txt"));
 		// Changed if using SSL, helps prevent program delay/timeout (add to backup.php also)
 		if ($request_type== 'NONSSL'){
 			header("Pragma: no-cache");
@@ -1064,22 +1031,15 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		//*******************************
 		// PUT FILE IN TEMP DIR
 		//*******************************
-		$tmpfpath = $temp_path . "$EXPORT_FILE" . (($col_delimiter == ",")?".csv":".txt");
+		$tmpfpath = $temp_path . $export_file . (($col_delimiter == ",")?".csv":".txt");
 		$fp = fopen( $tmpfpath, "w+");
 		foreach ($filestring as $line) {
 			fputcsv($fp, $line, $col_delimiter, $col_enclosure);
 		}
 		fclose($fp);
-		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $EXPORT_FILE, $tempdir), 'success');
+		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $export_file, $tempdir), 'success');
 	}
 }
-
-//*******************************
-//*******************************
-// DOWNLOADING ENDS HERE
-//*******************************
-//*******************************
-
 
 //*******************************
 //*******************************
@@ -1107,11 +1067,10 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED;
 
 	if ($filelayout = $file->getFileLayout()) {
-	$file->seek(1);
 	$itemcount = 0;
 	foreach ($file as $items) {
 		$items = $file->handleRow($items);
-die(var_dump($items));
+
 		// @todo we should just select * and stop using this v_*
 		$sql = 'SELECT
 			p.products_id as v_products_id,
