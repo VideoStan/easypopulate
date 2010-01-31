@@ -304,6 +304,7 @@ if (zen_not_null($ep_dltype)) {
 		$custom_layout_sql = ' ';
 		if(count($custom_fields) > 0) {
 			foreach($custom_fields as $f) {
+				if (empty($f)) continue;
 				$filelayout[] = 'v_'.$f;
 				$custom_filelayout_sql .= ', p.'.$f.' as v_'.$f.' ';
 			}
