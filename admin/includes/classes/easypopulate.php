@@ -115,6 +115,13 @@ class EPUploadStandard extends SplFileObject
 	 */
 	public function handleRow($item)
 	{
+		if ((trim($item['v_products_quantity']) == '') || !isset($item['v_products_quantity'])) {
+			$items['v_products_quantity'] = 0;
+		}
+		if ((trim($items['v_products_image']) == '') || !isset($item['v_products_image'])) {
+			$items['v_products_image'] = PRODUCTS_IMAGE_NO_IMAGE;
+		}
+
 		return $item;
 	}
 }

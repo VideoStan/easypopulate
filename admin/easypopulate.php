@@ -1075,7 +1075,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 	foreach ($file as $items) {
 		$items = $file->handleRow($items);
 
-		if (!isset($items['v_products_model']) && !zen_not_null($items['v_products_model']))
+		if (!isset($items['v_products_model']) && !zen_not_null($items['v_products_model'])) {
 			$output_class = 'fail nomodel';
 			$output_message = EASYPOPULATE_DISPLAY_RESULT_NO_MODEL;
 			continue;
@@ -1128,7 +1128,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 		$result = ep_query($sql);
 
 		$product_is_new = true;
-
 		while ( $row = mysql_fetch_array($result) ) {
 			$output_class = 'success';
 			$output_message = '';
@@ -1347,10 +1346,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			}
 		}
 
-		if (trim($v_products_quantity) == '') {
-			$v_products_quantity = 0;
-		}
-
 		// default the stock if they spec'd it or if it's blank
 		// @todo <chadd> we should try something like this $v_db_status = $v_products_status;
 		$v_db_status = '1'; // default to active
@@ -1367,10 +1362,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 
 		if ($v_manufacturer_id == '') {
 			$v_manufacturer_id = "NULL";
-		}
-
-		if (trim($v_products_image) == '') {
-			$v_products_image = PRODUCTS_IMAGE_NO_IMAGE;
 		}
 
 		// OK, we need to convert the manufacturer's name into id's for the database
@@ -1839,13 +1830,12 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 				$output['specials'][] = array('status' => $specials_status, 'class' => $specials_class, 'message' => $specials_message, 'data' => $specials_data);
 			}
 			// end specials for this product
-
 		$output_data = array_values($items);
 		$output['items'][] = array('status' => $output_status, 'class' => $output_class, 'message' => $output_message, 'data' => $output_data);
 		// end of row insertion code
 		$itemcount++;
 	}
-
+}
 	/**
 	* Post-upload tasks start
 	*/
