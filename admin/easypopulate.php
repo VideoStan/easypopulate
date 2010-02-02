@@ -155,15 +155,6 @@ if ($advanced_smart_tags) $smart_tags = array_merge($advanced_smart_tags,$smart_
 
 $category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
 
-// model name length error handling @todo fix this
-$model_varchar = zen_field_length(TABLE_PRODUCTS, 'products_model');
-if (!isset($model_varchar)) {
-	$messageStack->add(EASYPOPULATE_MSGSTACK_MODELSIZE_DETECT_FAIL, 'warning');
-	$modelsize = 32;
-} else {
-	$modelsize = $model_varchar;
-}
-
 /**
 * Pre-flight checks finish here
 */
@@ -1070,10 +1061,32 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED;
 
+	// model name length error handling
+	$model_varchar = zen_field_length(TABLE_PRODUCTS, 'products_model');
+	if (!isset($model_varchar)) {
+		$messageStack->add(EASYPOPULATE_MSGSTACK_MODELSIZE_DETECT_FAIL, 'warning');
+		$modelsize = 32;
+	} else {
+		$modelsize = $model_varchar;
+	}
+
 	if ($filelayout = $file->getFileLayout()) {
 	$itemcount = 0;
 	foreach ($file as $items) {
 		$items = $file->handleRow($items);
+
+		if (!isset($items['v_products_model']) && !zen_not_null($items['v_products_model']))
+			$output_class = 'fail nomodel';
+			$output_message = EASYPOPULATE_DISPLAY_RESULT_NO_MODEL;
+			continue;
+		}
+
+		if (strlen($items['v_products_model']) > $modelsize) {
+			$output_class = 'fail';
+			$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
+			$output_message = EASYPOPULATE_DISPLAY_RESULT_MODEL_NAME_LONG;
+			continue;
+		}
 
 		// @todo we should just select * and stop using this v_*
 		$sql = 'SELECT
@@ -1130,7 +1143,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			if ($items['v_status'] == 9) {
 				$output_status = EASYPOPULATE_DISPLAY_RESULT_DELETED;
 				$output_class = 'success deleted';
-				ep_remove_product($item['v_products_model']);
+				ep_remove_product($items['v_products_model']);
 				continue 2;
 			}
 
@@ -1238,14 +1251,8 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 		* Data error checking
 		* inputs: $items; $filelayout; $product_is_new (no reliance on $row)
 		*/
-		if ($items['v_status'] == 9 && zen_not_null($items['v_products_model'])) {
-			// new delete got this far, so cant exist in db. Cant delete what we don't have...
-			$output_class = 'fail';
-			$output_status = EASYPOPULATE_DISPLAY_RESULT_DELETE_NOT_FOUND;
-			continue;
-		}
 		if ($product_is_new == true) {
-			if (!zen_not_null(trim($items['v_categories_name_1'])) && zen_not_null($items['v_products_model'])) {
+			if (!zen_not_null(trim($items['v_categories_name_1']))) {
 				// let's skip this new product without a master category..
 				$output_class = 'fail';
 				$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
@@ -1366,13 +1373,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			$v_products_image = PRODUCTS_IMAGE_NO_IMAGE;
 		}
 
-		if (strlen($v_products_model) > $modelsize ){
-			$output_class = 'fail';
-			$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
-			$output_message = EASYPOPULATE_DISPLAY_RESULT_MODEL_NAME_LONG;
-			continue;
-		}
-
 		// OK, we need to convert the manufacturer's name into id's for the database
 		if ( isset($v_manufacturers_name) && $v_manufacturers_name != '' ){
 			$sql = "SELECT man.manufacturers_id as manID
@@ -1438,7 +1438,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 		}
 
 		// insert new, or update existing, product
-		if ($v_products_model != "") { //   products_model exists!
+		// @todo harmonize the indentation
 			// First we check to see if this is a product in the current db.
 			$result = ep_query("SELECT `products_id` FROM ".TABLE_PRODUCTS." WHERE (products_model = '" . zen_db_input($v_products_model) . "') LIMIT 1 ");
 
@@ -1839,17 +1839,11 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 				$output['specials'][] = array('status' => $specials_status, 'class' => $specials_class, 'message' => $specials_message, 'data' => $specials_data);
 			}
 			// end specials for this product
-		} else {
-			// this record is missing the product_model
-			$output_class = 'fail nomodel';
-			$output_message = EASYPOPULATE_DISPLAY_RESULT_NO_MODEL;
-		}
 
 		$output_data = array_values($items);
 		$output['items'][] = array('status' => $output_status, 'class' => $output_class, 'message' => $output_message, 'data' => $output_data);
 		// end of row insertion code
 		$itemcount++;
-	}
 	}
 
 	/**
