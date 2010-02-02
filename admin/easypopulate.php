@@ -98,7 +98,6 @@ $ep_stack_sql_error = false; // function returns true on any 1 error, and notifi
 $products_with_attributes = false; // langer - this will be redundant after html renovation
 // @todo CHECK: maybe below can go in array eg $ep_processed['attributes'] = true, etc.. cold skip all post-upload tasks on check if isset var $ep_processed.
 $has_attributes == false;
-$has_specials == false;
 
 
 // all mods go in this array as 'name' => 'true' if exist. eg $ep_supported_mods['psd'] = true; means it exists.
@@ -1782,7 +1781,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 				}
 
 				// if null (set further above), set forever, else get raw date
-				$has_specials == true;
 				$v_specials_date_avail = ($v_specials_date_avail == true) ? date("Y-m-d H:i:s",strtotime($v_specials_date_avail)) : "0001-01-01";
 				$v_specials_expires_date = ($v_specials_expires_date == true) ? date("Y-m-d H:i:s",strtotime($v_specials_expires_date)) : "0001-01-01";
 
@@ -1842,7 +1840,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 
 	ep_update_prices();
 
-	if ($has_specials) {
+	if (!empty($output['specials']) {
 		zen_expire_specials();
 	}
 
