@@ -467,7 +467,9 @@ function ep_get_config($var = '')
 	$config['price_with_tax'] = ((EASYPOPULATE_CONFIG_PRICE_INC_TAX == 'true') ? true : false);
 	$config['max_categories'] = EASYPOPULATE_CONFIG_MAX_CATEGORY_LEVELS;
 	$config['strip_smart_tags'] = ((EASYPOPULATE_CONFIG_SMART_TAGS == 'true') ? true : false);
-	$config['advanced_smart_tags'] = ((EASYPOPULATE_CONFIG_ADV_SMART_TAGS == 'true') ? true : false);
+	$config['smart_tags'] = EASYPOPULATE_CONFIG_SMART_TAGS_LIST;
+	$config['enable_advanced_smart_tags'] = ((EASYPOPULATE_CONFIG_ADV_SMART_TAGS == 'true') ? true : false);
+	$config['advanced_smart_tags'] = EASYPOPULATE_CONFIG_ADV_SMART_TAGS_LIST;
 	$config['detect_line_endings'] = ((EASYPOPULATE_CONFIG_DETECT_LINE_ENDINGS == 'true') ? true : false);
 	$config['deactivate_on_zero_qty'] = ((EASYPOPULATE_CONFIG_ZERO_QTY_INACTIVE == 'true') ? true : false);
 	// @todo FIXME Currently just works on TABLE_PRODUCTS
