@@ -55,7 +55,7 @@ function print_el($value)
 	return substr(strip_tags($value), 0, 10);
 }
 
-function smart_tags($string,$tags,$crsub,$doit) {
+function smart_tags($string,$tags, $doit) {
 	if ($doit == true) {
 		foreach ($tags as $tag => $new) {
 			$tag = '/('.$tag.')/';

@@ -1232,14 +1232,14 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 
 			if (isset($filelayout['v_products_name_' . $l_id ])){ // do for each language in our upload file if exist
 				// convert language names from _1, _2, etc; into arrays [1], [2], etc
-				$v_products_name[$l_id] = smart_tags($items['v_products_name_' . $l_id],$smart_tags,$cr_replace,false);
-				//$v_products_description[$l_id] = smart_tags($items['v_products_description_' . $l_id ],$smart_tags,$cr_replace,$strip_smart_tags);
+				$v_products_name[$l_id] = smart_tags($items['v_products_name_' . $l_id],$smart_tags,false);
+				//$v_products_description[$l_id] = smart_tags($items['v_products_description_' . $l_id ],$smart_tags,$strip_smart_tags);
 				$v_products_description[$l_id] = $items['v_products_description_' . $l_id ];
 				// if short descriptions exist
 				if ($ep_supported_mods['psd'] == true) {
-					$v_products_short_desc[$l_id] = smart_tags($items['v_products_short_desc_' . $l_id ],$smart_tags,$cr_replace,$strip_smart_tags);
+					$v_products_short_desc[$l_id] = smart_tags($items['v_products_short_desc_' . $l_id ],$smart_tags,$strip_smart_tags);
 				}
-				$v_products_url[$l_id] = smart_tags($items['v_products_url_' . $l_id ],$smart_tags,$cr_replace,false);
+				$v_products_url[$l_id] = smart_tags($items['v_products_url_' . $l_id ],$smart_tags,false);
 			}
 		}
 		//elari... we get the tax_clas_id from the tax_title - from zencart??
@@ -1404,16 +1404,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			}
 			if ($ep_supported_mods['upc']) {
 					$product['products_upc'] = $v_products_upc;
-			}
-
-			/**
-			 * Custom fields to add to query
-			 * @todo $custom_input doesn't seem right, it only allows one field with multiple values the way it is now
-			 */
-			if (count($custom_fields) > 0) {
-				foreach($custom_fields as $f) {
-					$products[$f] = $custom_input;
-				}
 			}
 
 			if ($row = mysql_fetch_array($result)) {
