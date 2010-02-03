@@ -14,6 +14,29 @@
 require_once ('includes/application_top.php');
 require(DIR_WS_CLASSES . 'easypopulate.php');
 
+$output = array();
+
+if (!isset($_GET['epinstaller'])) $_GET['epinstaller'] = '';
+if (!isset($_GET['dross'])) $_GET['dross'] = '';
+
+if (!defined(EASYPOPULATE_CONFIG_TEMP_DIR) && !empty($_GET['epinstaller'])) { // admin area config not installed
+    $messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_INSTALL_KEYS_FAIL, '<a href="' . zen_href_link(FILENAME_EASYPOPULATE, 'epinstaller=install') . '">', '</a>'), 'warning');
+}
+
+// START installation
+if ($_GET['epinstaller'] == 'remove') {
+    remove_easypopulate();
+    zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+}
+
+if ($_GET['epinstaller'] == 'install') {
+	remove_easypopulate();
+	install_easypopulate();
+	//$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_SUCCESS, 'success');
+	zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+}
+// END installation
+
 /**
  * Initialise vars
  */
@@ -28,14 +51,11 @@ extract($config);
 // @todo move this define to somewhere not dependent on the admin interface being loaded
 define('EASYPOPULATE_VERSION', '3.9.5');
 
-$output = array();
-$ep_dltype = NULL;
-$ep_dlmethod = NULL;
 $chmod_check = true;
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
 $products_with_attributes = false; // langer - this will be redundant after html renovation
 // @todo CHECK: maybe below can go in array eg $ep_processed['attributes'] = true, etc.. cold skip all post-upload tasks on check if isset var $ep_processed.
-$has_attributes == false;
+$has_attributes = false;
 
 
 // all mods go in this array as 'name' => 'true' if exist. eg $ep_supported_mods['psd'] = true; means it exists.
@@ -58,24 +78,6 @@ if (!$chmod_check) {
 	$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG), 'warning');
 }
 
-if (EASYPOPULATE_CONFIG_TEMP_DIR == 'EASYPOPULATE_CONFIG_TEMP_DIR' && ($_GET['epinstaller'] != 'install')) { // admin area config not installed
-    $messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_INSTALL_KEYS_FAIL, '<a href="' . zen_href_link(FILENAME_EASYPOPULATE, 'epinstaller=install') . '">', '</a>'), 'warning');
-}
-
-// START installation
-if ($_GET['epinstaller'] == 'install') {
-    remove_easypopulate();
-	install_easypopulate();
-	//$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_SUCCESS, 'success');
-	zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
-}
-
-if ($_GET['epinstaller'] == 'remove') {
-    remove_easypopulate();
-    zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
-}
-// END installation
-
 /**
 * START check for existence of various mods
 */
@@ -92,33 +94,6 @@ $category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categorie
 * Pre-flight checks finish here
 */
 
-// START: Create File Layout for Download Types
-
-// START Create attributes array
-// @todo this seems like the wrong place for this code, why is it here?
-$attribute_options_array = array();
-
-if (is_array($attribute_options_select) && (count($attribute_options_select) > 0)) {
-	// this limits the size of files where there are many options/attributes
-	// Maybe we can automatically creat multiple files where column count is likely to exceed 256?
-	foreach ($attribute_options_select as $value) {
-		$attribute_options_query = "select distinct products_options_id from " . TABLE_PRODUCTS_OPTIONS . " where products_options_name = '" . zen_db_input($value) . "'";
-		$attribute_options_values = ep_query($attribute_options_query);
-
-		if ($attribute_options = mysql_fetch_array($attribute_options_values)){
-			$attribute_options_array[] = array('products_options_id' => $attribute_options['products_options_id']);
-		}
-	}
-} else {
-	$attribute_options_query = "select distinct products_options_id from " . TABLE_PRODUCTS_OPTIONS . " order by products_options_id";
-	$attribute_options_values = ep_query($attribute_options_query);
-
-	while ($attribute_options = mysql_fetch_array($attribute_options_values)){
-		$attribute_options_array[] = array('products_options_id' => $attribute_options['products_options_id']);
-	}
-}
-// END Create attributes array
-
 $langcode = zen_get_languages();
 // start array at one, the rest of the code expects it that way
 $langcode = array_combine(range(1, count($langcode)), array_values($langcode));
@@ -130,9 +105,34 @@ foreach ($langcode as $value) {
 	}
 }
 
-$ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : $ep_dltype;
+$ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : NULL;
 
 if (zen_not_null($ep_dltype)) {
+
+
+	// START Create attributes array
+	$attribute_options_array = array();
+	if (isset($attribute_options_select) && is_array($attribute_options_select) && (count($attribute_options_select) > 0)) {
+		// this limits the size of files where there are many options/attributes
+		// Maybe we can automatically creat multiple files where column count is likely to exceed 256?
+		foreach ($attribute_options_select as $value) {
+			$attribute_options_query = "select distinct products_options_id from " . TABLE_PRODUCTS_OPTIONS . " where products_options_name = '" . zen_db_input($value) . "'";
+			$attribute_options_values = ep_query($attribute_options_query);
+
+			if ($attribute_options = mysql_fetch_array($attribute_options_values)){
+				$attribute_options_array[] = array('products_options_id' => $attribute_options['products_options_id']);
+			}
+		}
+	} else {
+		$attribute_options_query = "select distinct products_options_id from " . TABLE_PRODUCTS_OPTIONS . " order by products_options_id";
+		$attribute_options_values = ep_query($attribute_options_query);
+
+		while ($attribute_options = mysql_fetch_array($attribute_options_values)){
+			$attribute_options_array[] = array('products_options_id' => $attribute_options['products_options_id']);
+		}
+	}
+	// END Create attributes array
+
 	// if dltype is set, then create the filelayout.  Otherwise filelayout is read from the uploaded file.
 
 	$filelayout = array();
@@ -591,7 +591,7 @@ if (zen_not_null($ep_dltype)) {
 //*******************************
 //*******************************
 
-$ep_dlmethod = isset($_GET['download']) ? $_GET['download'] : $ep_dlmethod;
+$ep_dlmethod = isset($_GET['download']) ? $_GET['download'] : NULL;
 if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 	//*******************************
 	//*******************************
