@@ -1667,6 +1667,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 				}
 				$attribute_rows++;
 			}
+			unset($attributes);
 			// END ATTRIBUTES
 
 			/**
