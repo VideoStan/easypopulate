@@ -123,6 +123,12 @@ class EPUploadStandard extends SplFileObject
 		if ((trim($item['v_products_image']) == '') || !isset($item['v_products_image'])) {
 			$item['v_products_image'] = PRODUCTS_IMAGE_NO_IMAGE;
 		}
+		if (empty($item['v_products_quantity_order_min']) || !isset($item['v_products_quantity_order_min'])) {
+			$item['v_products_quantity_order_min'] = 1;
+		}
+		if (empty($item['v_products_quantity_order_units']) || !isset($item['v_products_quantity_order_units'])) {
+			$item['v_products_quantity_order_units'] = 1;
+		}
 
 		$attributes = array();
 		foreach ($item as $key => $value) {

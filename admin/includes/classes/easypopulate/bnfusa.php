@@ -105,6 +105,14 @@ class EPUploadBNFUSA extends EPUploadStandard
 		if (empty($item['v_categories_name_3'])) {
 			unset($item['v_categories_name_3']);
 		}
+
+		if (empty($item['v_products_quantity_order_min']) || !isset($item['v_products_quantity_order_min'])) {
+			$item['v_products_quantity_order_min'] = 1;
+		}
+
+		if (empty($item['v_products_quantity_order_units']) || !isset($item['v_products_quantity_order_units'])) {
+			$item['v_products_quantity_order_units'] = 1;
+		}
 		$item['v_products_discount_type'] = 2;
 
 		$model = $item['v_products_model'];
