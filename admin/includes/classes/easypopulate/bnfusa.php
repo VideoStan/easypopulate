@@ -118,6 +118,7 @@ class EPUploadBNFUSA extends EPUploadStandard
 		$model = $item['v_products_model'];
 		$item['v_products_image'] = 'products/' . $model . '/' . $model . '_800.jpg';
 		$desc = $item['x_size_color_desc'];
+		$item['attributes'] = array();
 		$name = '';
 		if (!empty($desc)) {
 			$optionValues = array();
@@ -148,7 +149,6 @@ class EPUploadBNFUSA extends EPUploadStandard
 			$attributes['names'][1] = $name;
 
 			$item['attributes'][0] = array_merge($attributes, array('values' => $optionValues));
-
 		}
 		return $item;
 	}
