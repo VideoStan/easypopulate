@@ -55,6 +55,7 @@
  */
 class EPUploadBNFUSA extends EPUploadStandard
 {
+	public $masterRowCount = 1;
 	public function mapFileLayout(array $filelayout)
 	{
 		$rename = array();
@@ -75,7 +76,7 @@ class EPUploadBNFUSA extends EPUploadStandard
 		$rename['v_categories_name_1']		= 'Major Category';
 		$rename['v_categories_name_2']		= 'Minor Category';
 		$rename['v_categories_name_3']		= 'Item Status';
-		$rename['x_size_color_desc']			= 'Item Size-Color Desc'; 
+		$rename['x_size_color_desc']			= 'Item Size-Color Desc';
 		$rename['x_size_color_numeric']		= 'Size-Color Key Numeric';
 		$rename['x_item_categories_numeric'] = 'Item Categories (numeric)';
 		$filelayout = str_replace(array_values($rename), array_keys($rename), $filelayout);
@@ -83,32 +84,11 @@ class EPUploadBNFUSA extends EPUploadStandard
 		// Everything below here is dynamic, there is no matching field in the file
 		$filelayout[] = 'v_products_image';
 		$filelayout[] = 'v_products_discount_type';
-		/*$filelayout[] = 'v_categories_name_1';
+		$filelayout[] = 'v_categories_name_1';
 		$filelayout[] = 'v_categories_name_2';
 		$filelayout[] = 'v_categories_name_3';
 		$filelayout[] = 'v_categories_name_4';
-		$filelayout[] = 'v_categories_name_5';*/
-
-		$filelayout[] = 'v_attribute_options_id_1';
-		$filelayout[] = 'v_attribute_options_name_1_1';
-		$filelayout[] = 'v_attribute_values_id_1_1';
-		$filelayout[] = 'v_attribute_values_price_1_1';
-		$filelayout[] = 'v_attribute_values_name_1_1_1';
-		$filelayout[] = 'v_attribute_values_id_1_2';
-		$filelayout[] = 'v_attribute_values_price_1_2';
-		$filelayout[] = 'v_attribute_values_name_1_2_1';
-		$filelayout[] = 'v_attribute_values_id_1_3';
-		$filelayout[] = 'v_attribute_values_price_1_3';
-		$filelayout[] = 'v_attribute_values_name_1_3_1';
-		$filelayout[] = 'v_attribute_values_id_1_4';
-		$filelayout[] = 'v_attribute_values_price_1_4';
-		$filelayout[] = 'v_attribute_values_name_1_4_1';
-		$filelayout[] = 'v_attribute_values_id_1_5';
-		$filelayout[] = 'v_attribute_values_price_1_5';
-		$filelayout[] = 'v_attribute_values_name_1_5_1';
-		$filelayout[] = 'v_attribute_values_id_1_6';
-		$filelayout[] = 'v_attribute_values_price_1_6';
-		$filelayout[] = 'v_attribute_values_name_1_6_1';
+		$filelayout[] = 'v_categories_name_5';
 
 		$filelayout = array_flip($filelayout);
 		return $filelayout;
@@ -132,30 +112,35 @@ class EPUploadBNFUSA extends EPUploadStandard
 		$desc = $item['x_size_color_desc'];
 		$name = '';
 		if (!empty($desc)) {
-			$att = array();
-			$pos = $this->key();
-			$this->next();
+			$optionValues = array();
 			while ($nextItem = $this->current()) {
-				if ($nextItem['v_products_model'] != $model) break;
+				if ($nextItem['v_products_model'] != $model) {
+					$this->seek($this->key() - 1);
+					break;
+				}
+				$optionsId = $this->key();
 				if ((int)$nextItem['x_size_color_numeric'] > 5000) {
 					$name = 'Color';
 				} else if ((int)$nextItem['x_size_color_numeric'] > 1) {
 					$name = 'Size';
 				}
-				$att[] = $nextItem['x_size_color_desc'];
+				$values = array();
+				$values['name'] = array();
+				$values['id'] = $this->masterRowCount;
+				$values['price'] = 0.00;
+				$values['names'][1]  = $nextItem['x_size_color_desc']; // indexed by language_id
+				$optionValues[] = $values;
+				$this->masterRowCount++;
 				$this->next();
 			}
 
-			$item['v_attribute_options_id_1'] = 1;
-			$item['v_attribute_options_name_1_1'] = $name;
-			$count = 1;
-			foreach ($att as $value) {
-				if ($value == '') continue;
-				$item['v_attribute_values_id_1_' . $count] = $count;
-				$item['v_attribute_values_price_1_' . $count] = 0.00;
-				$item['v_attribute_values_name_1_' . $count . '_1'] = $value;
-				$count++;
-			}
+			$attributes = array();
+			$attributes['id'] = $optionsId;
+			$attributes['names'] = array(); // indexed by language_id;
+			$attributes['names'][1] = $name;
+
+			$item['attributes'][0] = array_merge($attributes, array('values' => $optionValues));
+
 		}
 		return $item;
 	}
