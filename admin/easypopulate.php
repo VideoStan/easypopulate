@@ -627,7 +627,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 	$filestring[] = array_keys($filelayout_header);
 
 	$num_of_langs = count($langcode);
-	
+
 	while ($row = mysql_fetch_array($result, MYSQL_ASSOC)){
 
 		// build the long full froogle image path
@@ -721,7 +721,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 				$row['v_specials_date_avail'] = $ep_specials['specials_date_available'];
 				$row['v_specials_expires_date'] = $ep_specials['expires_date'];
 			}
-		} 
+		}
 		// END specials
 
 		/**
@@ -1543,153 +1543,131 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 				}
 			}
 
-			///************************
-			// VJ product attribs begin
-			//*************************
-			if (isset($v_attribute_options_id_1)){
+			// START ATTRIBUTES
+			if (isset($attributes) && !empty($attributes)) {
 				$has_attributes = true;
 				$attribute_rows = 1; // master row count
-
 				$languages = zen_get_languages();
 
-				// product options count
-				$attribute_options_count = 1;
-				$v_attribute_options_id_var = 'v_attribute_options_id_' . $attribute_options_count;
+				// remove product attribute options linked to this product before proceeding further
+				$attributes_clean_query = 'DELETE FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' WHERE products_id = ' . $v_products_id;
+				ep_query($attributes_clean_query);
 
-				while (isset($$v_attribute_options_id_var) && $$v_attribute_options_id_var != '') {
-					// langer - above was: && !empty($$v_attribute_options_id_var)) - this broke because 0 is a legitimate options id value
-					// which appears to be not required unless user removes it...
-
-					// remove product attribute options linked to this product before proceeding further
-					$attributes_clean_query = "delete from " . TABLE_PRODUCTS_ATTRIBUTES . " where products_id = '" . (int)$v_products_id . "' and options_id = '" . (int)$$v_attribute_options_id_var . "'";
-					ep_query($attributes_clean_query);
-
-					$attribute_options_query = "select products_options_name from " . TABLE_PRODUCTS_OPTIONS . " where products_options_id = '" . (int)$$v_attribute_options_id_var . "'";
+				foreach ($attributes as $attribute) {
+					$option_id = $attribute['id'];
+					$attribute_options_query = 'SELECT products_options_name FROM ' . TABLE_PRODUCTS_OPTIONS . '
+						where products_options_id = ' . $option_id;
 					$attribute_options_values = ep_query($attribute_options_query);
-
 					// option table update begin
 					// langer - does once initially for each model, for all options and languages in upload file
 					if ($attribute_rows == 1) {
 						// insert into options table if no option exists
-						if (mysql_num_rows($attribute_options_values) <= 0) {
-							for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
-								$lid = $languages[$i]['id'];
+						if (!mysql_num_rows($attribute_options_values)) {
+							foreach($attribute['names'] as $lid => $name) {
+								$data = array();
+								$data['products_options_id'] = $option_id;
+								$data['language_id'] = $lid;
+								$data['products_options_name'] = $name;
+								$query = ep_db_modify(TABLE_PRODUCTS_OPTIONS, $data, 'INSERT');
+								$attribute_options_insert = ep_query($query);
 
-								$v_attribute_options_name_var = 'v_attribute_options_name_' . $attribute_options_count . '_' . $lid;
-
-								if (isset($$v_attribute_options_name_var)) {
-									$attribute_options_insert_query = "insert into " . TABLE_PRODUCTS_OPTIONS . " (products_options_id, language_id, products_options_name) values ('" . (int)$$v_attribute_options_id_var . "', '" . (int)$lid . "', '" . zen_db_input($$v_attribute_options_name_var) . "')";
-									$attribute_options_insert = ep_query($attribute_options_insert_query);
-								}
 							}
 						} else { // update options table, if options already exists
-							for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
-								$lid = $languages[$i]['id'];
+							foreach($attribute['names'] as $lid => $name) {
+								$attribute_options_update_lang_query = "select products_options_name from " . TABLE_PRODUCTS_OPTIONS . " where products_options_id = '" . (int)$option_id . "' and language_id ='" . (int)$lid . "'";
+								$attribute_options_update_lang_values = ep_query($attribute_options_update_lang_query);
 
-								$v_attribute_options_name_var = 'v_attribute_options_name_' . $attribute_options_count . '_' . $lid;
-
-								if (isset($$v_attribute_options_name_var)) {
-									$attribute_options_update_lang_query = "select products_options_name from " . TABLE_PRODUCTS_OPTIONS . " where products_options_id = '" . (int)$$v_attribute_options_id_var . "' and language_id ='" . (int)$lid . "'";
-									$attribute_options_update_lang_values = ep_query($attribute_options_update_lang_query);
-
-									// if option name doesn't exist for particular language, insert value
-									if (mysql_num_rows($attribute_options_update_lang_values) <= 0) {
-										$attribute_options_lang_insert_query = "insert into " . TABLE_PRODUCTS_OPTIONS . " (products_options_id, language_id, products_options_name) values ('" . (int)$$v_attribute_options_id_var . "', '" . (int)$lid . "', '" . zen_db_input($$v_attribute_options_name_var) . "')";
-										$attribute_options_lang_insert = ep_query($attribute_options_lang_insert_query);
-									} else { // if option name exists for particular language, update table
-										$attribute_options_update_query = "update " . TABLE_PRODUCTS_OPTIONS . " set products_options_name = '" . zen_db_input($$v_attribute_options_name_var) . "' where products_options_id ='" . (int)$$v_attribute_options_id_var . "' and language_id = '" . (int)$lid . "'";
-										$attribute_options_update = ep_query($attribute_options_update_query);
-									}
+								$data = array();
+								$data['products_options_id'] = $option_id;
+								$data['language_id'] = $lid;
+								$data['products_options_name'] = $name;
+								// if option name doesn't exist for particular language, insert value
+								if (!mysql_num_rows($attribute_options_update_lang_values)) {
+									$query = ep_db_modify(TABLE_PRODUCTS_OPTIONS, $data, 'INSERT');
+									$attribute_options_lang_insert = ep_query($query);
+								} else { // if option name exists for particular language, update table
+									$where = 'products_options_id =' . $option_id . ' AND language_id = ' . $lid;
+									$query = ep_db_modify(TABLE_PRODUCTS_OPTIONS, $data, 'UPDATE', $where);
 								}
+								ep_query($query);
 							}
 						}
 					}
 					// option table update end
 
-					// product option values count
-					$attribute_values_count = 1;
-					$v_attribute_values_id_var = 'v_attribute_values_id_' . $attribute_options_count . '_' . $attribute_values_count;
-
-					// langer - allowed for 0 value for attributes id also (like options id)... just in case it is possible
-					while (isset($$v_attribute_values_id_var) && $$v_attribute_values_id_var != '') {
-						$attribute_values_query = "SELECT products_options_values_name FROM " . TABLE_PRODUCTS_OPTIONS_VALUES . " WHERE products_options_values_id = '" . (int)$$v_attribute_values_id_var . "'";
+					foreach ($attribute['values'] as $values) {
+						$attribute_values_query = "SELECT products_options_values_name FROM " . TABLE_PRODUCTS_OPTIONS_VALUES . ' WHERE products_options_values_id = ' . (int)$values['id'];
 						$attribute_values_values = ep_query($attribute_values_query);
 
 						// options_values table update begin
 						// langer - does once initially for each model, for all attributes and languages in upload file
 						if ($attribute_rows == 1) {
-							if (mysql_num_rows($attribute_values_values) <= 0) {
-								for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
-									$lid = $languages[$i]['id'];
-
-									$v_attribute_values_name_var = 'v_attribute_values_name_' . $attribute_options_count . '_' . $attribute_values_count . '_' . $lid;
-
-									if (isset($$v_attribute_values_name_var)) {
-										$attribute_values_insert_query = "insert into " . TABLE_PRODUCTS_OPTIONS_VALUES . " (products_options_values_id, language_id, products_options_values_name) values ('" . (int)$$v_attribute_values_id_var . "', '" . (int)$lid . "', '" . zen_db_input($$v_attribute_values_name_var) . "')";
-										$attribute_values_insert = ep_query($attribute_values_insert_query);
-									}
+							if (!mysql_num_rows($attribute_values_values)) {
+								foreach($values['names'] as $lid => $name) {
+									$data = array();
+									$data['products_options_values_id'] = $values['id'];
+									$data['language_id'] = $lid;
+									$data['products_options_values_name'] = $name;
+									$query = ep_db_modify(TABLE_PRODUCTS_OPTIONS_VALUES, $data, 'INSERT');
+									$attribute_values_insert = ep_query($query);
 								}
 
 								// insert values to pov2po table
-								$attribute_values_pov2po_query = "insert into " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " (products_options_id, products_options_values_id) values ('" . (int)$$v_attribute_options_id_var . "', '" . (int)$$v_attribute_values_id_var . "')";
-								$attribute_values_pov2po = ep_query($attribute_values_pov2po_query);
+								$data = array();
+								$data['products_options_id'] = $option_id;
+								$data['products_options_values_id'] = $values['id'];
+								$query = ep_db_modify(TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS, $data, 'INSERT');
+								$attribute_values_pov2po = ep_query($query);
 							} else { // update options table, if options already exists
-								for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
-									$lid = $languages[$i]['id'];
-
-									$v_attribute_values_name_var = 'v_attribute_values_name_' . $attribute_options_count . '_' . $attribute_values_count . '_' . $lid;
-
-									if (isset($$v_attribute_values_name_var)) {
-										$attribute_values_update_lang_query = "select products_options_values_name from " . TABLE_PRODUCTS_OPTIONS_VALUES . " where products_options_values_id = '" . (int)$$v_attribute_values_id_var . "' and language_id ='" . (int)$lid . "'";
-										$attribute_values_update_lang_values = ep_query($attribute_values_update_lang_query);
-
-										if (mysql_num_rows($attribute_values_update_lang_values) <= 0) {
-											$attribute_values_lang_insert_query = "insert into " . TABLE_PRODUCTS_OPTIONS_VALUES . " (products_options_values_id, language_id, products_options_values_name) values ('" . (int)$$v_attribute_values_id_var . "', '" . (int)$lid . "', '" . zen_db_input($$v_attribute_values_name_var) . "')";
-											$attribute_values_lang_insert = ep_query($attribute_values_lang_insert_query);
-										} else {
-											$attribute_values_update_query = "update " . TABLE_PRODUCTS_OPTIONS_VALUES . " set products_options_values_name = '" . zen_db_input($$v_attribute_values_name_var) . "' where products_options_values_id ='" . (int)$$v_attribute_values_id_var . "' and language_id = '" . (int)$lid . "'";
-											$attribute_values_update = ep_query($attribute_values_update_query);
-										}
+								foreach($values['names'] as $lid => $name) {
+									$attribute_values_update_lang_query = 'SELECT products_options_values_name FROM ' . TABLE_PRODUCTS_OPTIONS_VALUES . ' WHERE products_options_values_id = ' . (int)$values['id'] . ' and language_id =' . (int)$lid;
+									$attribute_values_update_lang_values = ep_query($attribute_values_update_lang_query);
+									$data = array();
+									$data['products_options_values_id'] = $values['id'];
+									$data['language_id'] = $lid;
+									$data['products_options_values_name'] = $name;
+									if (!mysql_num_rows($attribute_values_update_lang_values)) {
+										$query = ep_db_modify(TABLE_PRODUCTS_OPTIONS_VALUES, $data, 'INSERT');
+									} else {
+										$where = 'products_options_values_id =' . $values['id'] . ' AND language_id = ' . $lid;
+										$query = ep_db_modify(TABLE_PRODUCTS_OPTIONS_VALUES, $data, 'UPDATE' , $where);
 									}
+									$attribute_values_update = ep_query($query);
 								}
 							}
 						}
 						// options_values table update end
 
 						// options_values price update begin
-						$v_attribute_values_price_var = 'v_attribute_values_price_' . $attribute_options_count . '_' . $attribute_values_count;
-						 // @todo, this check doesn't seem right, it is always fails.hiding it until i can make it error out
-						if (true /*isset($$v_attribute_values_price_var) && ($$v_attribute_values_price_var != '')*/) {
-							$attribute_prices_query = "select options_values_price, price_prefix from " . TABLE_PRODUCTS_ATTRIBUTES . " where products_id = '" . (int)$v_products_id . "' and options_id ='" . (int)$$v_attribute_options_id_var . "' and options_values_id = '" . (int)$$v_attribute_values_id_var . "'";
+						if (isset($values['price']) && is_numeric($values['price'])) {
+							$attribute_prices_query = 'SELECT options_values_price, price_prefix FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' WHERE products_id = ' . (int)$v_products_id . ' AND options_id =' . (int)$option_id . ' AND options_values_id = ' . (int)$values['id'];
 							$attribute_prices_values = ep_query($attribute_prices_query);
 
-							$attribute_values_price_prefix = ($$v_attribute_values_price_var < 0) ? '-' : '+';
+							$attribute_values_price_prefix = ($values['price'] < 0) ? '-' : '+';
 
 							// options_values_prices table update begin
-							if (mysql_num_rows($attribute_prices_values) <= 0) {
-								$attribute_prices_insert_query = "insert into " . TABLE_PRODUCTS_ATTRIBUTES . " (products_id, options_id, options_values_id, options_values_price, price_prefix) values ('" . (int)$v_products_id . "', '" . (int)$$v_attribute_options_id_var . "', '" . (int)$$v_attribute_values_id_var . "', '" . (float)$$v_attribute_values_price_var . "', '" . zen_db_input($attribute_values_price_prefix) . "')";
-								$attribute_prices_insert = ep_query($attribute_prices_insert_query);
+							if (!mysql_num_rows($attribute_prices_values)) {
+								$data = array();
+								$data['products_id'] = $v_products_id;
+								$data['options_id'] = $option_id;
+								$data['options_values_id'] = $values['id'];
+								$data['options_values_price'] = (float)$values['price'];
+								$data['price_prefix'] = $attribute_values_price_prefix;
+								$query = ep_db_modify(TABLE_PRODUCTS_ATTRIBUTES, $data, 'INSERT');
 							} else {
-								$attribute_prices_update_query = "update " . TABLE_PRODUCTS_ATTRIBUTES . " set options_values_price = '" . $$v_attribute_values_price_var . "', price_prefix = '" . $attribute_values_price_prefix . "' where products_id = '" . (int)$v_products_id . "' and options_id = '" . (int)$$v_attribute_options_id_var . "' and options_values_id ='" . (int)$$v_attribute_values_id_var . "'";
-								$attribute_prices_update = ep_query($attribute_prices_update_query);
+								$where = 'products_id = ' . $v_products_id . '
+											AND options_id = ' . $option_id . '
+											AND options_values_id =' . $values['id'];
+								$query = ep_db_modify(TABLE_PRODUCTS_ATTRIBUTES, $data, 'UPDATE', $where);
 							}
+							$attribute_prices_update = ep_query($query);
 						}
 						// options_values price update end
-
-						$attribute_values_count++;
-						$v_attribute_values_id_var = 'v_attribute_values_id_' . $attribute_options_count . '_' . $attribute_values_count;
 					}
-
-					$attribute_options_count++;
-					$v_attribute_options_id_var = 'v_attribute_options_id_' . $attribute_options_count;
 				}
-
 				$attribute_rows++;
-
 			}
-			//*************************
-			// VJ product attribs end
-			//*************************
+			// END ATTRIBUTES
 
 			/**
 			* Specials
@@ -1771,7 +1749,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 		zen_expire_specials();
 	}
 
-	if ($has_attributes == true) {
+	if ($has_attributes) {
 		ep_update_attributes_sort_order();
 	}
 
@@ -1970,7 +1948,7 @@ if ($_GET['dross'] == 'delete') {
 						<td class="status"><?php echo $item['status'] ?></td>
 						<td class="message"><?php echo $item['message'] ?></td>
 						<?php foreach ($item['data'] as $data) { ?>
-							<td><?php echo print_el($data); ?></td>	
+							<td><?php echo print_el($data); ?></td>
 						<?php } ?>
 					</tr>
 				<?php } ?>

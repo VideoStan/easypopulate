@@ -42,7 +42,7 @@ class EPUploadStandard extends SplFileObject
 
 		parent::__construct($file);
 
-		$this->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY | SplFileObject:: DROP_NEW_LINE);
+		$this->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY | SplFileObject::DROP_NEW_LINE);
 		$this->setCsvControl($col_delimiter, $col_enclosure);
 	}
 
@@ -112,15 +112,44 @@ class EPUploadStandard extends SplFileObject
 
 	/**
 	 * Map row values to columns
+	 *
+	 * @todo transform all other underscore separated fields, not just attributes
 	 */
-	public function handleRow($item)
+	public function handleRow(array $item)
 	{
 		if ((trim($item['v_products_quantity']) == '') || !isset($item['v_products_quantity'])) {
 			$items['v_products_quantity'] = 0;
 		}
 		if ((trim($item['v_products_image']) == '') || !isset($item['v_products_image'])) {
-			$items['v_products_image'] = PRODUCTS_IMAGE_NO_IMAGE;
+			$item['v_products_image'] = PRODUCTS_IMAGE_NO_IMAGE;
 		}
+
+		$attributes = array();
+		foreach ($item as $key => $value) {
+			$column = explode('_', $key); // v is column 0
+			if ($column[1] == 'attribute') {
+				if ($column[2] == 'options') {
+					if ($column[3] == 'id') {
+						$attributes[$column[4]]['id'] = $value; // v_attribute_options_id_1
+					}
+					if ($column[3] == 'name') {
+						$attributes[$column[4]]['names'][$column[5]] = $value; // v_attribute_options_name_1_1
+					}
+				}
+				if ($column[2] == 'values') {
+					if ($column[3] == 'id') {
+						$attributes[$column[4]]['values'][$column[5]]['id'] = $value; //v_attribute_values_id_1_1
+					}
+					if ($column[3] == 'name') {
+						$attributes[$column[4]]['values'][$column[5]]['names'][$column[6]] = $value; // v_attribute_values_name_2_3_1
+					}
+					if ($column[3] == 'price') {
+						$attributes[$column[4]]['values'][$column[5]]['price'] = is_numeric($value) ? $value : 0.00;
+					}
+				}
+			}
+		}
+		$item['attributes'] = $attributes;
 
 		return $item;
 	}
