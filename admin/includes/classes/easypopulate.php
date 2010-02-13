@@ -115,8 +115,41 @@ class EPUploadStandard extends SplFileObject
 	 *
 	 * @todo transform all other underscore separated fields, not just attributes
 	 */
-	public function handleRow(array $item)
+	public function handleRow(array $olditem)
 	{
+		$attributes = array();
+		$item = array();
+		foreach ($olditem as $key => $value) {
+			$column = explode('_', $key); // v is column 0
+			switch ($column[1]) {
+				case 'attribute':
+					if ($column[2] == 'options') {
+						if ($column[3] == 'id') {
+							$attributes[$column[4]]['id'] = $value; // v_attribute_options_id_1
+						}
+						if ($column[3] == 'name') {
+							$attributes[$column[4]]['names'][$column[5]] = $value; // v_attribute_options_name_1_1
+						}
+					}
+					if ($column[2] == 'values') {
+						if ($column[3] == 'id') {
+							$attributes[$column[4]]['values'][$column[5]]['id'] = $value; //v_attribute_values_id_1_1
+						}
+						if ($column[3] == 'name') {
+							$attributes[$column[4]]['values'][$column[5]]['names'][$column[6]] = $value; // v_attribute_values_name_2_3_1
+						}
+						if ($column[3] == 'price') {
+							$attributes[$column[4]]['values'][$column[5]]['price'] = is_numeric($value) ? $value : 0.00;
+						}
+					}
+					break;
+				default:
+					$item[$key] = $value;
+					break;
+			}
+		}
+		$item['attributes'] = $attributes;
+
 		if ((trim($item['v_products_quantity']) == '') || !isset($item['v_products_quantity'])) {
 			$items['v_products_quantity'] = 0;
 		}
@@ -129,33 +162,6 @@ class EPUploadStandard extends SplFileObject
 		if (empty($item['v_products_quantity_order_units']) || !isset($item['v_products_quantity_order_units'])) {
 			$item['v_products_quantity_order_units'] = 1;
 		}
-
-		$attributes = array();
-		foreach ($item as $key => $value) {
-			$column = explode('_', $key); // v is column 0
-			if ($column[1] == 'attribute') {
-				if ($column[2] == 'options') {
-					if ($column[3] == 'id') {
-						$attributes[$column[4]]['id'] = $value; // v_attribute_options_id_1
-					}
-					if ($column[3] == 'name') {
-						$attributes[$column[4]]['names'][$column[5]] = $value; // v_attribute_options_name_1_1
-					}
-				}
-				if ($column[2] == 'values') {
-					if ($column[3] == 'id') {
-						$attributes[$column[4]]['values'][$column[5]]['id'] = $value; //v_attribute_values_id_1_1
-					}
-					if ($column[3] == 'name') {
-						$attributes[$column[4]]['values'][$column[5]]['names'][$column[6]] = $value; // v_attribute_values_name_2_3_1
-					}
-					if ($column[3] == 'price') {
-						$attributes[$column[4]]['values'][$column[5]]['price'] = is_numeric($value) ? $value : 0.00;
-					}
-				}
-			}
-		}
-		$item['attributes'] = $attributes;
 
 		return $item;
 	}
