@@ -1077,18 +1077,16 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 				continue 2;
 			}
 
-			foreach ($langcode as $key => $lang){
-
-				$sql2 = 'SELECT * FROM '.TABLE_PRODUCTS_DESCRIPTION.' WHERE products_id = '.
-					$row['v_products_id'] . ' AND language_id = ' . $lang['id'];
-				$result2 = ep_query($sql2);
-				$row2 =  mysql_fetch_array($result2);
-				$row['v_products_name_' . $lang['id']] = $row2['products_name'];
-				$row['v_products_description_' . $lang['id']] = $row2['products_description'];
+			$sql2 = 'SELECT * FROM '.TABLE_PRODUCTS_DESCRIPTION.' WHERE products_id = '.
+				$row['v_products_id'] . ' ORDER BY language_id';
+			$result2 = ep_query($sql2);
+			while ($row2 = mysql_fetch_array($result2)) {
+				$row['v_products_name_' . $row2['language_id']] = $row2['products_name'];
+				$row['v_products_description_' . $row2['language_id']] = $row2['products_description'];
+				$row['v_products_url_' . $row2['language_id']] = $row2['products_url'];
 				if ($ep_supported_mods['psd']) {
-					$row['v_products_short_desc_' . $lang['id']] = $row2['products_short_desc'];
+					$row['v_products_short_desc_' . $row2['language_id']] = $row2['products_short_desc'];
 				}
-				$row['v_products_url_' . $lang['id']] = $row2['products_url'];
 			}
 
 			/**
