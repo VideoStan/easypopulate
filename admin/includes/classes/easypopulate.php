@@ -67,7 +67,10 @@ class EPUploadStandard extends SplFileObject
 	 * @return array
 	 */
 	public function mapFileLayout($filelayout)
-	{
+	{	
+		foreach ($filelayout as &$column) {
+			$column = str_replace('v_', '', $column);
+		}
 		return array_flip($filelayout);
 	}
 
@@ -113,54 +116,56 @@ class EPUploadStandard extends SplFileObject
 	/**
 	 * Map row values to columns
 	 *
-	 * @todo transform all other underscore separated fields, not just attributes
+	 * @todo transform all other fields that contain numbers, not just attributes
 	 */
 	public function handleRow(array $olditem)
 	{
 		$attributes = array();
 		$item = array();
 		foreach ($olditem as $key => $value) {
-			$column = explode('_', $key); // v is column 0
-			switch ($column[1]) {
+			$column = explode('_', $key);
+			switch ($column[0]) {
 				case 'attribute':
-					if ($column[2] == 'options') {
-						if ($column[3] == 'id') {
-							$attributes[$column[4]]['id'] = $value; // v_attribute_options_id_1
+					if ($column[1] == 'options') {
+						if ($column[2] == 'id') {
+							$attributes[$column[3]]['id'] = $value; // attribute_options_id_1
 						}
-						if ($column[3] == 'name') {
-							$attributes[$column[4]]['names'][$column[5]] = $value; // v_attribute_options_name_1_1
+						if ($column[2] == 'name') {
+							$attributes[$column[3]]['names'][$column[4]] = $value; // attribute_options_name_1_1
 						}
 					}
-					if ($column[2] == 'values') {
-						if ($column[3] == 'id') {
-							$attributes[$column[4]]['values'][$column[5]]['id'] = $value; //v_attribute_values_id_1_1
+					if ($column[1] == 'values') {
+						if ($column[2] == 'id') {
+							$attributes[$column[3]]['values'][$column[4]]['id'] = $value; //attribute_values_id_1_1
 						}
-						if ($column[3] == 'name') {
-							$attributes[$column[4]]['values'][$column[5]]['names'][$column[6]] = $value; // v_attribute_values_name_2_3_1
+						if ($column[2] == 'name') {
+							$attributes[$column[3]]['values'][$column[4]]['names'][$column[5]] = $value; // attribute_values_name_2_3_1
 						}
-						if ($column[3] == 'price') {
-							$attributes[$column[4]]['values'][$column[5]]['price'] = is_numeric($value) ? $value : 0.00;
+						if ($column[2] == 'price') {
+							$attributes[$column[3]]['values'][$column[4]]['price'] = is_numeric($value) ? $value : 0.00;
 						}
 					}
 					break;
 				default:
+					// @todo CHECKME this is just temporary until we cleanup the other fields
 					$item[$key] = $value;
 					break;
 			}
 		}
+
 		$item['attributes'] = $attributes;
 
-		if ((trim($item['v_products_quantity']) == '') || !isset($item['v_products_quantity'])) {
-			$items['v_products_quantity'] = 0;
+		if ((trim($item['products_quantity']) == '') || !isset($item['products_quantity'])) {
+			$item['v_products_quantity'] = 0;
 		}
-		if ((trim($item['v_products_image']) == '') || !isset($item['v_products_image'])) {
-			$item['v_products_image'] = PRODUCTS_IMAGE_NO_IMAGE;
+		if ((trim($item['products_image']) == '') || !isset($item['products_image'])) {
+			$item['products_image'] = PRODUCTS_IMAGE_NO_IMAGE;
 		}
-		if (empty($item['v_products_quantity_order_min']) || !isset($item['v_products_quantity_order_min'])) {
-			$item['v_products_quantity_order_min'] = 1;
+		if (empty($item['products_quantity_order_min']) || !isset($item['products_quantity_order_min'])) {
+			$item['products_quantity_order_min'] = 1;
 		}
-		if (empty($item['v_products_quantity_order_units']) || !isset($item['v_products_quantity_order_units'])) {
-			$item['v_products_quantity_order_units'] = 1;
+		if (empty($item['products_quantity_order_units']) || !isset($item['products_quantity_order_units'])) {
+			$item['products_quantity_order_units'] = 1;
 		}
 
 		return $item;

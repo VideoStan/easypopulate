@@ -1006,60 +1006,60 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 	foreach ($file as $items) {
 		$items = $file->handleRow($items);
 
-		if (!isset($items['v_products_model']) && !zen_not_null($items['v_products_model'])) {
+		if (!isset($items['products_model']) && !zen_not_null($items['products_model'])) {
 			$output_class = 'fail nomodel';
 			$output_message = EASYPOPULATE_DISPLAY_RESULT_NO_MODEL;
 			continue;
 		}
 
-		if (strlen($items['v_products_model']) > $modelsize) {
+		if (strlen($items['products_model']) > $modelsize) {
 			$output_class = 'fail';
 			$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
 			$output_message = EASYPOPULATE_DISPLAY_RESULT_MODEL_NAME_LONG;
 			continue;
 		}
 
-		// @todo we should just select * and stop using this v_*
+		// @todo should we just SELECT * ?
 		$sql = 'SELECT
-			p.products_id as v_products_id,
-			p.products_model as v_products_model,
-			p.products_image as v_products_image,
-			p.products_price as v_products_price,';
+			p.products_id,
+			p.products_model,
+			p.products_image,
+			p.products_price,';
 
 		if ($ep_supported_mods['uom'] == true) {
-			$sql .=  'p.products_price_as as v_products_price_as,';
+			$sql .=  'p.products_price_as,';
 		}
 		if ($ep_supported_mods['upc'] == true) {
-			$sql .=  'p.products_upc as v_products_upc,';
+			$sql .=  'p.products_upc,';
 		}
 
-		$sql .= 'p.products_weight as v_products_weight,
-			p.products_discount_type as v_products_discount_type,
-			p.products_discount_type_from as v_products_discount_type_from,
-			p.product_is_call as v_product_is_call,
-			p.products_sort_order as v_products_sort_order,
-			p.products_quantity_order_min as v_products_quantity_order_min,
-			p.products_quantity_order_units	as v_products_quantity_order_units,
-			p.products_date_added as v_date_added,
-			p.products_date_available as v_date_avail,
-			p.products_tax_class_id as v_tax_class_id,
-			p.products_quantity as v_products_quantity,
-			p.products_status as v_products_status,
-			p.manufacturers_id as v_manufacturers_id,
-			subc.categories_id as v_categories_id'.
+		$sql .= 'p.products_weight,
+			p.products_discount_type,
+			p.products_discount_type_from,
+			p.product_is_call,
+			p.products_sort_order,
+			p.products_quantity_order_min,
+			p.products_quantity_order_units,
+			p.products_date_added as date_added,
+			p.products_date_available as date_avail,
+			p.products_tax_class_id as tax_class_id,
+			p.products_quantity,
+			p.products_status,
+			p.manufacturers_id,
+			subc.categories_id as categories_id'.
 			" FROM
 			".TABLE_PRODUCTS." as p,
 			".TABLE_CATEGORIES." as subc,
 			".TABLE_PRODUCTS_TO_CATEGORIES." as ptoc
 			WHERE
 			p.products_id = ptoc.products_id AND
-			p.products_model = '" . zen_db_input($items['v_products_model']) . "' AND
+			p.products_model = '" . zen_db_input($items['products_model']) . "' AND
 			ptoc.categories_id = subc.categories_id";
 
 		$result = ep_query($sql);
 
 		$product_is_new = true;
-		while ( $row = mysql_fetch_array($result) ) {
+		while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			$output_class = 'success';
 			$output_message = '';
 			$output_data = array();
@@ -1070,22 +1070,22 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			*/
 
 			// let's check and delete it if requested
-			if ($items['v_status'] == 9) {
+			if ($items['status'] == 9) {
 				$output_status = EASYPOPULATE_DISPLAY_RESULT_DELETED;
 				$output_class = 'success deleted';
-				ep_remove_product($items['v_products_model']);
+				ep_remove_product($items['products_model']);
 				continue 2;
 			}
 
 			$sql2 = 'SELECT * FROM '.TABLE_PRODUCTS_DESCRIPTION.' WHERE products_id = '.
-				$row['v_products_id'] . ' ORDER BY language_id';
+				$row['products_id'] . ' ORDER BY language_id';
 			$result2 = ep_query($sql2);
 			while ($row2 = mysql_fetch_array($result2)) {
-				$row['v_products_name_' . $row2['language_id']] = $row2['products_name'];
-				$row['v_products_description_' . $row2['language_id']] = $row2['products_description'];
-				$row['v_products_url_' . $row2['language_id']] = $row2['products_url'];
+				$row['products_name_' . $row2['language_id']] = $row2['products_name'];
+				$row['products_description_' . $row2['language_id']] = $row2['products_description'];
+				$row['products_url_' . $row2['language_id']] = $row2['products_url'];
 				if ($ep_supported_mods['psd']) {
-					$row['v_products_short_desc_' . $row2['language_id']] = $row2['products_short_desc'];
+					$row['products_short_desc_' . $row2['language_id']] = $row2['products_short_desc'];
 				}
 			}
 
@@ -1096,7 +1096,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			 * Set the appropriate variable name
 			 * If parent_id is not null, then follow it up.
 			 */
-			$thecategory_id = $row['v_categories_id'];// master category id
+			$thecategory_id = $row['categories_id'];// master category id
 
 			for($categorylevel=1; $categorylevel<$max_categories+1; $categorylevel++){
 				if (!empty($thecategory_id)){
@@ -1107,7 +1107,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 							language_id = " . $epdlanguage_id ;
 					$result2 = ep_query($sql2);
 					$row2 = mysql_fetch_array($result2);
-					$temprow['v_categories_name_' . $categorylevel] = $row2['categories_name'];
+					$temprow['categories_name_' . $categorylevel] = $row2['categories_name'];
 
 					$sql3 = "SELECT parent_id
 						FROM ".TABLE_CATEGORIES."
@@ -1123,30 +1123,30 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 						$thecategory_id = false;
 					}
 				} else {
-						$temprow['v_categories_name_' . $categorylevel] = '';
+						$temprow['categories_name_' . $categorylevel] = '';
 				}
 			}
 			// temprow has the old style low to high level categories.
 			$newlevel = 1;
 			// let's turn them into high to low level categories
 			for( $categorylevel=$max_categories+1; $categorylevel>0; $categorylevel--){
-				if ($temprow['v_categories_name_' . $categorylevel] != ''){
-					$row['v_categories_name_' . $newlevel++] = $temprow['v_categories_name_' . $categorylevel];
+				if ($temprow['categories_name_' . $categorylevel] != ''){
+					$row['categories_name_' . $newlevel++] = $temprow['categories_name_' . $categorylevel];
 				}
 			}
 
 			/**
 			* retrieve current manufacturer name from db for this product if exist
 			*/
-			$row['v_manufacturers_name'] = '';
-			if (!empty($row['v_manufacturers_id'])) {
+			$row['manufacturers_name'] = '';
+			if (!empty($row['manufacturers_id'])) {
 				$sql2 = "SELECT manufacturers_name
 					FROM ".TABLE_MANUFACTURERS."
 					WHERE
-					manufacturers_id = " . $row['v_manufacturers_id'];
+					manufacturers_id = " . $row['manufacturers_id'];
 				$result2 = ep_query($sql2);
 				$row2 =  mysql_fetch_array($result2);
-				$row['v_manufacturers_name'] = $row2['manufacturers_name'];
+				$row['manufacturers_name'] = $row2['manufacturers_name'];
 			}
 
 			/**
@@ -1154,15 +1154,15 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			 * We check the value of tax class and title instead of the id
 			 *Then we add the tax to price if $price_with_tax is set to true
 			 */
-			$row_tax_multiplier = ep_get_tax_class_rate($row['v_tax_class_id']);
-			$row['v_tax_class_title'] = zen_get_tax_class_title($row['v_tax_class_id']);
+			$row_tax_multiplier = ep_get_tax_class_rate($row['tax_class_id']);
+			$row['tax_class_title'] = zen_get_tax_class_title($row['tax_class_id']);
 			if ($price_with_tax){
-				$row['v_products_price'] = round($row['v_products_price'] + ($row['v_products_price'] * $row_tax_multiplier / 100),2);
+				$row['products_price'] = round($row['products_price'] + ($row['products_price'] * $row_tax_multiplier / 100),2);
 			}
 
 			/**
 			 * The following defaults all of our current data from our db ($row array) to our update variables (called internal variables here)
-			 * eg $v_products_price = $row['v_products_price'];
+			 * eg $products_price = $row['products_price'];
 			 * @todo <langer> CHECKME perhaps we should build onto this array with each $row assignment routing above, so as to default all data to existing database
 			 * @todo <johnny> we shouln't use extract, just keeping for compatibility with the current code
 			 */
@@ -1178,7 +1178,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 		* inputs: $items; $filelayout; $product_is_new (no reliance on $row)
 		*/
 		if ($product_is_new == true) {
-			if (!zen_not_null(trim($items['v_categories_name_1']))) {
+			if (!zen_not_null(trim($items['categories_name_1']))) {
 				// let's skip this new product without a master category..
 				$output_class = 'fail';
 				$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
@@ -1186,7 +1186,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 				continue;
 			}
 		} else { // not new product
-			if (!zen_not_null(trim($items['v_categories_name_1'])) && isset($filelayout['v_categories_name_1'])) {
+			if (!zen_not_null(trim($items['categories_name_1'])) && isset($filelayout['categories_name_1'])) {
 				// let's skip this existing product without a master category but has the column heading
 				// or should we just update it to result of $row (it's current category..)??
 				$output_class = 'fail';
@@ -1202,7 +1202,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 
 		/**
 		* langer - assign to our vars any new data from $items (from our file)
-		* output is: $v_products_model = "modelofthing", $v_products_description_1 = "descofthing", etc for each file heading
+		* output is: $products_model = "modelofthing", $products_description_1 = "descofthing", etc for each file heading
 		* any existing (default) data assigned above is overwritten here with the new vals from file
 		*/
 		extract($items);
@@ -1213,57 +1213,57 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			$l_id = $lang['id'];
 
 			//metaTags
-			if ( isset($filelayout['v_metatags_title_' . $l_id ]) ) {
-				$v_metatags_title[$l_id] = $items['v_metatags_title_' . $l_id];
-				$v_metatags_keywords[$l_id] = $items['v_metatags_keywords_' . $l_id];
-				$v_metatags_description[$l_id] = $items['v_metatags_description_' . $l_id];
+			if ( isset($filelayout['metatags_title_' . $l_id ]) ) {
+				$metatags_title[$l_id] = $items['metatags_title_' . $l_id];
+				$metatags_keywords[$l_id] = $items['metatags_keywords_' . $l_id];
+				$metatags_description[$l_id] = $items['metatags_description_' . $l_id];
 			}
 			//metaTags
 
 
-			if (isset($filelayout['v_products_name_' . $l_id ])){ // do for each language in our upload file if exist
+			if (isset($filelayout['products_name_' . $l_id ])){ // do for each language in our upload file if exist
 				// convert language names from _1, _2, etc; into arrays [1], [2], etc
-				$v_products_name[$l_id] = smart_tags($items['v_products_name_' . $l_id],$smart_tags,false);
-				//$v_products_description[$l_id] = smart_tags($items['v_products_description_' . $l_id ],$smart_tags,$strip_smart_tags);
-				$v_products_description[$l_id] = $items['v_products_description_' . $l_id ];
+				$products_name[$l_id] = smart_tags($items['products_name_' . $l_id],$smart_tags,false);
+				//$products_description[$l_id] = smart_tags($items['products_description_' . $l_id ],$smart_tags,$strip_smart_tags);
+				$products_description[$l_id] = $items['products_description_' . $l_id ];
 				// if short descriptions exist
 				if ($ep_supported_mods['psd'] == true) {
-					$v_products_short_desc[$l_id] = smart_tags($items['v_products_short_desc_' . $l_id ],$smart_tags,$strip_smart_tags);
+					$products_short_desc[$l_id] = smart_tags($items['products_short_desc_' . $l_id ],$smart_tags,$strip_smart_tags);
 				}
-				$v_products_url[$l_id] = smart_tags($items['v_products_url_' . $l_id ],$smart_tags,false);
+				$products_url[$l_id] = smart_tags($items['products_url_' . $l_id ],$smart_tags,false);
 			}
 		}
 		//elari... we get the tax_clas_id from the tax_title - from zencart??
 		//on screen will still be displayed the tax_class_title instead of the id....
-		if (isset($v_tax_class_title)){
-			$v_tax_class_id = ep_get_tax_title_class_id($v_tax_class_title);
+		if (isset($tax_class_title)){
+			$tax_class_id = ep_get_tax_title_class_id($tax_class_title);
 		}
 		//we check the tax rate of this tax_class_id
-		$row_tax_multiplier = ep_get_tax_class_rate($v_tax_class_id);
+		$row_tax_multiplier = ep_get_tax_class_rate($tax_class_id);
 
 		//And we recalculate price without the included tax...
 		//Since it seems display is made before, the displayed price will still include tax
 		//This is same problem for the tax_class_id that display tax_class_title
 		if ($price_with_tax) {
-			$v_products_price = round( $v_products_price / (1 + ( $row_tax_multiplier * $price_with_tax/100) ), 4);
+			$products_price = round( $products_price / (1 + ( $row_tax_multiplier * $price_with_tax/100) ), 4);
 		}
 
 		// if they give us one category, they give us all 6 categories
 		// @todo this does not appear to support more than 7 categories??
-		unset ($v_categories_name); // default to not set.
+		unset ($categories_name); // default to not set.
 
-		if (isset($filelayout['v_categories_name_1'])) { // does category 1 column exist in our file..
+		if (isset($filelayout['categories_name_1'])) { // does category 1 column exist in our file..
 
 			$category_strlen_long = false;// checks cat length does not exceed db, else exclude product from upload
 			$newlevel = 1;
 			for($categorylevel=6; $categorylevel>0; $categorylevel--) {
-				if ($items['v_categories_name_' . $categorylevel] != '') {
-					if (strlen($items['v_categories_name_' . $categorylevel]) > $category_strlen_max) $category_strlen_long = TRUE;
-					$v_categories_name[$newlevel++] = $items['v_categories_name_' . $categorylevel]; // adding the category name values to $v_categories_name array
+				if ($items['categories_name_' . $categorylevel] != '') {
+					if (strlen($items['categories_name_' . $categorylevel]) > $category_strlen_max) $category_strlen_long = TRUE;
+					$categories_name[$newlevel++] = $items['categories_name_' . $categorylevel]; // adding the category name values to $categories_name array
 				}// null categories are not assigned
 			}
 			while( $newlevel < $max_categories+1){
-				$v_categories_name[$newlevel++] = ''; // default the remaining items to nothing
+				$categories_name[$newlevel++] = ''; // default the remaining items to nothing
 			}
 			if ($category_strlen_long) {
 				$output_class = 'fail';
@@ -1274,49 +1274,49 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 		}
 
 		// default the stock if they spec'd it or if it's blank
-		// @todo <chadd> we should try something like this $v_db_status = $v_products_status;
-		$v_db_status = '1'; // default to active
-		if ($v_status == '0'){
+		// @todo <chadd> we should try something like this $db_status = $products_status;
+		$db_status = '1'; // default to active
+		if ($status == '0'){
 			// they told us to deactivate this item
-			$v_db_status = '0';
+			$db_status = '0';
 		}
-		if ($v_status == '1') { // request activate this item
-			$v_db_status = '1';
+		if ($status == '1') { // request activate this item
+			$db_status = '1';
 		}
-		if ($deactivate_on_zero_qty && $v_products_quantity == 0) {
-			$v_db_status = '0';
+		if ($deactivate_on_zero_qty && $products_quantity == 0) {
+			$db_status = '0';
 		}
 
-		if ($v_manufacturer_id == '') {
-			$v_manufacturer_id = "NULL";
+		if ($manufacturer_id == '') {
+			$manufacturer_id = "NULL";
 		}
 
 		// OK, we need to convert the manufacturer's name into id's for the database
-		if ( isset($v_manufacturers_name) && $v_manufacturers_name != '' ){
+		if ( isset($manufacturers_name) && $manufacturers_name != '' ){
 			$sql = "SELECT man.manufacturers_id as manID
 				FROM ".TABLE_MANUFACTURERS." as man
 				WHERE
-					man.manufacturers_name = '" . zen_db_input($v_manufacturers_name) . "' LIMIT 1";
+					man.manufacturers_name = '" . zen_db_input($manufacturers_name) . "' LIMIT 1";
 			$result = ep_query($sql);
 			if ( $row =  mysql_fetch_array($result) ){
-				$v_manufacturers_id = $row['manID'];
+				$manufacturers_id = $row['manID'];
 			} else {
 				$data = array();
-				$data['manufacturers_name'] = $v_manufacturers_name;
+				$data['manufacturers_name'] = $manufacturers_name;
 				$data['date_added'] = 'NOW()';
 				$data['last_modified'] = 'NOW()';
 				$query = ep_db_modify(TABLE_MANUFACTURERS, $data, 'INSERT');
 				$result = ep_query($query);
-				$v_manufacturers_id = mysql_insert_id();
+				$manufacturers_id = mysql_insert_id();
 			}
 		}
 		// if the categories names are set then try to update them
-		if (isset($v_categories_name_1)) {
+		if (isset($categories_name_1)) {
 			// start from the highest possible category and work our way down from the parent
-			$v_categories_id = 0;
+			$categories_id = 0;
 			$theparent_id = 0;
 			for ( $categorylevel=$max_categories+1; $categorylevel>0; $categorylevel-- ){
-				$thiscategoryname = $v_categories_name[$categorylevel];
+				$thiscategoryname = $categories_name[$categorylevel];
 				if ( $thiscategoryname != ''){
 					// we found a category name in this field
 
@@ -1327,7 +1327,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 							cat.parent_id = " . $theparent_id . " AND
 							des.categories_name = '" . zen_db_input($thiscategoryname) . "' LIMIT 1";
 					$result = ep_query($sql);
-					if ( $row = mysql_fetch_array($result) ){ // langer - null result here where len of $v_categories_name[] exceeds maximum in database
+					if ( $row = mysql_fetch_array($result) ){ // langer - null result here where len of $categories_name[] exceeds maximum in database
 						$thiscategoryid = $row['catID'];
 					} else {
 						$data = array();
@@ -1350,7 +1350,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 					}
 					// the current catid is the next level's parent
 					$theparent_id = $thiscategoryid;
-					$v_categories_id = $thiscategoryid; // keep setting this, we need the lowest level category ID later
+					$categories_id = $thiscategoryid; // keep setting this, we need the lowest level category ID later
 				}
 			}
 		}
@@ -1358,50 +1358,50 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 		// insert new, or update existing, product
 		// @todo harmonize the indentation
 			// First we check to see if this is a product in the current db.
-			$result = ep_query("SELECT `products_id` FROM ".TABLE_PRODUCTS." WHERE (products_model = '" . zen_db_input($v_products_model) . "') LIMIT 1 ");
+			$result = ep_query("SELECT `products_id` FROM ".TABLE_PRODUCTS." WHERE (products_model = '" . zen_db_input($products_model) . "') LIMIT 1 ");
 
-			$v_date_avail = ($v_date_avail == true) ? date("Y-m-d H:i:s",strtotime($v_date_avail)) : '';
+			$date_avail = ($date_avail == true) ? date("Y-m-d H:i:s",strtotime($date_avail)) : '';
 			// if date added is null, let's keep the existing date in db..
-			if (!$v_date_added && $row['v_date_added']) { $v_date_added = $row['v_date_added']; }
-			$v_date_added = ($v_date_added) ? date("Y-m-d H:i:s",strtotime($v_date_added)) : 'NOW()';
+			if (!$date_added && $row['date_added']) { $date_added = $row['date_added']; }
+			$date_added = ($date_added) ? date("Y-m-d H:i:s",strtotime($date_added)) : 'NOW()';
 
 			$product = array();
-			$product['products_model']	= $v_products_model;
-			$product['products_date_available'] = $v_date_avail;
-			$product['products_date_added'] = $v_date_added;
+			$product['products_model']	= $products_model;
+			$product['products_date_available'] = $date_avail;
+			$product['products_date_added'] = $date_added;
 			$product['products_last_modified'] = 'NOW()';
-			$product['products_price'] = $v_products_price;
-			$product['products_image'] = $v_products_image;
-			$product['products_weight'] = $v_products_weight;
-			$product['products_tax_class_id'] = $v_tax_class_id;
-			$product['products_discount_type'] = $v_products_discount_type;
-			$product['products_discount_type_from'] = $v_products_discount_type_from;
-			$product['product_is_call'] = $v_product_is_call;
-			$product['products_sort_order'] = $v_products_sort_order;
-			$product['products_quantity_order_min'] = $v_products_quantity_order_min;
-			$product['products_quantity_order_units'] = $v_products_quantity_order_units;
-			$product['products_quantity']	= $v_products_quantity;
-			$product['master_categories_id'] = $v_categories_id;
-			$product['manufacturers_id'] = $v_manufacturers_id;
-			$product['products_status'] = $v_db_status;
-			$product['metatags_title_status'] = $v_metatags_title_status;
-			$product['metatags_products_name_status']	= $v_metatags_products_name_status;
-			$product['metatags_model_status'] = $v_metatags_model_status;
-			$product['metatags_price_status'] = $v_metatags_price_status;
-			$product['metatags_title_tagline_status']	= $v_metatags_title_tagline_status;
+			$product['products_price'] = $products_price;
+			$product['products_image'] = $products_image;
+			$product['products_weight'] = $products_weight;
+			$product['products_tax_class_id'] = $tax_class_id;
+			$product['products_discount_type'] = $products_discount_type;
+			$product['products_discount_type_from'] = $products_discount_type_from;
+			$product['product_is_call'] = $product_is_call;
+			$product['products_sort_order'] = $products_sort_order;
+			$product['products_quantity_order_min'] = $products_quantity_order_min;
+			$product['products_quantity_order_units'] = $products_quantity_order_units;
+			$product['products_quantity']	= $products_quantity;
+			$product['master_categories_id'] = $categories_id;
+			$product['manufacturers_id'] = $manufacturers_id;
+			$product['products_status'] = $db_status;
+			$product['metatags_title_status'] = $metatags_title_status;
+			$product['metatags_products_name_status']	= $metatags_products_name_status;
+			$product['metatags_model_status'] = $metatags_model_status;
+			$product['metatags_price_status'] = $metatags_price_status;
+			$product['metatags_title_tagline_status']	= $metatags_title_tagline_status;
 
 			if ($ep_supported_mods['uom']) {
-				$product['products_price_as'] = $v_products_price_as;
+				$product['products_price_as'] = $products_price_as;
 			}
 			if ($ep_supported_mods['upc']) {
-					$product['products_upc'] = $v_products_upc;
+					$product['products_upc'] = $products_upc;
 			}
 
 			if ($row = mysql_fetch_array($result)) {
 				//UPDATING PRODUCT
-				$v_products_id = $row['products_id'];
+				$products_id = $row['products_id'];
 
-				$query = ep_db_modify(TABLE_PRODUCTS, $product, 'UPDATE', "products_id = $v_products_id");
+				$query = ep_db_modify(TABLE_PRODUCTS, $product, 'UPDATE', "products_id = $products_id");
 
 				if ( ep_query($query) ) {
 					$output_class = 'updated success';
@@ -1415,7 +1415,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 				//NEW PRODUCT
 				$query = ep_db_modify(TABLE_PRODUCTS, $product, 'INSERT');
 				if ( ep_query($query) ) {
-					$v_products_id = mysql_insert_id();
+					$products_id = mysql_insert_id();
 					$output_class = 'new success';
 					$output_status = EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT;
 				} else {
@@ -1430,18 +1430,18 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			//*************************
 			// Product Meta Start
 			//*************************
-			if (isset($v_metatags_title)){
-			foreach ( $v_metatags_title as $key => $metaData ) {
+			if (isset($metatags_title)){
+			foreach ( $metatags_title as $key => $metaData ) {
 				$data = array();
-				$data['products_id'] = $v_products_id;
+				$data['products_id'] = $products_id;
 				$data['language_id'] = $key;
-				$data['metatags_title']	= $v_metatags_title[$key];
-				$data['metatags_keywords'] = $v_metatags_keywords[$key];
-				$data['metatags_description']	= $v_metatags_description[$key];
-				$query = "SELECT `products_id` FROM ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION." WHERE (`products_id` = '$v_products_id' AND `language_id` = '$key') LIMIT 1 ";
+				$data['metatags_title']	= $metatags_title[$key];
+				$data['metatags_keywords'] = $metatags_keywords[$key];
+				$data['metatags_description']	= $metatags_description[$key];
+				$query = "SELECT `products_id` FROM ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION." WHERE (`products_id` = '$products_id' AND `language_id` = '$key') LIMIT 1 ";
 				$result = ep_query($query);
 				if ($row = mysql_fetch_array($result)) {
-					$where = "products_id = $v_products_id AND language_id = $key";
+					$where = "products_id = $products_id AND language_id = $key";
 					$query = ep_db_modify(TABLE_META_TAGS_PRODUCTS_DESCRIPTION, $data, 'UPDATE', $where);
 				} else {
 					$query = ep_db_modify(TABLE_META_TAGS_PRODUCTS_DESCRIPTION, $data, 'INSERT');
@@ -1452,26 +1452,26 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 
 			/**
 			 * Update quantity price breaks
-			 * if v_products_discount_type == 0 then there are no quantity breaks
+			 * if products_discount_type == 0 then there are no quantity breaks
 			 */
-			if (isset($items['v_products_discount_type']) && !empty($items['v_products_discount_type'])) {
-				$sql = "SELECT `products_id` FROM ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." WHERE (`products_id` = '$v_products_id') LIMIT 1 ";
+			if (isset($items['products_discount_type']) && !empty($items['products_discount_type'])) {
+				$sql = "SELECT `products_id` FROM ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." WHERE (`products_id` = '$products_id') LIMIT 1 ";
 				$result = ep_query($sql);
 				if ($row = mysql_fetch_array($result)) {
-					$sql = "DELETE FROM ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." WHERE (`products_id` = '$v_products_id') ";
+					$sql = "DELETE FROM ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." WHERE (`products_id` = '$products_id') ";
 					$result = ep_query($sql);
 				}
 				for ($discount = 1; ; $discount++) {
-					if (!isset($items['v_discount_qty_' .$discount])) break;
-					if (!isset($items['v_discount_price_' .$discount])) break;
-					if (empty($items['v_discount_qty_' .$discount])) continue;
-					if (empty($items['v_discount_price_' .$discount])) continue;
+					if (!isset($items['discount_qty_' .$discount])) break;
+					if (!isset($items['discount_price_' .$discount])) break;
+					if (empty($items['discount_qty_' .$discount])) continue;
+					if (empty($items['discount_price_' .$discount])) continue;
 					// Easier to start over than try to update individual discounts
 					$data = array();
 					$data['discount_id'] = $discount;
-					$data['products_id'] = $v_products_id;
-					$data['discount_qty'] = $items['v_discount_qty_' .$discount];
-					$data['discount_price'] = $items['v_discount_price_' .$discount];
+					$data['products_id'] = $products_id;
+					$data['discount_qty'] = $items['discount_qty_' .$discount];
+					$data['discount_price'] = $items['discount_price_' .$discount];
 					$sql = ep_db_modify(TABLE_PRODUCTS_DISCOUNT_QUANTITY, $data, 'INSERT');
 					$result = ep_query($sql);
 				}
@@ -1480,27 +1480,27 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			//*************************
 			// Products Descriptions Start
 			//*************************
-			if (isset($v_products_name)){
-			foreach( $v_products_name as $key => $name){
+			if (isset($products_name)){
+			foreach( $products_name as $key => $name){
 			if ($name != ''){
 
-					$sql = "SELECT * FROM ".TABLE_PRODUCTS_DESCRIPTION." WHERE products_id = $v_products_id AND	language_id = " . $key . " LIMIT 1 ";
+					$sql = "SELECT * FROM ".TABLE_PRODUCTS_DESCRIPTION." WHERE products_id = $products_id AND	language_id = " . $key . " LIMIT 1 ";
 					$result = ep_query($sql);
 					$data = array();
-					$data['products_id']	= $v_products_id;
+					$data['products_id']	= $products_id;
 					$data['language_id']	= $key;
 					$data['products_name'] = $name;
-					$data['products_description']	= $v_products_description[$key];
-					$data['products_url'] = $v_products_url[$key];
+					$data['products_description']	= $products_description[$key];
+					$data['products_url'] = $products_url[$key];
 
 					if ($ep_supported_mods['psd']) {
-						$data['products_short_desc'] = $v_products_short_desc[$key];
+						$data['products_short_desc'] = $products_short_desc[$key];
 					}
 					if (mysql_num_rows($result) == 0) {
 						$query = ep_db_modify(TABLE_PRODUCTS_DESCRIPTION, $data, 'INSERT');
 						$result = ep_query($query);
 					} else {
-						$where = "products_id = $v_products_id AND language_id = $key";
+						$where = "products_id = $products_id AND language_id = $key";
 						$query = ep_db_modify(TABLE_PRODUCTS_DESCRIPTION, $data, 'UPDATE', $where);
 						$result = ep_query($query);
 					}
@@ -1515,19 +1515,19 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			 * Assign product to category if linked
 			 * @todo <chadd> FIXME: this is buggy as instances occur when the master category id is INCORRECT!
 			 */
-			if (isset($v_categories_id)) { // find out if this product is listed in the category given
+			if (isset($categories_id)) { // find out if this product is listed in the category given
 				$result_incategory = ep_query('SELECT
 							'.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id,
 							'.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id
 							FROM '.TABLE_PRODUCTS_TO_CATEGORIES.'
 							WHERE
-							'.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id='.$v_products_id.' AND
-							'.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id='.$v_categories_id);
+							'.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id='.$products_id.' AND
+							'.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id='.$categories_id);
 
 				if (mysql_num_rows($result_incategory) == 0) {
 					$data = array();
-					$data['products_id'] = $v_products_id;
-					$data['categories_id'] = $v_categories_id;
+					$data['products_id'] = $products_id;
+					$data['categories_id'] = $categories_id;
 					$query = ep_db_modify(TABLE_PRODUCTS_TO_CATEGORIES, $data, 'INSERT');
 					$res1 = ep_query($query);
 				}
@@ -1540,7 +1540,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 				$languages = zen_get_languages();
 
 				// remove product attribute options linked to this product before proceeding further
-				$attributes_clean_query = 'DELETE FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' WHERE products_id = ' . $v_products_id;
+				$attributes_clean_query = 'DELETE FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' WHERE products_id = ' . $products_id;
 				ep_query($attributes_clean_query);
 
 				foreach ($attributes as $attribute) {
@@ -1630,7 +1630,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 
 						// options_values price update begin
 						if (isset($values['price']) && is_numeric($values['price'])) {
-							$attribute_prices_query = 'SELECT options_values_price, price_prefix FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' WHERE products_id = ' . (int)$v_products_id . ' AND options_id =' . (int)$option_id . ' AND options_values_id = ' . (int)$values['id'];
+							$attribute_prices_query = 'SELECT options_values_price, price_prefix FROM ' . TABLE_PRODUCTS_ATTRIBUTES . ' WHERE products_id = ' . (int)$products_id . ' AND options_id =' . (int)$option_id . ' AND options_values_id = ' . (int)$values['id'];
 							$attribute_prices_values = ep_query($attribute_prices_query);
 
 							$attribute_values_price_prefix = ($values['price'] < 0) ? '-' : '+';
@@ -1638,14 +1638,14 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 							// options_values_prices table update begin
 							if (!mysql_num_rows($attribute_prices_values)) {
 								$data = array();
-								$data['products_id'] = $v_products_id;
+								$data['products_id'] = $products_id;
 								$data['options_id'] = $option_id;
 								$data['options_values_id'] = $values['id'];
 								$data['options_values_price'] = (float)$values['price'];
 								$data['price_prefix'] = $attribute_values_price_prefix;
 								$query = ep_db_modify(TABLE_PRODUCTS_ATTRIBUTES, $data, 'INSERT');
 							} else {
-								$where = 'products_id = ' . $v_products_id . '
+								$where = 'products_id = ' . $products_id . '
 											AND options_id = ' . $option_id . '
 											AND options_values_id =' . $values['id'];
 								$query = ep_db_modify(TABLE_PRODUCTS_ATTRIBUTES, $data, 'UPDATE', $where);
@@ -1664,10 +1664,10 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			* Specials
 			* if a null value in specials price, do not add or update. If price = 0, let's delete it
 			*/
-			if (isset($v_specials_price) && zen_not_null($v_specials_price)) {
+			if (isset($specials_price) && zen_not_null($specials_price)) {
 				$specials_message = '';
 				$specials_status = '';
-				if ($v_specials_price >= $v_products_price) {
+				if ($specials_price >= $products_price) {
 					$specials_class = 'fail';
 					$specials_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
 					$specials_message = EASYPOPULATE_SPECIALS_PRICE_FAIL;
@@ -1677,22 +1677,22 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 				}
 
 				// if null (set further above), set forever, else get raw date
-				$v_specials_date_avail = ($v_specials_date_avail == true) ? date("Y-m-d H:i:s",strtotime($v_specials_date_avail)) : "0001-01-01";
-				$v_specials_expires_date = ($v_specials_expires_date == true) ? date("Y-m-d H:i:s",strtotime($v_specials_expires_date)) : "0001-01-01";
+				$specials_date_avail = ($specials_date_avail == true) ? date("Y-m-d H:i:s",strtotime($specials_date_avail)) : "0001-01-01";
+				$specials_expires_date = ($specials_expires_date == true) ? date("Y-m-d H:i:s",strtotime($specials_expires_date)) : "0001-01-01";
 
 				$special = ep_query("SELECT products_id
 											FROM " . TABLE_SPECIALS . "
-											WHERE products_id = ". $v_products_id);
+											WHERE products_id = ". $products_id);
 				$data = array();
-				$data['products_id'] = $v_products_id;
-				$data['specials_new_products_price'] = $v_specials_price;
-				$data['specials_date_available'] = $v_specials_date_avail;
+				$data['products_id'] = $products_id;
+				$data['specials_new_products_price'] = $specials_price;
+				$data['specials_date_available'] = $specials_date_avail;
 				$data['specials_last_modified'] = 'NOW()';
-				$data['expires_date'] = $v_specials_expires_date;
+				$data['expires_date'] = $specials_expires_date;
 				$data['status'] = 1;
 
 				if (mysql_num_rows($special) == 0) {
-					if ($v_specials_price == '0') {
+					if ($specials_price == '0') {
 						$specials_class = 'fail notfound';
 						$specials_status = EASYPOPULATE_DISPLAY_RESULT_DELETE_NOT_FOUND;
 						$specials_message = EASYPOPULATE_SPECIALS_DELETE_FAIL;
@@ -1706,20 +1706,20 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 					$specials_status = EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT;
 				} else {
 					// existing product
-					if ($v_specials_price == '0') {
+					if ($specials_price == '0') {
 						$db->Execute("delete from " . TABLE_SPECIALS . "
-									 where products_id = '" . (int)$v_products_id . "'");
+									 where products_id = '" . (int)$products_id . "'");
 						$specials_class = 'delete success';
 						$specials_status = EASYPOPULATE_DISPLAY_RESULT_DELETED;
 						continue;
 					}
-					$query = ep_db_modify(TABLE_SPECIALS, $data, 'UPDATE', "products_id = $v_products_id");
+					$query = ep_db_modify(TABLE_SPECIALS, $data, 'UPDATE', "products_id = $products_id");
 					$result = ep_query($query);
 					$specials_class = 'updated success';
 					$specials_status = EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT;
 				}
 
-				$specials_data = array($v_products_model, $v_products_name[$epdlanguage_id], $v_products_price , $v_specials_price);
+				$specials_data = array($products_model, $products_name[$epdlanguage_id], $products_price , $specials_price);
 				$output['specials'][] = array('status' => $specials_status, 'class' => $specials_class, 'message' => $specials_message, 'data' => $specials_data);
 			}
 			// end specials for this product

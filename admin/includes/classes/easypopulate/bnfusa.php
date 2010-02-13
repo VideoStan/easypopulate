@@ -59,36 +59,36 @@ class EPUploadBNFUSA extends EPUploadStandard
 	public function mapFileLayout(array $filelayout)
 	{
 		$rename = array();
-		$rename['v_products_description_1'] = 'Web Description';
-		$rename['v_products_name_1']			= 'Item Title';
-		$rename['v_products_model']			= 'Parent Number';
-		$rename['v_products_price']			= 'Each Price';
-		$rename['v_products_quantity']		= 'Available Inventory';
-		$rename['v_discount_price_1']			= 'Column 2 Price';
-		$rename['v_discount_qty_1']			= 'Column 2 Break';
-		$rename['v_discount_price_2']			= 'Column 3 Price';
-		$rename['v_discount_qty_2']			= 'Column 3 Break';
-		$rename['v_discount_price_3']			= 'Column 4 Price';
-		$rename['v_discount_qty_3']			= 'Column 4 Break';
-		$rename['v_discount_price_4']			= 'Column 5 Price';
-		$rename['v_discount_qty_4']			= 'Column 5 Break';
-		$rename['v_products_weight']			= 'Each Weight (lbs.)';
-		$rename['v_categories_name_1']		= 'Major Category';
-		$rename['v_categories_name_2']		= 'Minor Category';
-		$rename['v_categories_name_3']		= 'Item Status';
+		$rename['products_description_1'] = 'Web Description';
+		$rename['products_name_1']			= 'Item Title';
+		$rename['products_model']			= 'Parent Number';
+		$rename['products_price']			= 'Each Price';
+		$rename['products_quantity']		= 'Available Inventory';
+		$rename['discount_price_1']			= 'Column 2 Price';
+		$rename['discount_qty_1']			= 'Column 2 Break';
+		$rename['discount_price_2']			= 'Column 3 Price';
+		$rename['discount_qty_2']			= 'Column 3 Break';
+		$rename['discount_price_3']			= 'Column 4 Price';
+		$rename['discount_qty_3']			= 'Column 4 Break';
+		$rename['discount_price_4']			= 'Column 5 Price';
+		$rename['discount_qty_4']			= 'Column 5 Break';
+		$rename['products_weight']			= 'Each Weight (lbs.)';
+		$rename['categories_name_1']		= 'Major Category';
+		$rename['categories_name_2']		= 'Minor Category';
+		$rename['categories_name_3']		= 'Item Status';
 		$rename['x_size_color_desc']			= 'Item Size-Color Desc';
 		$rename['x_size_color_numeric']		= 'Size-Color Key Numeric';
 		$rename['x_item_categories_numeric'] = 'Item Categories (numeric)';
 		$filelayout = str_replace(array_values($rename), array_keys($rename), $filelayout);
 
 		// Everything below here is dynamic, there is no matching field in the file
-		$filelayout[] = 'v_products_image';
-		$filelayout[] = 'v_products_discount_type';
-		$filelayout[] = 'v_categories_name_1';
-		$filelayout[] = 'v_categories_name_2';
-		$filelayout[] = 'v_categories_name_3';
-		$filelayout[] = 'v_categories_name_4';
-		$filelayout[] = 'v_categories_name_5';
+		$filelayout[] = 'products_image';
+		$filelayout[] = 'products_discount_type';
+		$filelayout[] = 'categories_name_1';
+		$filelayout[] = 'categories_name_2';
+		$filelayout[] = 'categories_name_3';
+		$filelayout[] = 'categories_name_4';
+		$filelayout[] = 'categories_name_5';
 
 		$filelayout = array_flip($filelayout);
 		return $filelayout;
@@ -99,31 +99,31 @@ class EPUploadBNFUSA extends EPUploadStandard
 		/*$foo = explode(',', trim($item['Item Categories']));
 		$count = 1;
 		foreach ($foo as $cat) {
-			$item['v_categories_name_' . $count] = $cat;
+			$item['categories_name_' . $count] = $cat;
 			$count++;
 		}*/
-		if (empty($item['v_categories_name_3'])) {
-			unset($item['v_categories_name_3']);
+		if (empty($item['categories_name_3'])) {
+			unset($item['categories_name_3']);
 		}
 
-		if (empty($item['v_products_quantity_order_min']) || !isset($item['v_products_quantity_order_min'])) {
-			$item['v_products_quantity_order_min'] = 1;
+		if (empty($item['products_quantity_order_min']) || !isset($item['products_quantity_order_min'])) {
+			$item['products_quantity_order_min'] = 1;
 		}
 
-		if (empty($item['v_products_quantity_order_units']) || !isset($item['v_products_quantity_order_units'])) {
-			$item['v_products_quantity_order_units'] = 1;
+		if (empty($item['products_quantity_order_units']) || !isset($item['products_quantity_order_units'])) {
+			$item['products_quantity_order_units'] = 1;
 		}
-		$item['v_products_discount_type'] = 2;
+		$item['products_discount_type'] = 2;
 
-		$model = $item['v_products_model'];
-		$item['v_products_image'] = 'products/' . $model . '/' . $model . '_800.jpg';
+		$model = $item['products_model'];
+		$item['products_image'] = 'products/' . $model . '/' . $model . '_800.jpg';
 		$desc = $item['x_size_color_desc'];
 		$item['attributes'] = array();
 		$name = '';
 		if (!empty($desc)) {
 			$optionValues = array();
 			while ($nextItem = $this->current()) {
-				if ($nextItem['v_products_model'] != $model) {
+				if ($nextItem['products_model'] != $model) {
 					$this->seek($this->key() - 1);
 					break;
 				}
