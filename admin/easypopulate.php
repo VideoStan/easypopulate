@@ -4,7 +4,8 @@
  *
  * @package easypopulate
  * @author langer
- * @copyright 20??-2010
+ * @author too many to list, see history.txt
+ * @copyright 200?-2010
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  *
  * @todo <chadd> change v_products_price_as to v_products_price_uom
@@ -51,7 +52,6 @@ extract($config);
 // @todo move this define to somewhere not dependent on the admin interface being loaded
 define('EASYPOPULATE_VERSION', '3.9.5');
 
-$chmod_check = true;
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
 $products_with_attributes = false; // langer - this will be redundant after html renovation
 // @todo CHECK: maybe below can go in array eg $ep_processed['attributes'] = true, etc.. cold skip all post-upload tasks on check if isset var $ep_processed.
@@ -70,29 +70,28 @@ if ($log_queries) {
 }
 
 /**
-* Pre-flight checks start here
-*/
-
+ * Pre-flight checks start here
+ */
 $chmod_check = is_dir($temp_path) && is_writable($temp_path);
 if (!$chmod_check) {
 	$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG), 'warning');
 }
 
 /**
-* START check for existence of various mods
-*/
+ * START check for existence of various mods
+ */
 $ep_supported_mods['psd'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_short_desc');
 $ep_supported_mods['uom'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_as'); // uom = unit of measure
 $ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
 /**
-* END check for existance of various mods
-*/
+ * END check for existance of various mods
+ */
 
 $category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
 
 /**
-* Pre-flight checks finish here
-*/
+ * Pre-flight checks finish here
+ */
 
 $langcode = zen_get_languages();
 // start array at one, the rest of the code expects it that way
@@ -132,8 +131,6 @@ if (zen_not_null($ep_dltype)) {
 		}
 	}
 	// END Create attributes array
-
-	// if dltype is set, then create the filelayout.  Otherwise filelayout is read from the uploaded file.
 
 	$filelayout = array();
 	$fileheaders = array();
@@ -966,12 +963,10 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 	}
 }
 
-//*******************************
+
 //*******************************
 // UPLOADING OF FILES STARTS HERE
 //*******************************
-//*******************************
-
 if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 
 	$output['specials'] = array();
@@ -1082,8 +1077,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 				continue 2;
 			}
 
-			// Let's get all the data we need and fill in all the fields that need to be defaulted to the current values
-			// for each language, get the description and set the vals
 			foreach ($langcode as $key => $lang){
 
 				$sql2 = 'SELECT * FROM '.TABLE_PRODUCTS_DESCRIPTION.' WHERE products_id = '.
@@ -1170,9 +1163,9 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			}
 
 			/**
-			 * langer - the following defaults all of our current data from our db ($row array) to our update variables (called internal variables here)
+			 * The following defaults all of our current data from our db ($row array) to our update variables (called internal variables here)
 			 * eg $v_products_price = $row['v_products_price'];
-			 * perhaps we should build onto this array with each $row assignment routing above, so as to default all data to existing database
+			 * @todo <langer> CHECKME perhaps we should build onto this array with each $row assignment routing above, so as to default all data to existing database
 			 * @todo <johnny> we shouln't use extract, just keeping for compatibility with the current code
 			 */
 			extract($row);
@@ -1252,7 +1245,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 
 		//And we recalculate price without the included tax...
 		//Since it seems display is made before, the displayed price will still include tax
-		//This is same problem for the tax_clas_id that display tax_class_title
+		//This is same problem for the tax_class_id that display tax_class_title
 		if ($price_with_tax) {
 			$v_products_price = round( $v_products_price / (1 + ( $row_tax_multiplier * $price_with_tax/100) ), 4);
 		}
@@ -1423,7 +1416,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			} else {
 				//NEW PRODUCT
 				$query = ep_db_modify(TABLE_PRODUCTS, $product, 'INSERT');
-
 				if ( ep_query($query) ) {
 					$v_products_id = mysql_insert_id();
 					$output_class = 'new success';
@@ -1703,7 +1695,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 
 				if (mysql_num_rows($special) == 0) {
 					if ($v_specials_price == '0') {
-						// delete requested, but is not a special
 						$specials_class = 'fail notfound';
 						$specials_status = EASYPOPULATE_DISPLAY_RESULT_DELETE_NOT_FOUND;
 						$specials_message = EASYPOPULATE_SPECIALS_DELETE_FAIL;
@@ -1729,7 +1720,7 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 					$specials_class = 'updated success';
 					$specials_status = EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT;
 				}
-				// we still have our special here..
+
 				$specials_data = array($v_products_model, $v_products_name[$epdlanguage_id], $v_products_price , $v_specials_price);
 				$output['specials'][] = array('status' => $specials_status, 'class' => $specials_class, 'message' => $specials_message, 'data' => $specials_data);
 			}
@@ -1743,7 +1734,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 	/**
 	* Post-upload tasks start
 	*/
-
 	ep_update_prices();
 
 	if (!empty($output['specials'])) {
@@ -1757,7 +1747,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 	/**
 	* Post-upload tasks end
 	*/
-
 }
 
 // END FILE UPLOADS
@@ -1799,7 +1788,7 @@ if ($_GET['dross'] == 'delete') {
  * @todo <johnny> show results via xhr method
  * @todo <langer> 1 input field for local and server updating
  * @todo <langer> default to update directly from HDD, with option to upload to temp, or update from temp
- * @todo <langer> List temp files with upload, delete, etc options
+ * @todo <langer> List temp files with delete, etc options
  * @todo <langer> Auto detecting of mods - display list of (only) installed mods, with check-box to include in download
  * @todo <langer> may consider an auto-splitting feature if it can be done.
  *     Will detect speed of server, safe_mode etc and determine what splitting level is required (can be over-ridden of course)
@@ -1895,8 +1884,8 @@ if ($_GET['dross'] == 'delete') {
 			$ep_exports['pricebreaks'] = 'Model/Price/Breaks';
 			$ep_exports['modqty'] = 'Model/Price/Qty/Last Modified/Status';
 			$ep_exports['category'] = 'Model/Category';
-			$ep_exports['attrib'] = 'Detailed Products Attributes (multi-line)';
-			$ep_exports['attrib_basic'] = 'Basic Products Attributes (single-line)';
+			$ep_exports['attrib'] = 'Detailed Products Attributes (single-line)';
+			$ep_exports['attrib_basic'] = 'Basic Products Attributes (multi-line)';
 			$ep_exports['options'] = 'Attribute Options Names';
 			$ep_exports['values'] = 'Attribute Options Values';
 			$ep_exports['optionvalues'] = 'Attribute Options-Names-to-Values';
@@ -1994,7 +1983,7 @@ if ($_GET['dross'] == 'delete') {
 				</tr>
 				</thead>
 				<?php $linkBase = HTTP_SERVER .  DIR_WS_CATALOG . $tempdir; ?>
-				<!-- @todo replace the onclick with unobtrusive js when i get to jquery -->
+				<!-- @todo replace the onclick with unobtrusive js when we use jquery -->
 				<?php foreach (new DirectoryIterator($temp_path) as $tempFile) { ?>
 				<?php if (!$tempFile->isDot() && ($tempFile->getFilename() != 'index.html')) { ?>
 					<tr>
