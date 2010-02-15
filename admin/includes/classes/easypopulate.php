@@ -121,6 +121,7 @@ class EPUploadStandard extends SplFileObject
 	public function handleRow(array $olditem)
 	{
 		$attributes = array();
+		$metatags = array();
 		$item = array();
 		foreach ($olditem as $key => $value) {
 			$column = explode('_', $key);
@@ -146,13 +147,17 @@ class EPUploadStandard extends SplFileObject
 						}
 					}
 					break;
+				case 'metatags': // only for title,description,keywords
+					if (isset($column[2]) && is_numeric($column[2]) && !empty($value)) {
+						$metatags[$column[2]][$column[1]] = $value; //indexed by language_id
+					}
+					break;
 				default:
-					// @todo CHECKME this is just temporary until we cleanup the other fields
 					$item[$key] = $value;
 					break;
 			}
 		}
-
+		$item['metatags'] = $metatags;
 		$item['attributes'] = $attributes;
 
 		if ((trim($item['products_quantity']) == '') || !isset($item['products_quantity'])) {

@@ -1211,20 +1211,9 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 		// The assumption is that if you give us names and descriptions, then you give us name and description for all applicable languages
 		foreach ($langcode as $lang){
 			$l_id = $lang['id'];
-
-			//metaTags
-			if ( isset($filelayout['metatags_title_' . $l_id ]) ) {
-				$metatags_title[$l_id] = $items['metatags_title_' . $l_id];
-				$metatags_keywords[$l_id] = $items['metatags_keywords_' . $l_id];
-				$metatags_description[$l_id] = $items['metatags_description_' . $l_id];
-			}
-			//metaTags
-
-
 			if (isset($filelayout['products_name_' . $l_id ])){ // do for each language in our upload file if exist
 				// convert language names from _1, _2, etc; into arrays [1], [2], etc
 				$products_name[$l_id] = smart_tags($items['products_name_' . $l_id],$smart_tags,false);
-				//$products_description[$l_id] = smart_tags($items['products_description_' . $l_id ],$smart_tags,$strip_smart_tags);
 				$products_description[$l_id] = $items['products_description_' . $l_id ];
 				// if short descriptions exist
 				if ($ep_supported_mods['psd'] == true) {
@@ -1430,15 +1419,15 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 			//*************************
 			// Product Meta Start
 			//*************************
-			if (isset($metatags_title)){
-			foreach ( $metatags_title as $key => $metaData ) {
+			foreach ($metatags as $key => $metaData) {
 				$data = array();
 				$data['products_id'] = $products_id;
 				$data['language_id'] = $key;
-				$data['metatags_title']	= $metatags_title[$key];
-				$data['metatags_keywords'] = $metatags_keywords[$key];
-				$data['metatags_description']	= $metatags_description[$key];
-				$query = "SELECT `products_id` FROM ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION." WHERE (`products_id` = '$products_id' AND `language_id` = '$key') LIMIT 1 ";
+				$data['metatags_title']	= $metaData['title'];
+				$data['metatags_keywords'] = $metaData['keywords'];
+				$data['metatags_description']	= $metaData['description'];
+				$query = "SELECT products_id FROM ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION.
+				" WHERE products_id = $products_id AND language_id = $key";
 				$result = ep_query($query);
 				if ($row = mysql_fetch_array($result)) {
 					$where = "products_id = $products_id AND language_id = $key";
@@ -1447,7 +1436,6 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 					$query = ep_db_modify(TABLE_META_TAGS_PRODUCTS_DESCRIPTION, $data, 'INSERT');
 				}
 				$result = ep_query($query);
-			}
 			}
 
 			/**
