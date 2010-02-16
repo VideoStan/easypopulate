@@ -1789,13 +1789,13 @@ if ($_GET['dross'] == 'delete') {
 	<link rel="stylesheet" type="text/css" href="includes/cssjsmenuhover.css" media="all" id="hoverJS">
 	<script language="javascript" type="text/javascript" src="includes/menu.js"></script>
 	<script language="javascript" type="text/javascript" src="includes/general.js"></script>
+	<script language="javascript" type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+
 	<script type="text/javascript">
-		function init()
-		{
+	$(document).ready(function() {
 		cssjsmenu('navbar');
-		var kill = document.getElementById('hoverJS');
-		kill.disabled = true;
-		}
+		$('#hoverJS').attr('disabled', 'disabled');
+	});
 	</script>
 	<!--@todo: move this css to some other file -->
 	<style type="text/css">
@@ -1817,7 +1817,7 @@ if ($_GET['dross'] == 'delete') {
 	}
 	</style>
 </head>
-<body onLoad="init()">
+<body>
 <?php require(DIR_WS_INCLUDES . 'header.php'); ?>
 <div id="ep_header">
 	<h1>Easy Populate <?php echo EASYPOPULATE_VERSION ?></h1>
@@ -1957,7 +1957,7 @@ if ($_GET['dross'] == 'delete') {
 			<?php } ?>
 			<?php if (is_dir($temp_path)) { ?>
 			<div><h2>Uploaded Files</h2></div>
-			<form enctype="multipart/form-data" action="easypopulate.php" method="POST">
+			<form id="uploaded_files" enctype="multipart/form-data" action="easypopulate.php" method="POST">
 			<input type="hidden" name="local_file" />
 			<table>
 				<thead>
@@ -1974,7 +1974,7 @@ if ($_GET['dross'] == 'delete') {
 				<?php if (!$tempFile->isDot() && ($tempFile->getFilename() != 'index.html')) { ?>
 					<tr>
 						<td><input type="submit" onclick="this.form.local_file.value='<?php echo $tempFile->getFileName() ?>';" value="Import" /></td>
-						<td><a href="<?php echo $linkBase . $tempFile->getFileName(); ?>"> <?php echo $tempFile->getFileName(); ?></a></td>
+						<td><a href="<?php echo $linkBase . $tempFile->getFileName(); ?>"><?php echo $tempFile->getFileName(); ?></a></td>
 						<td><?php echo round(($tempFile->getSize() / 1024)); ?> KB</td>
 						<td><?php echo strftime(DATE_FORMAT_LONG, $tempFile->getMTime()); ?></td>
 					</tr>
