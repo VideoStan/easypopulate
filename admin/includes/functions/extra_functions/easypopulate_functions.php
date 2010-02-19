@@ -20,8 +20,10 @@ function ep_handle_uploaded_file($file)
 			$target = $temp_path . $file['name'];
 			move_uploaded_file($file['tmp_name'], $target);
 		}
-	} else if (is_string($file) && !empty($file)) {
+	} else if (is_string($file) && !empty($file) && file_exists($temp_path . $file)) {
 		$target = $temp_path . $file;
+	} else {
+		$target = $file;
 	}
 	return $target;
 }
@@ -399,6 +401,10 @@ function install_easypopulate() {
 							'key' => 'EASYPOPULATE_CONFIG_TIME_LIMIT',
 							'value' => '1200', 
 							'description' => '(In Seconds) You can change this if your script is taking too long to process. This functionality may be not always be enabled by your server administrator (Default: 1200)');
+	$entries[] = array('title' => 'Temporary Data Store',
+							'key' => 'EASYPOPULATE_CONFIG_TEMP_STORE',
+							'value' => serialize(array()),
+							'description' => 'A Temporary Place to Store Data used by EP scripts. DO NOT EDIT!!!');
 	$count = 1;
 	foreach($entries as $entry) {
 		$data = array();
@@ -476,6 +482,7 @@ function ep_get_config($var = '')
 	$config['custom_fields'] = explode(',',trim(EASYPOPULATE_CONFIG_CUSTOM_FIELDS,','));
 	$config['time_limit'] = EASYPOPULATE_CONFIG_TIME_LIMIT;
 	$config['upload_file_format'] = EASYPOPULATE_CONFIG_UPLOAD_FILE_FORMAT;
+	$config['temp_store'] = unserialize(EASYPOPULATE_CONFIG_TEMP_STORE);
 	$tempdir = EASYPOPULATE_CONFIG_TEMP_DIR;
 	if (substr($tempdir, -1) != '/') $tempdir .= '/';
    if (substr($tempdir, 0, 1) == '/') $tempdir = substr($tempdir, 1);
