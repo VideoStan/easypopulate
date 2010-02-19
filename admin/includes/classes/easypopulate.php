@@ -33,7 +33,6 @@ class EPFileUploadFactory
 class EPUploadStandard extends SplFileObject
 {
 	public $filelayout = array();
-
 	function __construct($file)
 	{
 		$col_delimiter = ep_get_config('col_delimiter');
@@ -67,7 +66,7 @@ class EPUploadStandard extends SplFileObject
 	 * @return array
 	 */
 	public function mapFileLayout($filelayout)
-	{	
+	{
 		foreach ($filelayout as &$column) {
 			$column = str_replace('v_', '', $column);
 		}
@@ -174,6 +173,27 @@ class EPUploadStandard extends SplFileObject
 		}
 
 		return $item;
+	}
+
+	public function onFileStart()
+	{
+	}
+
+	/**
+	 * Do something when the item is finished
+	 *
+	 * @todo think about this function signature
+	 */
+	public function onItemFinish($productId, $productModel)
+	{
+
+	}
+
+	/**
+	 * do something when the file is finished processing
+	 */
+	public function onFileFinish()
+	{
 	}
 }
 ?>

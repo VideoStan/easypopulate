@@ -967,7 +967,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 //*******************************
 // UPLOADING OF FILES STARTS HERE
 //*******************************
-if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
+if (isset($_POST['import'])) {
 
 	$output['specials'] = array();
 	$output['errors'] = array();
@@ -1002,6 +1002,9 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 	}
 
 	if ($filelayout = $file->getFileLayout()) {
+
+	$file->onFileStart();
+
 	$itemcount = 0;
 	foreach ($file as $items) {
 		$items = $file->handleRow($items);
@@ -1715,11 +1718,15 @@ if ( isset($_POST['local_file']) || isset($_FILES['uploaded_file']) ) {
 		$output['items'][] = array('status' => $output_status, 'class' => $output_class, 'message' => $output_message, 'data' => $output_data);
 		// end of row insertion code
 		$itemcount++;
+
+		$file->onItemFinish($products_id, $products_model);
 	}
 }
 	/**
 	* Post-upload tasks start
 	*/
+	$file->onFileFinish();
+
 	ep_update_prices();
 
 	if (!empty($output['specials'])) {
@@ -1824,9 +1831,10 @@ if ($_GET['dross'] == 'delete') {
 </div>
 <div>
 	<form enctype="multipart/form-data" action="easypopulate.php" method="POST">
+		<input type="hidden" name="MAX_FILE_SIZE" value="100000000">
+		<input type="hidden" name="import" value="1">
 		<fieldset>
 			<legend>Load comma or tab delimited files</legend>
-			<input type="hidden" name="MAX_FILE_SIZE" value="100000000">
 			<div>
 			<label for="uploaded_file">Upload EP File</label>
 			<input id="uploaded_file" name="uploaded_file" type="file" size="50">
@@ -1958,7 +1966,8 @@ if ($_GET['dross'] == 'delete') {
 			<?php if (is_dir($temp_path)) { ?>
 			<div><h2>Uploaded Files</h2></div>
 			<form id="uploaded_files" enctype="multipart/form-data" action="easypopulate.php" method="POST">
-			<input type="hidden" name="local_file" />
+			<input type="hidden" name="import" value="1">
+			<input type="hidden" name="local_file">
 			<table>
 				<thead>
 				<tr>
