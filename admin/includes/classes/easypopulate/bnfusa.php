@@ -55,7 +55,11 @@
  */
 class EPUploadBNFUSA extends EPUploadStandard
 {
+
 	public $masterRowCount = 1;
+	public $productIds = array();
+	public $lastProductIds = array();
+
 	public function mapFileLayout(array $filelayout)
 	{
 		$rename = array();
@@ -73,9 +77,9 @@ class EPUploadBNFUSA extends EPUploadStandard
 		$rename['discount_price_4']			= 'Column 5 Price';
 		$rename['discount_qty_4']			= 'Column 5 Break';
 		$rename['products_weight']			= 'Each Weight (lbs.)';
-		$rename['categories_name_1']		= 'Major Category';
-		$rename['categories_name_2']		= 'Minor Category';
-		$rename['categories_name_3']		= 'Item Status';
+		$rename['categories_name_1']			= 'Major Category';
+		$rename['categories_name_2']			= 'Minor Category';
+		$rename['categories_name_3']			= 'Item Status';
 		$rename['x_size_color_desc']			= 'Item Size-Color Desc';
 		$rename['x_size_color_numeric']		= 'Size-Color Key Numeric';
 		$rename['x_item_categories_numeric'] = 'Item Categories (numeric)';
@@ -84,11 +88,6 @@ class EPUploadBNFUSA extends EPUploadStandard
 		// Everything below here is dynamic, there is no matching field in the file
 		$filelayout[] = 'products_image';
 		$filelayout[] = 'products_discount_type';
-		$filelayout[] = 'categories_name_1';
-		$filelayout[] = 'categories_name_2';
-		$filelayout[] = 'categories_name_3';
-		$filelayout[] = 'categories_name_4';
-		$filelayout[] = 'categories_name_5';
 
 		$filelayout = array_flip($filelayout);
 		return $filelayout;
@@ -96,15 +95,14 @@ class EPUploadBNFUSA extends EPUploadStandard
 
 	public function handleRow(array $item)
 	{
-		/*$foo = explode(',', trim($item['Item Categories']));
-		$count = 1;
-		foreach ($foo as $cat) {
-			$item['categories_name_' . $count] = $cat;
-			$count++;
-		}*/
-		if (empty($item['categories_name_3'])) {
+		$item['metatags'] = array();
+		if (!empty($item['categories_name_3'])) {
 			unset($item['categories_name_3']);
 		}
+		/*$foo = explode(',', trim($item['Item Categories']));
+		foreach ($foo as $cat) {
+			$item['categories'][] = $cat;
+		}*/
 
 		if (empty($item['products_quantity_order_min']) || !isset($item['products_quantity_order_min'])) {
 			$item['products_quantity_order_min'] = 1;
@@ -150,7 +148,38 @@ class EPUploadBNFUSA extends EPUploadStandard
 
 			$item['attributes'][0] = array_merge($attributes, array('values' => $optionValues));
 		}
+
 		return $item;
+	}
+
+	function onFileStart()
+	{
+		$this->productIds = array();
+		$this->lastProductIds = ep_get_config('temp_store');
+	}
+
+	function onItemFinish($productId, $productModel)
+	{
+		$this->productIds[] = (int)$productId;
+	}
+
+	public function onFileFinish()
+	{
+		global $db;
+
+		if (!empty($this->lastProductIds)) {
+			$diff = array_diff($this->lastProductIds, $this->productIds);
+
+			foreach ($diff as $pid) {
+				zen_remove_product($pid);
+			}
+		}
+		$data = array();
+		$data['configuration_value'] = serialize(array_unique($this->productIds));
+		$data['last_modified'] = 'NOW()';
+		$where = 'configuration_key = \'EASYPOPULATE_CONFIG_TEMP_STORE\'';
+		$query = ep_db_modify(TABLE_CONFIGURATION, $data, 'UPDATE', $where);
+		$db->Execute($query);
 	}
 }
 ?>
