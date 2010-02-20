@@ -1932,7 +1932,9 @@ if ($_GET['dross'] == 'delete') {
 						<td class="status"><?php echo $item['status'] ?></td>
 						<td class="message"><?php echo $item['message'] ?></td>
 						<?php foreach ($item['data'] as $data) { ?>
-							<td><?php echo print_el($data); ?></td>
+							<?php if (!is_array($data)) { ?>
+								<td><?php echo print_el($data); ?></td>
+							<?php } ?>
 						<?php } ?>
 					</tr>
 				<?php } ?>
