@@ -1005,7 +1005,6 @@ if (isset($_POST['import'])) {
 
 	$file->onFileStart();
 
-	$itemcount = 0;
 	foreach ($file as $items) {
 		$items = $file->handleRow($items);
 
@@ -1717,7 +1716,7 @@ if (isset($_POST['import'])) {
 		$output_data = array_values($items);
 		$output['items'][] = array('status' => $output_status, 'class' => $output_class, 'message' => $output_message, 'data' => $output_data);
 		// end of row insertion code
-		$itemcount++;
+
 
 		$file->onItemFinish($products_id, $products_model);
 	}
@@ -1915,7 +1914,7 @@ if ($_GET['dross'] == 'delete') {
 				<?php } ?>
 			<?php } ?>
 			<?php if (!empty($output['items'])) { ?>
-			<div><h2><?php echo EASYPOPULATE_DISPLAY_HEADING; ?></h2> Items Uploaded(<?php echo $itemcount;?>)</div>
+			<div><h2><?php echo EASYPOPULATE_DISPLAY_HEADING; ?></h2> Items Uploaded(<?php echo $file->itemCount;?>)</div>
 			<table id="uploaded_products" class="results_table">
 				<thead>
 				<tr>

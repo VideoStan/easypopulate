@@ -166,6 +166,7 @@ class EPUploadBNFUSA extends EPUploadStandard
 	function onItemFinish($productId, $productModel)
 	{
 		$this->productIds[] = (int)$productId;
+		$this-itemCount++;
 	}
 
 	public function onFileFinish()

@@ -33,6 +33,8 @@ class EPFileUploadFactory
 class EPUploadStandard extends SplFileObject
 {
 	public $filelayout = array();
+	public $itemCount = 0;
+
 	function __construct($file)
 	{
 		$col_delimiter = ep_get_config('col_delimiter');
@@ -186,7 +188,7 @@ class EPUploadStandard extends SplFileObject
 	 */
 	public function onItemFinish($productId, $productModel)
 	{
-
+		$this->itemCount++;
 	}
 
 	/**
