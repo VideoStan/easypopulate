@@ -58,7 +58,6 @@ class EPUploadBNFUSA extends EPUploadStandard
 
 	public $masterRowCount = 1;
 	public $productIds = array();
-	public $lastProductIds = array();
 
 	public function mapFileLayout(array $filelayout)
 	{
@@ -160,21 +159,20 @@ class EPUploadBNFUSA extends EPUploadStandard
 	function onFileStart()
 	{
 		$this->productIds = array();
-		$this->lastProductIds = ep_get_config('temp_store');
 	}
 
 	function onItemFinish($productId, $productModel)
 	{
 		$this->productIds[] = (int)$productId;
-		$this-itemCount++;
+		$this->itemCount++;
 	}
 
 	public function onFileFinish()
 	{
 		global $db;
-
-		if (!empty($this->lastProductIds)) {
-			$diff = array_diff($this->lastProductIds, $this->productIds);
+		$lastProductIds = ep_get_config('temp_store');
+		if (!empty($lastProductIds)) {
+			$diff = array_diff($lastProductIds, $this->productIds);
 
 			foreach ($diff as $pid) {
 				zen_remove_product($pid);
