@@ -1801,6 +1801,14 @@ if ($_GET['dross'] == 'delete') {
 	$(document).ready(function() {
 		cssjsmenu('navbar');
 		$('#hoverJS').attr('disabled', 'disabled');
+
+		$(".results_table tr").mouseover(function(){
+			$(this).addClass("over");
+		}).mouseout(function(){
+			$(this).removeClass("over");
+		});
+		$(".results_table tr:nth-child(even)").addClass("alt");
+
 	});
 	</script>
 	<!--@todo: move this css to some other file -->
@@ -1812,14 +1820,21 @@ if ($_GET['dross'] == 'delete') {
 		border-collapse: collapse;
 		border:1px solid #000;
 	}
-	.results_table .fail {
-		background-color: #E68080;
+	.results_table th {
+		padding-right: 0.5em;
+		background-color: #D7D6CC;
 	}
-	.results_table .success {
-		background-color: #85C285;
+	.results_table tr.fail td.status {
+		color: #E68080;
+	}
+	.results_table tr.success td.status {
+		color: #599659;
 	}
 	td.status {
 		font-weight: bold;
+	}
+	.results_table tr.alt {
+		background-color: #E7E6E0;
 	}
 	</style>
 </head>
@@ -1922,7 +1937,7 @@ if ($_GET['dross'] == 'delete') {
 					<th><?php echo EASYPOPULATE_DISPLAY_MESSAGE; ?></th>
 					<!-- @todo make sure the headers line up with the text in all cases -->
 					<?php foreach (array_keys($filelayout) as $header) { ?>
-						<th><?php echo $header ?></th>
+						<th><?php echo ucwords(str_replace('_', ' ', $header)); ?></th>
 					<?php } ?>
 				</tr>
 				</thead>
