@@ -34,6 +34,7 @@ class EPUploadStandard extends SplFileObject
 {
 	public $filelayout = array();
 	public $itemCount = 0;
+	public $transforms = array();
 
 	function __construct($file)
 	{
@@ -149,8 +150,15 @@ class EPUploadStandard extends SplFileObject
 					}
 					break;
 				case 'metatags': // only for title,description,keywords
-					if (isset($column[2]) && is_numeric($column[2]) && !empty($value)) {
-						$metatags[$column[2]][$column[1]] = $value; //indexed by language_id
+					if (isset($column[2]) && is_numeric($column[2])) {
+						$newvalue = $value;
+						if (($column[1] == 'keywords') && isset($this->transforms['metatags']['keywords']) && empty($newvalue)) {
+							$newvalue = $this->transformPlaceHolders($olditem, $this->transforms['metatags']['keywords']);
+							$newvalue = trim(strip_tags($newvalue));
+						}
+
+						if (empty($newvalue)) break;
+						$metatags[$column[2]][$column[1]] = $newvalue; //indexed by language_id
 					}
 					break;
 				default:
@@ -175,6 +183,20 @@ class EPUploadStandard extends SplFileObject
 		}
 
 		return $item;
+	}
+
+	/**
+	 * Transform {} placeholders to the field value
+	 *
+	 * If v_products_name_1 is foo, then it will transform {products_name_1} to foo
+	 *
+	 * @param mixed array of values to search
+	 * @param string string in which to replace search values
+	 * @return string
+	 */
+	public function transformPlaceHolders(array $search, $replace)
+	{
+		return preg_replace("/\{([^\{]{1,100}?)\}/e", '$search[$1]', $replace);
 	}
 
 	public function onFileStart()

@@ -969,9 +969,11 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 //*******************************
 if (isset($_POST['import'])) {
 
+	$transforms = array();
 	$output['specials'] = array();
 	$output['errors'] = array();
 	$output['info'] = '';
+
 	// BEGIN PROCESSING DATA
 	// @todo more error checking here
 	$uploaded_file = !empty($_POST['local_file']) ? $_POST['local_file'] : $_FILES['uploaded_file'];
@@ -999,6 +1001,10 @@ if (isset($_POST['import'])) {
 		$modelsize = 32;
 	} else {
 		$modelsize = $model_varchar;
+	}
+
+	if (!empty($_POST['transforms'])) {
+		$file->transforms = $_POST['transforms'];
 	}
 
 	if ($filelayout = $file->getFileLayout()) {
@@ -1856,6 +1862,12 @@ if ($_GET['dross'] == 'delete') {
 			<div>
 			<label for="local_file">Import from Temp Dir (<?php echo $tempdir; ?>)</label>
 			<input type="text" id="local_file" name="local_file" size="50">
+			</div>
+			<div id="transforms">
+				<div>
+				<label for="transforms_metatags_keywords">Meta Keywords Patterns</label>
+				<input type="text" id="transforms_metatags_keywords" name="transforms[metatags][keywords]" size="50">
+				</div>
 			</div>
 			<input type="submit" name="buttoninsert" value="Insert into db">
 		</fieldset>
