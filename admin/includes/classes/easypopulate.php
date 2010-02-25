@@ -38,14 +38,9 @@ class EPUploadStandard extends SplFileObject
 
 	function __construct($file)
 	{
-		$col_delimiter = ep_get_config('col_delimiter');
-		$col_enclosure = ep_get_config('col_enclosure');
 		@ini_set('auto_detect_line_endings',ep_get_config('detect_line_endings'));
-
 		parent::__construct($file);
-
 		$this->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY | SplFileObject::DROP_NEW_LINE);
-		$this->setCsvControl($col_delimiter, $col_enclosure);
 	}
 
 	/**

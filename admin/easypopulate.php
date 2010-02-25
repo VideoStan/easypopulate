@@ -991,6 +991,18 @@ if (isset($_POST['import'])) {
 
 	$fileInfo->setFileClass(EPFileUploadFactory::get($upload_file_format));
 	$file = $fileInfo->openFile('r');
+
+	$column_delimiter = ep_get_config('col_delimiter');
+	$column_enclosure = ep_get_config('col_enclosure');
+	if (isset($_POST['column_delimiter']) && !empty($_POST['column_delimiter'])) {
+			$column_delimiter = $_POST['column_delimiter'];
+			if ($column_delimiter == 'tab') $column_delimiter = "\t";
+	}
+	if (isset($_POST['column_enclosure']) && !empty($_POST['column_enclosure'])) {
+			$column_enclosure = $_POST['column_enclosure'];
+	}
+	$file->setCsvControl($column_delimiter, $column_enclosure);
+
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED;
 
@@ -1008,7 +1020,6 @@ if (isset($_POST['import'])) {
 	}
 
 	if ($filelayout = $file->getFileLayout()) {
-
 	$file->onFileStart();
 
 	foreach ($file as $items) {
@@ -1854,7 +1865,7 @@ if ($_GET['dross'] == 'delete') {
 		<input type="hidden" name="MAX_FILE_SIZE" value="100000000">
 		<input type="hidden" name="import" value="1">
 		<fieldset>
-			<legend>Load comma or tab delimited files</legend>
+			<legend>Load delimited files</legend>
 			<div>
 			<label for="uploaded_file">Upload EP File</label>
 			<input id="uploaded_file" name="uploaded_file" type="file" size="50">
@@ -1862,6 +1873,18 @@ if ($_GET['dross'] == 'delete') {
 			<div>
 			<label for="local_file">Import from Temp Dir (<?php echo $tempdir; ?>)</label>
 			<input type="text" id="local_file" name="local_file" size="50">
+			</div>
+			<div>
+			<label for="column_delimiter">Column Delimiter</label>
+			<?php $delimiters = array();
+			foreach (ep_get_config('col_delimiters') as $v) {
+				$delimiters[] = array('id' => $v, 'text' => $v);
+			} ?>
+			<?php echo zen_draw_pull_down_menu('column_delimiter', $delimiters, ep_get_config('col_delimiter')); ?>
+			</div>
+			<div>
+			<label for="column_enclosure">Column Enclosure</label>
+			<input type="text" id="column_enclosure" name="column_enclosure" size="1" value="<?php echo ep_get_config('col_delimiter') ?>">
 			</div>
 			<div id="transforms">
 				<div>

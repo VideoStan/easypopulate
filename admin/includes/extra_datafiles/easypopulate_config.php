@@ -1,12 +1,16 @@
 <?php
 /**
- * EasyPopulate smart tags
+ * EasyPopulate extra configuration
  *
  * @package easypopulate
  * @author langer? and other contributors
  * @copyright 2003?
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  */
+
+define('EASYPOPULATE_CONFIG_COLUMN_DELIMITERS', serialize(
+	array(',', 'tab', '|', ':',';')
+));
 define('EASYPOPULATE_CONFIG_SMART_TAGS_LIST', serialize(
 	array("\r\n|\r|\n" => '<br />')
 ));

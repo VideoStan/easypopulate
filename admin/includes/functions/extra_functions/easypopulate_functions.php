@@ -323,10 +323,13 @@ function install_easypopulate() {
 	$query = ep_db_modify(TABLE_CONFIGURATION_GROUP, $data, 'UPDATE', "configuration_group_id = $group_id");
 	$db->Execute($query);
 	
+	$delimiters = unserialize(EASYPOPULATE_CONFIG_COLUMN_DELIMITERS);
+
 	$entries = array();
 	$entries[] = array('title' => 'Column Delimiter',
 							'key' => 'EASYPOPULATE_CONFIG_COLUMN_DELIMITER',
 							'value' => ',',
+							'set_function' => 'zen_cfg_select_option(' . var_export($delimiters, true) . ',',
 							'description' => 'Single character used to separate fields');
 	$entries[] = array('title' => 'Column Enclosure',
 							'key' => 'EASYPOPULATE_CONFIG_COLUMN_ENCLOSURE',
@@ -376,7 +379,7 @@ function install_easypopulate() {
 	$entries[] = array('title' => 'Advanced Smart Tags',
 							'key' => 'EASYPOPULATE_CONFIG_ADV_SMART_TAGS',
 							'value' => 'false', 
-							'description' => 'Allow the use of complex regular expressions to format descriptions, making headings bold, add bullets, etc. Configuration is in ADMIN/easypopulate.php (default: false)',
+							'description' => 'Allow the use of complex regular expressions to format descriptions, making headings bold, add bullets, etc. Configuration is in \'admin/includes/extra_datafiles/easypopulate_config.php\' (default: false)',
 							'set_function' => 'zen_cfg_select_option(array(\"true\", \"false\"),');
 	$entries[] = array('title' => 'Log Errors',
 							'key' => 'EASYPOPULATE_CONFIG_DEBUG_LOGGING',
@@ -461,6 +464,7 @@ function ep_get_config($var = '')
 {
 	$config = array();
 	$config['col_delimiter'] = EASYPOPULATE_CONFIG_COLUMN_DELIMITER;
+	$config['col_delimiters'] = unserialize(EASYPOPULATE_CONFIG_COLUMN_DELIMITERS);
 	$config['col_enclosure']   = EASYPOPULATE_CONFIG_COLUMN_ENCLOSURE;
 	// @todo do we actually need this if we can query the qty discount table for the MAX() value?
 	// If so, we need to put it in the installer
