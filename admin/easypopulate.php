@@ -983,14 +983,14 @@ if (isset($_POST['import'])) {
 
 	$output['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $fileInfo->getFileName(), $fileInfo->getSize());
 
-	$upload_handler = ep_get_config('upload_file_format');
-	if (isset($_POST['upload_handler']) && !empty($_POST['upload_handler'])) {
-		$upload_handler = $_POST['upload_handler'];
+	$import_handler = ep_get_config('import_handler');
+	if (isset($_POST['import_handler']) && !empty($_POST['import_handler'])) {
+		$import_handler = $_POST['import_handler'];
 	}
 
 	if ($enable_advanced_smart_tags) $smart_tags = array_merge($advanced_smart_tags,$smart_tags);
 
-	$fileInfo->setFileClass(EPFileUploadFactory::get($upload_handler));
+	$fileInfo->setFileClass(EPFileUploadFactory::get($import_handler));
 	$file = $fileInfo->openFile('r');
 
 	$column_delimiter = ep_get_config('col_delimiter');
