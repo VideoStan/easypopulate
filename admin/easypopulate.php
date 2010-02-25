@@ -982,14 +982,15 @@ if (isset($_POST['import'])) {
 	$fileInfo = new SplFileInfo($file_location);
 
 	$output['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $fileInfo->getFileName(), $fileInfo->getSize());
-	// @todo add this to the gui with the default value selected
-	if (empty($upload_file_format) || !isset($upload_file_format)) {
-		$upload_file_format = 'Standard';
+
+	$upload_handler = ep_get_config('upload_file_format');
+	if (isset($_POST['upload_handler']) && !empty($_POST['upload_handler'])) {
+		$upload_handler = $_POST['upload_handler'];
 	}
 
 	if ($enable_advanced_smart_tags) $smart_tags = array_merge($advanced_smart_tags,$smart_tags);
 
-	$fileInfo->setFileClass(EPFileUploadFactory::get($upload_file_format));
+	$fileInfo->setFileClass(EPFileUploadFactory::get($upload_handler));
 	$file = $fileInfo->openFile('r');
 
 	$column_delimiter = ep_get_config('col_delimiter');
@@ -1001,6 +1002,7 @@ if (isset($_POST['import'])) {
 	if (isset($_POST['column_enclosure']) && !empty($_POST['column_enclosure'])) {
 			$column_enclosure = $_POST['column_enclosure'];
 	}
+
 	$file->setCsvControl($column_delimiter, $column_enclosure);
 
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
@@ -1865,7 +1867,7 @@ if ($_GET['dross'] == 'delete') {
 		<input type="hidden" name="MAX_FILE_SIZE" value="100000000">
 		<input type="hidden" name="import" value="1">
 		<fieldset>
-			<legend>Load delimited files</legend>
+			<legend>Import delimited files</legend>
 			<div>
 			<label for="uploaded_file">Upload EP File</label>
 			<input id="uploaded_file" name="uploaded_file" type="file" size="50">
@@ -1884,7 +1886,15 @@ if ($_GET['dross'] == 'delete') {
 			</div>
 			<div>
 			<label for="column_enclosure">Column Enclosure</label>
-			<input type="text" id="column_enclosure" name="column_enclosure" size="1" value="<?php echo ep_get_config('col_delimiter') ?>">
+			<input type="text" id="column_enclosure" name="column_enclosure" size="1" value="<?php echo htmlspecialchars(ep_get_config('col_enclosure')) ?>">
+			</div>
+			<div>
+			<label for="import_handler">Import File Handler</label>
+			<?php $handlers = array();
+			foreach (EPFileUploadFactory::find() as $v) {
+				$handlers[] = array('id' => $v, 'text' => $v);
+			} ?>
+			<?php echo zen_draw_pull_down_menu('import_handler', $handlers, ep_get_config('upload_file_format')); ?>
 			</div>
 			<div id="transforms">
 				<div>

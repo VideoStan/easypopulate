@@ -10,9 +10,29 @@
 
 class EPFileUploadFactory
 {
+	private static function baseDirectory()
+	{
+		return DIR_FS_ADMIN . DIR_WS_CLASSES . 'easypopulate/';
+	}
+
+	/**
+	 * Find and return list of subclasses
+	 *
+	 * @return array
+	 */
+	public static function find()
+	{
+		$classFiles = array('Standard');
+		foreach (new DirectoryIterator(self::baseDirectory()) as $classFile) {
+			if ($classFile->isDot() && !(preg_match('/\.php$/', $classFile->getFilename()))) continue;
+			$classFiles[] = $classFile->getBaseName('.php');
+		}
+		return $classFiles;
+	}
+
 	public static function get($type)
 	{
-		$file = DIR_FS_ADMIN . DIR_WS_CLASSES . 'easypopulate/' . strtolower($type) . '.php';
+		$file = self::baseDirectory() . $type . '.php';
 		if ($type == 'Standard' || include($file)) {
 			$classname = 'EPUpload' . $type;
 			return $classname;
