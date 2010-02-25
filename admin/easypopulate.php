@@ -1003,7 +1003,7 @@ if (isset($_POST['import'])) {
 			$column_enclosure = $_POST['column_enclosure'];
 	}
 
-	$file->setCsvControl($column_delimiter, $column_enclosure);
+	$file->setCsvControl($column_delimiter, stripslashes($column_enclosure));
 
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED;
@@ -1896,7 +1896,7 @@ if ($_GET['dross'] == 'delete') {
 			foreach (EPFileUploadFactory::find() as $v) {
 				$handlers[] = array('id' => $v, 'text' => $v);
 			} ?>
-			<?php echo zen_draw_pull_down_menu('import_handler', $handlers, ep_get_config('upload_file_format')); ?>
+			<?php echo zen_draw_pull_down_menu('import_handler', $handlers, ep_get_config('import_handler')); ?>
 			</div>
 			<div id="transforms">
 				<div>
