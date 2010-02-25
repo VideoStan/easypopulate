@@ -1834,6 +1834,8 @@ if ($_GET['dross'] == 'delete') {
 	<style type="text/css">
 	label {
 		font-weight: bold;
+		width: 20em;
+		float: left;
 	}
 	.results_table {
 		border-collapse: collapse;
