@@ -1017,6 +1017,10 @@ if (isset($_POST['import'])) {
 		$modelsize = $model_varchar;
 	}
 
+	if (isset($_POST['price_modifier']) && !empty($_POST['price_modifier'])) {
+			$price_modifier = $_POST['price_modifier'];
+	}
+
 	if (!empty($_POST['transforms'])) {
 		$file->transforms = $_POST['transforms'];
 	}
@@ -1243,6 +1247,17 @@ if (isset($_POST['import'])) {
 				$products_url[$l_id] = smart_tags($items['products_url_' . $l_id ],$smart_tags,false);
 			}
 		}
+
+		if (isset($price_modifier) && !empty($price_modifier)) {
+			if (strpos($price_modifier, '%') !== false) {
+				$modifier = str_replace('%', '', $price_modifier);
+				$modifier = $products_price * ($modifier / 100);
+			} else {
+				$modifier = $price_modifier;
+			}
+			$products_price += $modifier;
+		}
+
 		//elari... we get the tax_clas_id from the tax_title - from zencart??
 		//on screen will still be displayed the tax_class_title instead of the id....
 		if (isset($tax_class_title)){
@@ -1834,7 +1849,7 @@ if ($_GET['dross'] == 'delete') {
 	<style type="text/css">
 	label {
 		font-weight: bold;
-		width: 20em;
+		width: 22em;
 		float: left;
 	}
 	.results_table {
@@ -1889,6 +1904,10 @@ if ($_GET['dross'] == 'delete') {
 			<div>
 			<label for="column_enclosure">Column Enclosure</label>
 			<input type="text" id="column_enclosure" name="column_enclosure" size="1" value="<?php echo htmlspecialchars(ep_get_config('col_enclosure')) ?>">
+			</div>
+			<div>
+			<label for="price_modifier">Price Modifier (use % for percentage)</label>
+			<input type="text" id="price_modifier" name="price_modifier" size="5" value="">
 			</div>
 			<div>
 			<label for="import_handler">Import File Handler</label>
