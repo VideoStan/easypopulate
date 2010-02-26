@@ -55,6 +55,7 @@ class EPUploadStandard extends SplFileObject
 	public $filelayout = array();
 	public $itemCount = 0;
 	public $transforms = array();
+	public $imagePathPrefix = '';
 
 	function __construct($file)
 	{
@@ -189,6 +190,8 @@ class EPUploadStandard extends SplFileObject
 		}
 		if ((trim($item['products_image']) == '') || !isset($item['products_image'])) {
 			$item['products_image'] = PRODUCTS_IMAGE_NO_IMAGE;
+		} else {
+			$item['products_image'] = $this->imagePathPrefix . $item['products_image'];
 		}
 		if (empty($item['products_quantity_order_min']) || !isset($item['products_quantity_order_min'])) {
 			$item['products_quantity_order_min'] = 1;

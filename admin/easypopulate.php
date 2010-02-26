@@ -1021,6 +1021,10 @@ if (isset($_POST['import'])) {
 			$price_modifier = $_POST['price_modifier'];
 	}
 
+	if (isset($_POST['image_path_prefix']) && !empty($_POST['image_path_prefix']) {
+			$this->imagePathPrefix = $_POST['image_path_prefix'];
+	}
+
 	if (!empty($_POST['transforms'])) {
 		$file->transforms = $_POST['transforms'];
 	}
@@ -1921,6 +1925,10 @@ if ($_GET['dross'] == 'delete') {
 				<div>
 				<label for="transforms_metatags_keywords">Meta Keywords Patterns</label>
 				<input type="text" id="transforms_metatags_keywords" name="transforms[metatags][keywords]" size="50">
+				</div>
+				<div>
+				<label for="image_path_prefix">Image Path Prefix</label>
+				<input type="text" id="image_path_prefix" name="image_path_prefix" size="30" value="">
 				</div>
 			</div>
 			<input type="submit" name="buttoninsert" value="Insert into db">
