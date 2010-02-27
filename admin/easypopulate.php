@@ -11,9 +11,7 @@
  * @todo <chadd> change v_products_price_as to v_products_price_uom
  */
 
-// START INITIALIZATION
 require_once ('includes/application_top.php');
-require(DIR_WS_CLASSES . 'easypopulate.php');
 
 $output = array();
 

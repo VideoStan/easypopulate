@@ -12,6 +12,8 @@
  * @todo handle tab and other characters that need to be escaped for EASYPOPULATE_CONFIG_COLUMN_DELIMITER
  */
 
+require_once DIR_WS_CLASSES . 'easypopulate.php';
+
 function ep_handle_uploaded_file($file)
 {
 	$temp_path = ep_get_config('temp_path');
@@ -343,7 +345,7 @@ function install_easypopulate() {
 							'key' => 'EASYPOPULATE_CONFIG_IMPORT_HANDLER',
 							'value' => 'Standard',
 							'description' => 'Import File Handler (default: Standard).',
-							'set_function' => 'zen_cfg_select_option(array("Standard", "BNFUSA"),');
+							'set_function' => 'zen_cfg_select_option(array(EPFileUploadFactory::find(),');
 	$entries[] = array('title' => 'Upload File Date Format',
 							'key' => 'EASYPOPULATE_CONFIG_FILE_DATE_FORMAT',
 							'value' => 'm-d-y', 
