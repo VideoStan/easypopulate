@@ -1460,9 +1460,10 @@ if (isset($_POST['import'])) {
 			$data = array();
 			$data['products_id'] = $products_id;
 			$data['language_id'] = $key;
-			$data['metatags_title']	= $metaData['title'];
-			$data['metatags_keywords'] = $metaData['keywords'];
-			$data['metatags_description']	= $metaData['description'];
+			$data['metatags_title']	= isset($metaData['title']) ? $metaData['title'] : '';
+			$data['metatags_keywords'] = isset($metaData['keywords']) ? $metaData['keywords'] : '';
+			$data['metatags_description']	= isset($metaData['description']) ? $metaData['description'] : '';
+
 			$query = "SELECT products_id FROM ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION.
 			" WHERE products_id = $products_id AND language_id = $key";
 			$result = ep_query($query);
