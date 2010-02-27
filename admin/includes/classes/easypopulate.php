@@ -175,8 +175,8 @@ class EPUploadStandard extends SplFileObject
 
 						if (empty($newvalue)) break;
 						$metatags[$column[2]][$column[1]] = $newvalue; //indexed by language_id
+						break;
 					}
-					break;
 				default:
 					$item[$key] = $value;
 					break;
