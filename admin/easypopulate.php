@@ -29,7 +29,6 @@ if ($_GET['epinstaller'] == 'remove') {
 }
 
 if ($_GET['epinstaller'] == 'install') {
-	remove_easypopulate();
 	install_easypopulate();
 	//$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_SUCCESS, 'success');
 	zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
@@ -1020,7 +1019,7 @@ if (isset($_POST['import'])) {
 	}
 
 	if (isset($_POST['image_path_prefix']) && !empty($_POST['image_path_prefix'])) {
-			$this->imagePathPrefix = $_POST['image_path_prefix'];
+			$file->imagePathPrefix = $_POST['image_path_prefix'];
 	}
 
 	if (!empty($_POST['transforms'])) {
