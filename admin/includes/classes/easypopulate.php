@@ -52,10 +52,12 @@ class EPFileUploadFactory
  */
 class EPUploadStandard extends SplFileObject
 {
+	public $name = 'Standard';
 	public $filelayout = array();
 	public $itemCount = 0;
 	public $transforms = array();
 	public $imagePathPrefix = '';
+	public $columnDelimiter = ',';
 
 	function __construct($file)
 	{
@@ -212,9 +214,34 @@ class EPUploadStandard extends SplFileObject
 	 * @param string string in which to replace search values
 	 * @return string
 	 */
-	public function transformPlaceHolders(array $search, $replace)
+	protected function transformPlaceHolders(array $search, $replace)
 	{
 		return preg_replace("/\{([^\{]{1,100}?)\}/e", '$search[$1]', $replace);
+	}
+
+
+	protected function removeMissingProducts()
+	{
+		global $db;
+
+		$query = "SELECT * FROM " . DB_PREFIX . "easypopulate_feeds WHERE name = '" . $this->name . "'";
+
+		$result = ep_query($query);
+		$row = mysql_fetch_array($result, MYSQL_ASSOC);
+		$lastProductIds = unserialize($row['last_run_data']);
+		if (!empty($lastProductIds)) {
+			$diff = array_diff($lastProductIds, $this->productIds);
+			foreach ($diff as $pid) {
+				zen_remove_product($pid);
+			}
+		}
+
+		$data = array();
+		$data['last_run_data'] = serialize(array_unique($this->productIds));
+		$data['modified'] = 'NOW()';
+		$where = 'id = ' . $row['id'];
+		$query = ep_db_modify(DB_PREFIX . 'easypopulate_feeds', $data, 'UPDATE', $where);
+		$db->Execute($query);
 	}
 
 	public function onFileStart()

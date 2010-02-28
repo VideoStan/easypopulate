@@ -55,7 +55,7 @@
  */
 class EPUploadBNFUSA extends EPUploadStandard
 {
-
+	public $name = 'BNFUSA';
 	public $masterRowCount = 1;
 	public $productIds = array();
 
@@ -169,21 +169,7 @@ class EPUploadBNFUSA extends EPUploadStandard
 
 	public function onFileFinish()
 	{
-		global $db;
-		$lastProductIds = ep_get_config('temp_store');
-		if (!empty($lastProductIds)) {
-			$diff = array_diff($lastProductIds, $this->productIds);
-
-			foreach ($diff as $pid) {
-				zen_remove_product($pid);
-			}
-		}
-		$data = array();
-		$data['configuration_value'] = serialize(array_unique($this->productIds));
-		$data['last_modified'] = 'NOW()';
-		$where = 'configuration_key = \'EASYPOPULATE_CONFIG_TEMP_STORE\'';
-		$query = ep_db_modify(TABLE_CONFIGURATION, $data, 'UPDATE', $where);
-		$db->Execute($query);
+		$this->removeMissingProducts();
 	}
 }
 ?>
