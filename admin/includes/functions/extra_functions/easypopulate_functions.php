@@ -436,18 +436,7 @@ function install_easypopulate() {
 				PRIMARY KEY (id)
 				)';
 	$db->Execute($query);
-
-	$handlers = EPFileUploadFactory::find();
-	foreach ($handlers as $handler) {
-		$data = array();
-		$data['name'] = $handler;
-		$data['config'] = serialize(array());
-		$data['last_run_data'] = serialize(array());
-		$data['modified'] = 'NOW()';
-		$data['created'] = 'NOW()';
-		$query = ep_db_modify(DB_PREFIX . 'easypopulate_feeds', $data, 'INSERT');
-		$db->Execute($query);
-	}
+	ep_update_handlers();
 }
 
 /**
@@ -474,6 +463,32 @@ function remove_easypopulate() {
 	return true;
 }
 
+function ep_update_handlers()
+{
+	global $db;
+
+	$query = "SELECT name FROM " . DB_PREFIX . "easypopulate_feeds";
+	$result = ep_query($query);
+
+	$handlers_db = array();
+	while ($row = mysql_fetch_array($result)) {
+		$handlers_db[] = $row['name'];
+	}
+
+	$handlers = EPFileUploadFactory::find();
+	foreach ($handlers as $handler) {
+		if (in_array($handler,$handlers_db)) continue;
+
+		$data = array();
+		$data['name'] = $handler;
+		$data['config'] = serialize(array());
+		$data['last_run_data'] = serialize(array());
+		$data['modified'] = 'NOW()';
+		$data['created'] = 'NOW()';
+		$query = ep_db_modify(DB_PREFIX . 'easypopulate_feeds', $data, 'INSERT');
+		$db->Execute($query);
+	}
+}
 /**
  * Get all Easy Populate config vars or a single one
  *

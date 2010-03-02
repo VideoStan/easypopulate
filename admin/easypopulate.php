@@ -74,6 +74,8 @@ if (!$chmod_check) {
 	$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG), 'warning');
 }
 
+ep_update_handlers();
+
 /**
  * START check for existence of various mods
  */
