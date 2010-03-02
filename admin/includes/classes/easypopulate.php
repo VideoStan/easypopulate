@@ -61,7 +61,7 @@ class EPUploadStandard extends SplFileObject
 
 	function __construct($file)
 	{
-		@ini_set('auto_detect_line_endings',ep_get_config('detect_line_endings'));
+		@ini_set('auto_detect_line_endings',(int)ep_get_config('detect_line_endings'));
 		parent::__construct($file);
 		$this->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY | SplFileObject::DROP_NEW_LINE);
 	}
