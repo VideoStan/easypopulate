@@ -32,6 +32,9 @@
  */
 class EPUploadPremierProducts extends EPUploadStandard
 {
+	const FEED_URL = '';
+	const IMAGES_URL = 'http://www.hotbuy4u.com/picsdl.cfm';
+
 	public $name = 'PremierProducts';
 
 	public function mapFileLayout(array $filelayout)
@@ -62,6 +65,10 @@ class EPUploadPremierProducts extends EPUploadStandard
 		$item['products_image'] = $this->imagePathPrefix . $item['products_image'];
 		if (!file_exists(DIR_FS_CATALOG . 'images/' . $item['products_image'])) {
 			$item['products_image'] = 'no_picture.gif';
+		}
+
+		if (strpos($item['products_model'], '(R)') !== false) {
+			$item['products_description_1'] .= ' Reconditioned';
 		}
 		return $item;
 	}

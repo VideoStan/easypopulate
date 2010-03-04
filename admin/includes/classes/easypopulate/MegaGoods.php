@@ -68,6 +68,10 @@ class EPUploadMegaGoods extends EPUploadStandard
 			$item['products_image'] = 'no_picture.gif';
 		}
 
+		if ($item['condition'] == 'Reconditioned') {
+			$item['products_description_1'] .= ' ' . $item['condition'];
+		}
+
 		return $item;
 	}
 
