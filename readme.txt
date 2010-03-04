@@ -8,10 +8,45 @@ READ THE INSTALL FILE!!!!!!!
 OVERVIEW
 ---------
 
-Easy Populate allows you to add/update products from a tab or comma delimited
+Easy Populate allows you to add/update products from a delimited
 text file, which can be edited in Excel, or OpenOffice Calc. Please use Excel
 with care as most versions have trouble with files with lots of columns/rows.
 Please make sure to backup your products before trying it.
+
+Installing
+----------
+1) The temp folder is configured to reside in your store directory. If you store is not in the
+   site root (eg. /mystore/) then the temp directory must also go in this directory.
+2) If you want to rename the uploads (temp) folder, ensure that you configure Easy Populate to
+   reflect this change after installation
+3) Upload all files in their respective directories.
+4) Go to Admin -> Tools -> Easy Populate. If prompted to install Easy Populate, click on the
+   link provided. Otherwise, type in your browser address bar ?epinstaller=install after /easypopulate.php
+   (eg. YOUR_ADMIN/easypopulate.php?epinstaller=install). If you wish to remove and re-install the default
+   config settings, type ?epinstaller=remove after /easypopulate.php
+   (eg. YOUR_ADMIN/easypopulate.php?epinstaller=remove) and begin this step again.
+5) Go to Admin -> Configuration -> Easy Populate, and configure the upload directory if you have
+   changed it from default. Also, ensure that the correct date format is set for your upload files.
+
+Upgrading
+---------
+If you are upgrading from 1.2.5.5 (Update added on Jan 12 2009):
+
+You must point your browser to:
+YOUR_ADMIN/easypopulate.php?epinstaller=remove
+and then:
+YOUR_ADMIN/easypopulate.php?epinstaller=install
+This will prompt for the new configuration values to be reinstalled.
+############
+
+IMPORTANT!!!
+-------------
+
+** your temp folder must have owner permissions to read/write/execute (chmod 700 or chmod 777) for EP to work.
+(unless you have a windows server - ask your host to adjust permissions on this folder for the IIS web server)
+
+** It is recommended that you download a file first and use this as a template for your uploads (install should do this for you..)
+
 
 USAGE
 ---------
@@ -69,16 +104,6 @@ Category1 -> Category2 (sub-cat) -> Category3 (sub-sub-cat) etc..
 To add, simply put a price in. All blank specials price fields are ignored by
 Easy Populate.
 
-TIMEOUTS: You may experience timeouts when adding/updating large numbers of
-products. If you have a large file that times out, you can use the
-"Split EP File" option. This will create multiple files containing a maximum of
-300 records (default - you can change this in Admin). Thus, 1000 products will
-produce 4 files. These files are created in your /temp/ folder, from where you
-can upload each in turn after they have been split. If 300 is too many or too
-few for your circumstances, adjust it in
-Admin -> Configuration -> "Easy Populate".
-
-
 CONFIGURATION
 -------------
 
@@ -102,16 +127,6 @@ EXAMPLE OUTPUT FILES
 
 See the /temp/ folder for examples
 
-
-KNOWN ISSUES
--------------
-* Large numbers of Options & Attributes can cause column number to exceed
-display maximums in file editors (Excel, etc.)
-* CHMOD permissions on your temp folder of 700 may not work, depending on
-the config of your server. Make the permissions 777 if this is the case,
-and ensure that you have the index.html file in the directory if you wish
-to prevent browsing of your upload files.
-
 TO DO
 -----
 
@@ -130,7 +145,7 @@ Can wait:
 * Revamp downloads layout for modular construction - makes little sense to have multiple configs
 * generate an optional "exceptions" dump on update - users that update their site from supplier list could use this to hide/delete products removed from supplier's list.
 	# or maybe menu of option for what to do with these - delete, make inactive, etc.
-* Set file suffix in config (Eg .tab) - easy
+
 * Feasibility of addition to smart-tags for creating <ul> lists based on occurance of blank lines & bullets, asterisks etc.
 * Listing of files in /temp/ (via iframe?) with options to upload, delete, refresh list.
 	- function zen_remove($source) - removes file/directory
