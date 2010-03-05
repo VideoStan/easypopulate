@@ -12,7 +12,8 @@
  */
 
 require_once ('includes/application_top.php');
-
+$original_error_level = error_reporting();
+//error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
 $output = array();
 
 if (!isset($_GET['epinstaller'])) $_GET['epinstaller'] = '';
@@ -41,6 +42,7 @@ if ($_GET['epinstaller'] == 'install') {
 $config = ep_get_config();
 // Brings all the configuration variables into the current symbol table
 extract($config);
+
 
 // @todo move this to where the file processing actually takes place
 @set_time_limit($time_limit);
@@ -2082,6 +2084,7 @@ if ($_GET['dross'] == 'delete') {
 			</form>
 			<?php } ?>
 </div>
+<?php error_reporting($original_error_level); ?>
 <?php require(DIR_WS_INCLUDES . 'footer.php'); ?>
 </body>
 </html>
