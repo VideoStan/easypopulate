@@ -1387,15 +1387,20 @@ if (isset($_POST['import'])) {
 		// First we check to see if this is a product in the current db.
 		$result = ep_query("SELECT `products_id` FROM ".TABLE_PRODUCTS." WHERE (products_model = '" . zen_db_input($products_model) . "') LIMIT 1 ");
 
-		$date_avail = ($date_avail == true) ? date("Y-m-d H:i:s",strtotime($date_avail)) : '';
-		// if date added is null, let's keep the existing date in db..
-		if (!$date_added && $row['date_added']) { $date_added = $row['date_added']; }
-		$date_added = ($date_added) ? date("Y-m-d H:i:s",strtotime($date_added)) : 'NOW()';
-
 		$product = array();
+
+		$product['products_date_available'] = 'NOW()';
+		if (isset($date_avail) && !empty($date_avail)) {
+			$product['products_date_available'] = date('Y-m-d H:i:s', strtotime($date_avail));
+		}
+
+		if (isset($row['date_added'])) {
+			$product['products_date_added'] = $row['date_added'];
+		} else {
+			$product['products_date_added'] = isset($date_added) && !empty($date_added) ? date("Y-m-d H:i:s",strtotime($date_added)) : 'NOW()';
+		}
+
 		$product['products_model']	= $products_model;
-		$product['products_date_available'] = $date_avail;
-		$product['products_date_added'] = $date_added;
 		$product['products_last_modified'] = 'NOW()';
 		$product['products_price'] = $products_price;
 		$product['products_image'] = $products_image;
