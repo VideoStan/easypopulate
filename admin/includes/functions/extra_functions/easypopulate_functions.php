@@ -522,7 +522,6 @@ function ep_get_config($var = '')
 	$config['custom_fields'] = explode(',',trim(EASYPOPULATE_CONFIG_CUSTOM_FIELDS,','));
 	$config['time_limit'] = EASYPOPULATE_CONFIG_TIME_LIMIT;
 	$config['import_handler'] = EASYPOPULATE_CONFIG_IMPORT_HANDLER;
-	$config['temp_store'] = unserialize(EASYPOPULATE_CONFIG_TEMP_STORE);
 	$tempdir = EASYPOPULATE_CONFIG_TEMP_DIR;
 	if (substr($tempdir, -1) != '/') $tempdir .= '/';
    if (substr($tempdir, 0, 1) == '/') $tempdir = substr($tempdir, 1);

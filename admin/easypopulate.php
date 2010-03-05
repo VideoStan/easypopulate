@@ -138,7 +138,7 @@ if (zen_not_null($ep_dltype)) {
 
     // build filters
     $sql_filter = '';
-    if (!empty($_GET['ep_category_filter'])) {
+    if (isset($_GET['ep_category_filter']) && !empty($_GET['ep_category_filter'])) {
       $sub_categories = array();
       $categories_query_addition = 'ptoc.categories_id = ' . (int)$_GET['ep_category_filter'] . '';
       zen_get_sub_categories($sub_categories, $_GET['ep_category_filter']);
@@ -147,10 +147,10 @@ if (zen_not_null($ep_dltype)) {
       }
       $sql_filter .= ' AND (' . $categories_query_addition . ')';
     }
-    if ($_GET['ep_manufacturer_filter']!='') {
+    if (isset($_GET['ep_manufacturer_filter']) && !empty($_GET['ep_manufacturer_filter'])) {
       $sql_filter .= ' and p.manufacturers_id = ' . (int)$_GET['ep_manufacturer_filter'];
     }
-    if ($_GET['ep_status_filter']!='') {
+    if (isset($_GET['ep_status_filter']) && !empty($_GET['ep_status_filter'])) {
       $sql_filter .= ' AND p.products_status = ' . (int)$_GET['ep_status_filter'];
     }
 
@@ -186,7 +186,6 @@ if (zen_not_null($ep_dltype)) {
 		}
 
 		$filelayout[] = 'v_specials_price';
-		$filelayout[] = 'v_specials_last_modified';
 		$filelayout[] = 'v_specials_expires_date';
 		$filelayout[] = 'v_products_price';
 
@@ -223,7 +222,7 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout[] = 'v_status';
 
 		//	START custom fields
-		$custom_layout_sql = ' ';
+		$custom_filelayout_sql = ' ';
 		if(count($custom_fields) > 0) {
 			foreach($custom_fields as $f) {
 				if (empty($f)) continue;
@@ -764,15 +763,18 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 				$temprow['v_categories_name_' . $categorylevel] = '';
 			}
 		}
+
 		// now trim off the last ">" from the category stack
 		$row['v_category_fullpath'] = substr($fullcategory,0,strlen($fullcategory)-3);
 
 		// temprow has the old style low to high level categories.
 		$newlevel = 1;
 		// let's turn them into high to low level categories
-		for( $categorylevel=6; $categorylevel>0; $categorylevel--){
+		for ($categorylevel= $max_categories; $categorylevel>0; $categorylevel--) {
 			if ($temprow['v_categories_name_' . $categorylevel] != ''){
 				$row['v_categories_name_' . $newlevel++] = $temprow['v_categories_name_' . $categorylevel];
+			} else {
+				$row['v_categories_name_' . $newlevel++] = '';
 			}
 		}
 
