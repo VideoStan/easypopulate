@@ -1,8 +1,38 @@
+johnny <johnny@localmomentum.net>
+
+* Category/Manufacturer/Status filter for downloaded files (chadd)
+* removal of lots of obsolete comments
+* tons more todos
+* quantity discounts (chadd)
+* major UI cleanup, use semantic html throughout and tables for upload output data
+* move all (except smart tags) configuration options to configuration GUI
+  * move smart tags/advanced smart tags settings to admin/includes/extra_datafiles/easypopulate_config.php
+  * add configuration option for detecting line endings on various operating systems
+  * add configuration option for set_time_limit/max_input_time
+* subclass SplFileObject as EPUploadStandard for parsing the uploaded files
+* replace the external directory listing code with a simpler table based listing via DirectoryIterator
+* allow subclassing EPUploadStandard for various product list feeds
+  * feed parser for BNFUSA
+  * feed parser for PremierProducts
+  * feed parser for MegaGoods
+* add configuration option for choosing default feed parser
+* cleanup attributes upload/insert code to support attributes that don't start with 1
+* add jquery from google cdn
+* display a count of uploaded products
+* cleanup upload results table display: use zebra striping, add background colors to headers
+* Allow creation of meta keywords via placeholders in the input file (ex: {v_products_name_1},{v_categories_name_1})
+* allow choosing the column delimiter and enclosure in the admin page (not just the config page)
+* add an option to modify all prices in the uploaded file +/- a flat value or a percentage
+* add an option to prefix the image path by another directory if you store the images in a subdirectory of images/
+* add a database table for storing various upload feed preferences and last data insertion so we can handle items disappearing off the feed
+
+See http://github.com/jrobeson/easypopulate/commits/master for a more complete listing of all changes made
 ------------------------------------
 !!!!!!!!!!!!!!!Any changes  below here may or may still be active!!!!!!!!!!!!!
 ------------------------------------
 
 Modified by Chadd - chadd at chicagophoto dot net
+  Add category filters
 1.3.01 - 03-30-09 - BUG FIX - when uploading FULL file. If v_status column is left out, would re-activate deactivated items.
 1.3.02 - 03-30-09 - BUG FIX - fixed blank manufactuers import where empty v_manufacturers_name when blank was not reset correctly
 1.3.03 - 09-08-09 - Begins Major Code Revisions
