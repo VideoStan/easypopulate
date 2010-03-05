@@ -13,7 +13,7 @@
 
 require_once ('includes/application_top.php');
 $original_error_level = error_reporting();
-//error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
+error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
 $output = array();
 
 if (!isset($_GET['epinstaller'])) $_GET['epinstaller'] = '';
@@ -1161,7 +1161,7 @@ if (isset($_POST['import'])) {
 			// temprow has the old style low to high level categories.
 			$newlevel = 1;
 			// let's turn them into high to low level categories
-			for( $categorylevel=$max_categories+1; $categorylevel>0; $categorylevel--){
+			for( $categorylevel=$max_categories; $categorylevel>0; $categorylevel--){
 				if ($temprow['categories_name_' . $categorylevel] != ''){
 					$row['categories_name_' . $newlevel++] = $temprow['categories_name_' . $categorylevel];
 				}
@@ -1319,10 +1319,6 @@ if (isset($_POST['import'])) {
 			$db_status = '0';
 		}
 
-		if ($manufacturer_id == '') {
-			$manufacturer_id = "NULL";
-		}
-
 		// OK, we need to convert the manufacturer's name into id's for the database
 		if ( isset($manufacturers_name) && $manufacturers_name != '' ){
 			$sql = "SELECT man.manufacturers_id as manID
@@ -1347,7 +1343,7 @@ if (isset($_POST['import'])) {
 			// start from the highest possible category and work our way down from the parent
 			$categories_id = 0;
 			$theparent_id = 0;
-			for ( $categorylevel=$max_categories+1; $categorylevel>0; $categorylevel-- ){
+			for ($categorylevel=$max_categories; $categorylevel>0; $categorylevel--) {
 				$thiscategoryname = $categories_name[$categorylevel];
 				if ( $thiscategoryname != ''){
 					// we found a category name in this field
