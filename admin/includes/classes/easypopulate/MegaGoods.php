@@ -74,7 +74,7 @@ class EPUploadMegaGoods extends EPUploadStandard
 
 		$description = '<br><em><strong>Retails Online: $' . $item['retails online'] . '</strong></em>' .
 							'<br><em><strong>MSRP : $' . $item['MSRP'] . '</strong></em>';
-		$item['products_description_1'] .= $description;
+		$item['products_description_1'] = $description . $item['products_description_1'];
 		return $item;
 	}
 
