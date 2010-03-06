@@ -71,7 +71,7 @@ class EPUploadPremierProducts extends EPUploadStandard
 			$item['products_description_1'] .= '<br> Reconditioned';
 		}
 		$item['products_description_1'] =  '<br><em><strong>Retail Price: $' . $item['retailprice'] . 
-			'</strong></em>' . $item['products_description_1'];
+			'</strong></em><br>' . $item['products_description_1'];
 
 		return $item;
 	}
