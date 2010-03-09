@@ -38,8 +38,6 @@ class EPUploadMegaGoods extends EPUploadStandard
 	public function mapFileLayout(array $filelayout)
 	{
 		$filelayout[0] = 'products_model';
-		$filelayout[2] = 'products_name_1';
-		$filelayout[3] = 'products_description_1';
 		$filelayout[5] = 'manufacturers_name';
 		$filelayout[6] = 'products_price';
 		$filelayout[9] = 'products_weight';
@@ -52,6 +50,8 @@ class EPUploadMegaGoods extends EPUploadStandard
 
 	public function handleRow(array $item)
 	{
+		$descriptions = array();
+		$descriptions['name'] = $item['name'];
 
 		$item['metatags'] = array();
 
@@ -70,11 +70,13 @@ class EPUploadMegaGoods extends EPUploadStandard
 			$item['products_image'] = 'no_picture.gif';
 		}
 
-		$item['products_description_1'] .= '<br>' . $item['condition'];
-
 		$description = '<br><em><strong>Retails Online: $' . $item['retails online'] . '</strong></em>' .
-							'<br><em><strong>MSRP : $' . $item['MSRP'] . '</strong></em><br><br>';
-		$item['products_description_1'] = $description . $item['products_description_1'];
+							'<br><em><strong>MSRP : $' . $item['MSRP'] . '</strong></em><br><br>' .
+							$item['description'] .'<br>' . $item['condition'];
+
+		$item['descriptions'][1]['name'] = $item['name'];
+		$item['descriptions'][1]['description'] = $description;
+
 		return $item;
 	}
 

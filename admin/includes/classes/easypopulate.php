@@ -142,6 +142,7 @@ class EPUploadStandard extends SplFileObject
 	{
 		$attributes = array();
 		$metatags = array();
+		$descriptions = array();
 		$item = array();
 		foreach ($olditem as $key => $value) {
 			$column = explode('_', $key);
@@ -179,6 +180,11 @@ class EPUploadStandard extends SplFileObject
 						$metatags[$column[2]][$column[1]] = $newvalue; //indexed by language_id
 						break;
 					}
+				case 'products':
+					if (in_array($column[1], array('name', 'description', 'url', 'short'))) {
+						if ($column[1] == 'short') $column[1] = 'short_desc';
+						$descriptions[$column[2]][$column[1]] = $value;
+					} // fall through for the rest
 				default:
 					$item[$key] = $value;
 					break;
@@ -186,6 +192,7 @@ class EPUploadStandard extends SplFileObject
 		}
 		$item['metatags'] = $metatags;
 		$item['attributes'] = $attributes;
+		$item['descriptions'] = $descriptions;
 
 		if ((trim($item['products_quantity']) == '') || !isset($item['products_quantity'])) {
 			$item['v_products_quantity'] = 0;

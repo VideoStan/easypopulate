@@ -62,8 +62,6 @@ class EPUploadBNFUSA extends EPUploadStandard
 	public function mapFileLayout(array $filelayout)
 	{
 		$rename = array();
-		$rename['products_description_1'] = 'Web Description';
-		$rename['products_name_1']			= 'Item Title';
 		$rename['products_model']			= 'Parent Number';
 		$rename['products_price']			= 'Each Price';
 		$rename['products_quantity']		= 'Available Inventory';
@@ -95,6 +93,12 @@ class EPUploadBNFUSA extends EPUploadStandard
 	public function handleRow(array $item)
 	{
 		$item['metatags'] = array();
+		$descriptions = array();
+
+		$descriptions[1]['name'] = $item['Item Title'];
+		$descriptions[1]['description'] = $item['Web Description'];
+		$item['descriptions'] = $descriptions;
+
 		if (!empty($item['categories_name_3'])) {
 			unset($item['categories_name_3']);
 		}
@@ -113,7 +117,7 @@ class EPUploadBNFUSA extends EPUploadStandard
 		$item['products_discount_type'] = 2;
 
 		$model = $item['products_model'];
-		
+
 		$item['products_image'] = $this->imagePathPrefix . $model . '/' . $model . '_800.jpg';
 		if (!file_exists(DIR_FS_CATALOG . 'images/' . $item['products_image'])) {
 			$item['products_image'] = 'no_picture.gif';

@@ -42,12 +42,10 @@ class EPUploadPremierProducts extends EPUploadStandard
 		$filelayout[1] = 'categories_name_1';
 		$filelayout[2] = 'categories_name_2';
 		$filelayout[3] = 'manufacturers_name';
-		$filelayout[4] = 'products_name_1';
 		$filelayout[5] = 'products_model';
 		$filelayout[7] = 'products_image';
 		$filelayout[8] = 'products_price';
 		$filelayout[9] = 'products_quantity';
-		$filelayout[10] = 'products_description_1';
 		$filelayout[11] = 'products_weight';
 		$filelayout = array_flip($filelayout);
 		return $filelayout;
@@ -56,6 +54,8 @@ class EPUploadPremierProducts extends EPUploadStandard
 	public function handleRow(array $item)
 	{
 		$item['metatags'] = array();
+		$descriptions = array();
+		$descriptions['name'] = $item['name'];
 
 		$item['products_quantity_order_min'] = 1;
 		$item['products_quantity_order_units'] = 1;
@@ -68,10 +68,12 @@ class EPUploadPremierProducts extends EPUploadStandard
 		}
 
 		if (strpos($item['products_model'], '(R)') !== false) {
-			$item['products_description_1'] .= '<br> Reconditioned';
+			$item['description'] .= '<br> Reconditioned';
 		}
-		$item['products_description_1'] =  '<br><em><strong>Retail Price: $' . $item['retailprice'] . 
-			'</strong></em><br>' . $item['products_description_1'];
+		$item['description'] =  '<br><em><strong>Retail Price: $' . $item['retailprice'] .
+			'</strong></em><br>' . $item['description'];
+
+		$item['descriptions'][1] = $descriptions;
 
 		return $item;
 	}

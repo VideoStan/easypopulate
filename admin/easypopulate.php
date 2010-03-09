@@ -1239,22 +1239,6 @@ if (isset($_POST['import'])) {
 		*/
 		extract($items);
 
-		// so how to handle these?  we shouldn't build the array unless it's been giving to us.
-		// The assumption is that if you give us names and descriptions, then you give us name and description for all applicable languages
-		foreach ($langcode as $lang){
-			$l_id = $lang['id'];
-			if (isset($filelayout['products_name_' . $l_id ])){ // do for each language in our upload file if exist
-				// convert language names from _1, _2, etc; into arrays [1], [2], etc
-				$products_name[$l_id] = smart_tags($items['products_name_' . $l_id],$smart_tags,false);
-				$products_description[$l_id] = $items['products_description_' . $l_id ];
-				// if short descriptions exist
-				if ($ep_supported_mods['psd'] == true) {
-					$products_short_desc[$l_id] = smart_tags($items['products_short_desc_' . $l_id ],$smart_tags,$strip_smart_tags);
-				}
-				$products_url[$l_id] = smart_tags($items['products_url_' . $l_id ],$smart_tags,false);
-			}
-		}
-
 		if (isset($price_modifier) && !empty($price_modifier)) {
 			if (strpos($price_modifier, '%') !== false) {
 				$modifier = str_replace('%', '', $price_modifier);
@@ -1512,21 +1496,18 @@ if (isset($_POST['import'])) {
 		//*************************
 		// Products Descriptions Start
 		//*************************
-		if (isset($products_name)){
-		foreach( $products_name as $key => $name){
-		if ($name != ''){
-
+		foreach ($descriptions as $key => $value) {
 				$sql = "SELECT * FROM ".TABLE_PRODUCTS_DESCRIPTION." WHERE products_id = $products_id AND	language_id = " . $key . " LIMIT 1 ";
 				$result = ep_query($sql);
 				$data = array();
 				$data['products_id']	= $products_id;
 				$data['language_id']	= $key;
-				$data['products_name'] = $name;
-				$data['products_description']	= $products_description[$key];
-				$data['products_url'] = $products_url[$key];
+				if (isset($value['name'])) $data['products_name'] = smart_tags($value['name'], $smart_tags, false);
+				if (isset($value['description'])) $data['products_description']	= $value['description'];
+				if (isset($value['url'])) $data['products_url'] = smart_tags($value['url'], $smart_tags, false);
 
 				if ($ep_supported_mods['psd']) {
-					$data['products_short_desc'] = $products_short_desc[$key];
+					$data['products_short_desc'] = smart_tags($value['short_desc'], $smart_tags, $strip_smart_tags);
 				}
 				if (mysql_num_rows($result) == 0) {
 					$query = ep_db_modify(TABLE_PRODUCTS_DESCRIPTION, $data, 'INSERT');
@@ -1536,8 +1517,6 @@ if (isset($_POST['import'])) {
 					$query = ep_db_modify(TABLE_PRODUCTS_DESCRIPTION, $data, 'UPDATE', $where);
 					$result = ep_query($query);
 				}
-		}
-		}
 		}
 		//*************************
 		// Products Descriptions End
@@ -1751,7 +1730,7 @@ if (isset($_POST['import'])) {
 				$specials_status = EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT;
 			}
 
-			$specials_data = array($products_model, $products_name[$epdlanguage_id], $products_price , $specials_price);
+			$specials_data = array($products_model, $descriptions[$epdlanguage_id]['name'], $products_price , $specials_price);
 			$output['specials'][] = array('status' => $specials_status, 'class' => $specials_class, 'message' => $specials_message, 'data' => $specials_data);
 		}
 		// end specials for this product
