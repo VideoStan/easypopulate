@@ -1830,6 +1830,9 @@ if ($_GET['dross'] == 'delete') {
 		});
 		$(".results_table tr:nth-child(even)").addClass("alt");
 
+		$("#show_uploaded_files").click(function() {
+			$("#uploaded_files").toggle();
+		});
 	});
 	</script>
 	<!--@todo: move this css to some other file -->
@@ -1839,6 +1842,11 @@ if ($_GET['dross'] == 'delete') {
 		width: 22em;
 		float: left;
 	}
+
+	#uploaded_files {
+	    display:none;
+	}
+
 	.results_table {
 		border-collapse: collapse;
 		border:1px solid #000;
@@ -1914,8 +1922,35 @@ if ($_GET['dross'] == 'delete') {
 				<input type="text" id="image_path_prefix" name="image_path_prefix" size="30" value="">
 				</div>
 			</div>
-			<input type="submit" name="buttoninsert" value="Insert into db">
+			<input type="submit" name="import" value="Import">
 		</fieldset>
+		<?php if (is_dir($temp_path)) { ?>
+			<fieldset>
+		   <legend><a id="show_uploaded_files" href="#">Show Uploaded Files</a></legend>
+			<table id="uploaded_files">
+				<thead>
+				<tr>
+					<th>Import</th>
+					<th>File</th>
+					<th>Size</th>
+					<th>Last Modified</th>
+				</tr>
+				</thead>
+				<?php $linkBase = HTTP_SERVER .  DIR_WS_CATALOG . $tempdir; ?>
+				<!-- @todo replace the onclick with unobtrusive js when we use jquery -->
+				<?php foreach (new DirectoryIterator($temp_path) as $tempFile) { ?>
+				<?php if (!$tempFile->isDot() && ($tempFile->getFilename() != 'index.html')) { ?>
+					<tr>
+						<td><input type="button" onclick="this.form.local_file.value='<?php echo $tempFile->getFileName() ?>';" value="Choose"></td>
+						<td><a href="<?php echo $linkBase . $tempFile->getFileName(); ?>"><?php echo $tempFile->getFileName(); ?></a></td>
+						<td><?php echo round(($tempFile->getSize() / 1024)); ?> KB</td>
+						<td><?php echo strftime(DATE_FORMAT_LONG, $tempFile->getMTime()); ?></td>
+					</tr>
+				<?php } ?>
+				<?php } ?>
+			</table>
+		</fieldset>
+		<?php } ?>
 	</form>
 		  <?php echo zen_draw_form('custom', 'easypopulate.php', 'id="custom"', 'get'); ?>
           <!--  <form ENCTYPE="multipart/form-data" ACTION="easypopulate.php?download=stream&dltype=full" METHOD="POST"> -->
@@ -2035,35 +2070,6 @@ if ($_GET['dross'] == 'delete') {
 					</tr>
 				<?php } ?>
 			</table>
-			<?php } ?>
-			<?php if (is_dir($temp_path)) { ?>
-			<div><h2>Uploaded Files</h2></div>
-			<form id="uploaded_files" enctype="multipart/form-data" action="easypopulate.php" method="POST">
-			<input type="hidden" name="import" value="1">
-			<input type="hidden" name="local_file">
-			<table>
-				<thead>
-				<tr>
-					<th>Import</th>
-					<th>File</th>
-					<th>Size</th>
-					<th>Last Modified</th>
-				</tr>
-				</thead>
-				<?php $linkBase = HTTP_SERVER .  DIR_WS_CATALOG . $tempdir; ?>
-				<!-- @todo replace the onclick with unobtrusive js when we use jquery -->
-				<?php foreach (new DirectoryIterator($temp_path) as $tempFile) { ?>
-				<?php if (!$tempFile->isDot() && ($tempFile->getFilename() != 'index.html')) { ?>
-					<tr>
-						<td><input type="submit" onclick="this.form.local_file.value='<?php echo $tempFile->getFileName() ?>';" value="Import" /></td>
-						<td><a href="<?php echo $linkBase . $tempFile->getFileName(); ?>"><?php echo $tempFile->getFileName(); ?></a></td>
-						<td><?php echo round(($tempFile->getSize() / 1024)); ?> KB</td>
-						<td><?php echo strftime(DATE_FORMAT_LONG, $tempFile->getMTime()); ?></td>
-					</tr>
-				<?php } ?>
-				<?php } ?>
-			</table>
-			</form>
 			<?php } ?>
 </div>
 <?php error_reporting($original_error_level); ?>
