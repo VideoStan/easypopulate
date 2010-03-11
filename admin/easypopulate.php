@@ -16,68 +16,49 @@ $original_error_level = error_reporting();
 error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
 $output = array();
 
-if (!isset($_GET['epinstaller'])) $_GET['epinstaller'] = '';
 if (!isset($_GET['dross'])) $_GET['dross'] = '';
 
-if (!defined(EASYPOPULATE_CONFIG_TEMP_DIR) && !empty($_GET['epinstaller'])) { // admin area config not installed
-    $messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_INSTALL_KEYS_FAIL, '<a href="' . zen_href_link(FILENAME_EASYPOPULATE, 'epinstaller=install') . '">', '</a>'), 'warning');
-}
-
-// START installation
-if ($_GET['epinstaller'] == 'remove') {
-    remove_easypopulate();
-    zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
-}
-
-if ($_GET['epinstaller'] == 'install') {
-	install_easypopulate();
-	//$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_SUCCESS, 'success');
+if (isset($_GET['epinstaller'])) {
+	$f = $_GET['epinstaller'] . '_easypopulate';
+	$f();
 	zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+	//$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_SUCCESS, 'success');
 }
-// END installation
 
-/**
- * Initialise vars
- */
-$config = ep_get_config();
-// Brings all the configuration variables into the current symbol table
-extract($config);
+if (!defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { // admin area config not installed
+    $messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_INSTALL_KEYS_FAIL, '<a href="' . zen_href_link(FILENAME_EASYPOPULATE, 'installer=install') . '">', '</a>'), 'warning');
+} else {
+	$config = ep_get_config();
+	extract($config); // Brings all the configuration variables into the current symbol table
+	$ep_debug_logging_all = $log_queries;
+	if ($log_queries) {
+		// new blank log file on each page impression for full testing log (too big otherwise!!)
+		$fp = fopen($temp_path . 'ep_debug_log.txt','w');
+		fclose($fp);
+	}
 
+	// @todo move this to where the file processing actually takes place
+	@set_time_limit($time_limit);
+	@ini_set('max_input_time', $time_limit);
+	$chmod_check = is_dir($temp_path) && is_writable($temp_path);
+	if (!$chmod_check) {
+		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG), 'warning');
+	}
 
-// @todo move this to where the file processing actually takes place
-@set_time_limit($time_limit);
-@ini_set('max_input_time', $time_limit);
-
+	ep_update_handlers();
+}
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
 $products_with_attributes = false; // langer - this will be redundant after html renovation
 // @todo CHECK: maybe below can go in array eg $ep_processed['attributes'] = true, etc.. cold skip all post-upload tasks on check if isset var $ep_processed.
 $has_attributes = false;
 
 
-// all mods go in this array as 'name' => 'true' if exist. eg $ep_supported_mods['psd'] = true; means it exists.
-// @todo scan array in future to reveal if any mods for inclusion in downloads
-$ep_supported_mods = array();
-
-$ep_debug_logging_all = $log_queries;
-if ($log_queries) {
-	// new blank log file on each page impression for full testing log (too big otherwise!!)
-	$fp = fopen($temp_path . 'ep_debug_log.txt','w');
-	fclose($fp);
-}
-
-/**
- * Pre-flight checks start here
- */
-$chmod_check = is_dir($temp_path) && is_writable($temp_path);
-if (!$chmod_check) {
-	$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG), 'warning');
-}
-
-ep_update_handlers();
-
 /**
  * START check for existence of various mods
  */
+// all mods go in this array as 'name' => 'true' if exist. eg $ep_supported_mods['psd'] = true; means it exists.
+// @todo scan array in future to reveal if any mods for inclusion in downloads
+$ep_supported_mods = array();
 $ep_supported_mods['psd'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_short_desc');
 $ep_supported_mods['uom'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_as'); // uom = unit of measure
 $ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
@@ -102,7 +83,7 @@ foreach ($langcode as $value) {
 
 $ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : NULL;
 
-if (zen_not_null($ep_dltype) {
+if (zen_not_null($ep_dltype)) {
    require DIR_WS_CLASSES . 'easypopulate/Export.php';
 
 	$export_file = 'EP-' . $ep_dltype . strftime('%Y%b%d-%H%M%S');
@@ -1052,6 +1033,7 @@ if ($_GET['dross'] == 'delete') {
 <div id="ep_header">
 	<h1>Easy Populate <?php echo EASYPOPULATE_VERSION ?></h1>
 </div>
+<?php if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { ?>
 <div>
 	<form enctype="multipart/form-data" action="easypopulate.php" method="POST">
 		<input type="hidden" name="MAX_FILE_SIZE" value="100000000">
@@ -1250,6 +1232,7 @@ if ($_GET['dross'] == 'delete') {
 			</table>
 			<?php } ?>
 </div>
+<?php } ?>
 <?php error_reporting($original_error_level); ?>
 <?php require(DIR_WS_INCLUDES . 'footer.php'); ?>
 </body>
