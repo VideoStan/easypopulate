@@ -6,12 +6,14 @@
  *
  * @package easypopulate
  * @author langer
- * @copyright ????-2009
+ * @author John William Robeson Jr <johnny@localmomentum.net>
+ * @author see history.txt
+ * @copyright 2002-2010
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  * @todo document these functions
- * @todo handle tab and other characters that need to be escaped for EASYPOPULATE_CONFIG_COLUMN_DELIMITER
  */
 
+define('EASYPOPULATE_VERSION', '3.9.5');
 require_once DIR_WS_CLASSES . 'easypopulate.php';
 
 function ep_handle_uploaded_file($file)

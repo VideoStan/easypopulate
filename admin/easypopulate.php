@@ -48,9 +48,6 @@ extract($config);
 @set_time_limit($time_limit);
 @ini_set('max_input_time', $time_limit);
 
-// @todo move this define to somewhere not dependent on the admin interface being loaded
-define('EASYPOPULATE_VERSION', '3.9.5');
-
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
 $products_with_attributes = false; // langer - this will be redundant after html renovation
 // @todo CHECK: maybe below can go in array eg $ep_processed['attributes'] = true, etc.. cold skip all post-upload tasks on check if isset var $ep_processed.
@@ -88,8 +85,6 @@ $ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIP
  * END check for existance of various mods
  */
 
-$category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
-
 /**
  * Pre-flight checks finish here
  */
@@ -107,7 +102,7 @@ foreach ($langcode as $value) {
 
 $ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : NULL;
 
-if (zen_not_null($ep_dltype)) {
+if (zen_not_null($ep_dltype) {
    require DIR_WS_CLASSES . 'easypopulate/Export.php';
 
 	$export_file = 'EP-' . $ep_dltype . strftime('%Y%b%d-%H%M%S');
@@ -200,6 +195,8 @@ if (isset($_POST['import'])) {
 	} else {
 		$modelsize = $model_varchar;
 	}
+
+   $category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
 
 	if (isset($_POST['price_modifier']) && !empty($_POST['price_modifier'])) {
 			$price_modifier = $_POST['price_modifier'];
