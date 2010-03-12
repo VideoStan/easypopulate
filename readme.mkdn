@@ -18,19 +18,16 @@ Installing
 4. Set permissions for your temp directory
 	* UNIX/Linux: chmod 700 or chmod 777
 	* Windows: ?
-5. Go to Admin -> Tools -> Easy Populate. If prompted to install Easy Populate, click on the
-   link provided. Otherwise, type in your browser address bar ?epinstaller=install after /easypopulate.php
-   (eg. YOUR_ADMIN/easypopulate.php?epinstaller=install). If you wish to remove and re-install the default
-   (eg. YOUR_ADMIN/easypopulate.php?epinstaller=remove) and begin this step again.
+5. Go to Admin -> Tools -> Easy Populate. Click "Install EasyPopulate"
+   link provided.
 6. Go to Admin -> Configuration -> Easy Populate, and configure the upload directory if you have
    changed it from default. Also, ensure that the correct date format is set for your upload files.
 
 Upgrading
 ---------
-Go to:
-
-1. http://example.org/YOUR_ADMIN/easypopulate.php?epinstaller=remove
-2. http://example.org/YOUR_ADMIN/easypopulate.php?epinstaller=install
+1. Go to Admin -> Tools -> Easy Populate
+2. Click "Remove Easy Populate"
+3. Click "Install Easy Populate" 
 
 Important Note
 -------------
