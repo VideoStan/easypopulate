@@ -26,7 +26,7 @@ if (isset($_POST['installer'])) {
 if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { // EasyPopulate is installed
 	$config = ep_get_config();
 	extract($config); // Brings all the configuration variables into the current symbol table
-	$ep_debug_logging_all = $log_queries;
+
 	if ($log_queries) {
 		// new blank log file on each page impression for full testing log (too big otherwise!!)
 		$fp = fopen($temp_path . 'ep_debug_log.txt','w');

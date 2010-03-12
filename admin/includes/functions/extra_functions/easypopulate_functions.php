@@ -100,7 +100,7 @@ function ep_field_name_exists($tbl,$fld) {
 }
 
 function ep_remove_product($product_model) {
-  global $db, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error;
+  global $db, $ep_debug_logging, $log_queries, $ep_stack_sql_error;
 
   $sql = "select products_id
                            from " . TABLE_PRODUCTS . "
@@ -114,7 +114,7 @@ function ep_remove_product($product_model) {
 			$string = "MySQL error ".mysql_errno().": ".mysql_error()."\nWhen executing:\n$sql\n";
 			write_debug_log($string);
 		}
-	} elseif ($ep_debug_logging_all == true) {
+	} elseif ($log_queries) {
 		$string = "MySQL PASSED\nWhen executing:\n$sql\n";
 		write_debug_log($string);
 	}
@@ -267,7 +267,7 @@ function write_debug_log($string)
 }
 
 function ep_query($query) {
-	global $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error;
+	global $ep_debug_logging, $log_queries, $ep_stack_sql_error;
 	$result = mysql_query($query);
 	if (mysql_errno()) {
 		$ep_stack_sql_error = true;
@@ -276,7 +276,7 @@ function ep_query($query) {
 			$string = "MySQL error ".mysql_errno().": ".mysql_error()."\nWhen executing:\n$query\n";
 			write_debug_log($string);
 		}
-	} elseif ($ep_debug_logging_all == true) {
+	} elseif ($log_queries) {
 		$string = "MySQL PASSED\nWhen executing:\n$query\n";
 		write_debug_log($string);
 	}
