@@ -23,11 +23,17 @@ Installing
 6. Go to Admin -> Configuration -> Easy Populate, and configure the upload directory if you have
    changed it from default. Also, ensure that the correct date format is set for your upload files.
 
-Upgrading
+Upgrading for newer versions
 ---------
 1. Go to Admin -> Tools -> Easy Populate
 2. Click "Remove Easy Populate"
-3. Click "Install Easy Populate" 
+3. Click "Install Easy Populate"
+
+Upgrading from older versions (1.2.5.7 and below)
+--------
+1. Go to Admin -> Tools -> Easy Populate
+2. add ?langer=remove after easypopulate.php in the browser address bar
+3. Click "Install EasyPopulate" 
 
 Important Note
 -------------
