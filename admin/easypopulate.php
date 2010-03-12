@@ -177,6 +177,7 @@ if (isset($_POST['import'])) {
 
    $category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
 
+	$price_modifier = 0;
 	if (isset($_POST['price_modifier']) && !empty($_POST['price_modifier'])) {
 			$price_modifier = $_POST['price_modifier'];
 	}
@@ -396,15 +397,8 @@ if (isset($_POST['import'])) {
 		*/
 		extract($items);
 
-		if (isset($price_modifier) && !empty($price_modifier)) {
-			if (strpos($price_modifier, '%') !== false) {
-				$modifier = str_replace('%', '', $price_modifier);
-				$modifier = $products_price * ($modifier / 100);
-			} else {
-				$modifier = $price_modifier;
-			}
-			$products_price += $modifier;
-		}
+		// Modify a price based on the submitted price modifier
+		$products_price = ep_modify_price($products_price, $price_modifier);
 
 		//elari... we get the tax_clas_id from the tax_title - from zencart??
 		//on screen will still be displayed the tax_class_title instead of the id....
@@ -644,7 +638,7 @@ if (isset($_POST['import'])) {
 				$data['discount_id'] = $discount;
 				$data['products_id'] = $products_id;
 				$data['discount_qty'] = $items['discount_qty_' .$discount];
-				$data['discount_price'] = $items['discount_price_' .$discount];
+				$data['discount_price'] = ep_modify_price($items['discount_price_' . $discount], $price_modifier);
 				$sql = ep_db_modify(TABLE_PRODUCTS_DISCOUNT_QUANTITY, $data, 'INSERT');
 				$result = ep_query($sql);
 			}

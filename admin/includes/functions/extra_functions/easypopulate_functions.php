@@ -32,6 +32,23 @@ function ep_handle_uploaded_file($file)
 	return $target;
 }
 
+/**
+ * Modifiy a price by a flat price or a percentage
+ *
+ * @param int $price a price
+ * @param mixed $modifier positive or negative value
+ *
+ * @return int
+ */
+function ep_modify_price($price , $modifier = 0)
+{
+	if (strpos($modifier, '%') !== false) {
+		$modifier = str_replace('%', '', $modifier);
+		$modifier = $price * ((int)$modifier / 100);
+	}
+	return $price += $modifier;
+}
+
 function ep_get_tax_class_rate($tax_class_id) {
 	$tax_multiplier = 0;
 	$tax_query = mysql_query("select SUM(tax_rate) as tax_rate from " . TABLE_TAX_RATES . " WHERE  tax_class_id = '" . zen_db_input($tax_class_id) . "' GROUP BY tax_priority");
