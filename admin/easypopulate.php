@@ -87,9 +87,6 @@ if (zen_not_null($ep_dltype)) {
 	$export_file = 'EP-' . $ep_dltype . strftime('%Y%b%d-%H%M%S');
 	// now either stream it to them or put it in the temp directory
 	if ($ep_dlmethod == 'stream') {
-		//*******************************
-		// STREAM FILE
-		//*******************************
 		header("Content-type: text/csv");
 		//header("Content-type: application/vnd.ms-excel"); // @todo make this configurable
 		header("Content-disposition: attachment; filename=$export_file" . (($col_delimiter == ",")?".csv":".txt"));
@@ -101,12 +98,13 @@ if (zen_not_null($ep_dltype)) {
 		}
 		header("Expires: 0");
 
-		$fp = fopen("php://output", "w+");
+		$fp = fopen("php://temp", "w+");
 		foreach ($filestring as $line) {
 			fputcsv($fp, $line, $col_delimiter, $col_enclosure);
 		}
-
-		die();
+		rewind($fp);
+		echo stream_get_contents($fp);
+		zen_exit();
 	} else {
 		//*******************************
 		// PUT FILE IN TEMP DIR
