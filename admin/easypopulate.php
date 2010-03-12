@@ -18,16 +18,14 @@ $output = array();
 
 if (!isset($_GET['dross'])) $_GET['dross'] = '';
 
-if (isset($_GET['epinstaller'])) {
-	$f = $_GET['epinstaller'] . '_easypopulate';
+if (isset($_POST['installer'])) {
+	$f = $_POST['installer'] . '_easypopulate';
 	$f();
 	zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
-	//$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_CHMOD_SUCCESS, 'success');
+	//$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_SUCCESS, 'success');
 }
 
-if (!defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { // admin area config not installed
-    $messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_INSTALL_KEYS_FAIL, '<a href="' . zen_href_link(FILENAME_EASYPOPULATE, 'installer=install') . '">', '</a>'), 'warning');
-} else {
+if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { // EasyPopulate is installed
 	$config = ep_get_config();
 	extract($config); // Brings all the configuration variables into the current symbol table
 	$ep_debug_logging_all = $log_queries;
@@ -982,6 +980,11 @@ if ($_GET['dross'] == 'delete') {
 		cssjsmenu('navbar');
 		$('#hoverJS').attr('disabled', 'disabled');
 
+		$("#installer :button").click(function() {
+			$("#installer input[name=installer]").val($(this).attr('name'));
+			$("#installer").submit();
+		});
+
 		$(".results_table tr").mouseover(function(){
 			$(this).addClass("over");
 		}).mouseout(function(){
@@ -996,6 +999,18 @@ if ($_GET['dross'] == 'delete') {
 	</script>
 	<!--@todo: move this css to some other file -->
 	<style type="text/css">
+	#ep_header {
+		margin-top: 5px;
+		height: 25px;
+	}
+	#ep_header h2 {
+		display: inline;
+	}
+	#installer {
+		float: right;
+		margin-bottom: 0;
+	}
+
 	label {
 		font-weight: bold;
 		width: 22em;
@@ -1003,7 +1018,7 @@ if ($_GET['dross'] == 'delete') {
 	}
 
 	#uploaded_files {
-	    display:none;
+	    display: none;
 	}
 
 	.results_table {
@@ -1031,8 +1046,19 @@ if ($_GET['dross'] == 'delete') {
 <body>
 <?php require(DIR_WS_INCLUDES . 'header.php'); ?>
 <div id="ep_header">
-	<h1>Easy Populate <?php echo EASYPOPULATE_VERSION ?></h1>
+	<h2>Easy Populate <?php echo EASYPOPULATE_VERSION ?></h2>
+	<form id="installer" enctype="multipart/form-data" action="easypopulate.php" method="POST">
+		<input type="hidden" name="installer" value="">
+	   <?php if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { ?>
+	   <input type="button" name="remove" value="Remove EasyPopulate">
+	   <!-- @todo <input type="button" name="upgrade" value="Upgrade"> -->
+	   <?php } else { ?>
+	   <span><?php echo EASYPOPULATE_ERROR_NOT_INSTALLED ?></span>
+		<input type="button" name="install" value="Install EasyPopulate">
+		<?php } ?>
+	</form>
 </div>
+
 <?php if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { ?>
 <div>
 	<form enctype="multipart/form-data" action="easypopulate.php" method="POST">
