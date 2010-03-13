@@ -8,47 +8,27 @@
  * @author too many to list, see history.txt
  * @copyright 200?-2010
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
- * @todo <johnny> actually make it a class 
+ * @todo <johnny> actually make it a class
  */
- 
+
+	// @todo CHECK: maybe below can go in array eg $ep_processed['attributes'] = true, etc.. cold skip all post-upload tasks on check if isset var $ep_processed.
+	$has_attributes = false;
 	$transforms = array();
 	$output['specials'] = array();
 	$output['errors'] = array();
 	$output['info'] = '';
 
 	// BEGIN PROCESSING DATA
-	// @todo more error checking here
-	$uploaded_file = !empty($_POST['local_file']) ? $_POST['local_file'] : $_FILES['uploaded_file'];
-	$file_location = ep_handle_uploaded_file($uploaded_file);
-
 	$fileInfo = new SplFileInfo($file_location);
 
 	$output['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $fileInfo->getFileName(), $fileInfo->getSize());
-
-	$import_handler = ep_get_config('import_handler');
-	if (isset($_POST['import_handler']) && !empty($_POST['import_handler'])) {
-		$import_handler = $_POST['import_handler'];
-	}
 
 	if ($enable_advanced_smart_tags) $smart_tags = array_merge($advanced_smart_tags,$smart_tags);
 
 	$fileInfo->setFileClass(EPFileUploadFactory::get($import_handler));
 	$file = $fileInfo->openFile('r');
 
-	$column_delimiter = ep_get_config('col_delimiter');
-	$column_enclosure = ep_get_config('col_enclosure');
-	if (isset($_POST['column_delimiter']) && !empty($_POST['column_delimiter'])) {
-			$column_delimiter = $_POST['column_delimiter'];
-			if ($column_delimiter == 'tab') $column_delimiter = "\t";
-	}
-	if (isset($_POST['column_enclosure']) && !empty($_POST['column_enclosure'])) {
-			$column_enclosure = $_POST['column_enclosure'];
-	}
-
 	$file->setCsvControl($column_delimiter, stripslashes($column_enclosure));
-
-	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
-	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED;
 
 	// model name length error handling
 	$model_varchar = zen_field_length(TABLE_PRODUCTS, 'products_model');
@@ -61,18 +41,8 @@
 
    $category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
 
-	$price_modifier = 0;
-	if (isset($_POST['price_modifier']) && !empty($_POST['price_modifier'])) {
-			$price_modifier = $_POST['price_modifier'];
-	}
-
-	if (isset($_POST['image_path_prefix']) && !empty($_POST['image_path_prefix'])) {
-			$file->imagePathPrefix = $_POST['image_path_prefix'];
-	}
-
-	if (!empty($_POST['transforms'])) {
-		$file->transforms = $_POST['transforms'];
-	}
+	$file->imagePathPrefix = $image_path_prefix;
+	$file->transforms = $transforms;
 
 	if ($filelayout = $file->getFileLayout()) {
 	$file->onFileStart();

@@ -101,6 +101,44 @@ if (zen_not_null($ep_dltype)) {
 // UPLOADING OF FILES STARTS HERE
 //*******************************
 if (isset($_POST['import'])) {
+
+	$column_delimiter = ep_get_config('col_delimiter');
+	$column_enclosure = ep_get_config('col_enclosure');
+	if (isset($_POST['column_delimiter']) && !empty($_POST['column_delimiter'])) {
+			$column_delimiter = $_POST['column_delimiter'];
+			if ($column_delimiter == 'tab') $column_delimiter = "\t";
+	}
+	if (isset($_POST['column_enclosure']) && !empty($_POST['column_enclosure'])) {
+			$column_enclosure = $_POST['column_enclosure'];
+	}
+
+	// @todo more error checking here
+	$uploaded_file = !empty($_POST['local_file']) ? $_POST['local_file'] : $_FILES['uploaded_file'];
+	$file_location = ep_handle_uploaded_file($uploaded_file);
+
+	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
+	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED;
+
+	$import_handler = ep_get_config('import_handler');
+	if (isset($_POST['import_handler']) && !empty($_POST['import_handler'])) {
+		$import_handler = $_POST['import_handler'];
+	}
+
+	$price_modifier = 0;
+	if (isset($_POST['price_modifier']) && !empty($_POST['price_modifier'])) {
+			$price_modifier = $_POST['price_modifier'];
+	}
+
+	$image_path_prefix = '';
+	if (isset($_POST['image_path_prefix']) && !empty($_POST['image_path_prefix'])) {
+		$image_path_prefix = $_POST['image_path_prefix'];
+	}
+
+	$transforms = array();
+	if (!empty($_POST['transforms'])) {
+		$transforms = $_POST['transforms'];
+	}
+
 	require DIR_WS_CLASSES . 'easypopulate/Import.php';
 }
 
