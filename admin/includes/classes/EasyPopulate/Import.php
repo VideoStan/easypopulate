@@ -114,7 +114,7 @@
 			*/
 
 			// let's check and delete it if requested
-			if ($items['status'] == 9) {
+			if (isset($items['status']) && $items['status'] == 9) {
 				$output_status = EASYPOPULATE_DISPLAY_RESULT_DELETED;
 				$output_class = 'success deleted';
 				ep_remove_product($items['products_model']);
@@ -293,20 +293,6 @@
 			}
 		}
 
-		// default the stock if they spec'd it or if it's blank
-		// @todo <chadd> we should try something like this $db_status = $products_status;
-		$db_status = '1'; // default to active
-		if ($status == '0'){
-			// they told us to deactivate this item
-			$db_status = '0';
-		}
-		if ($status == '1') { // request activate this item
-			$db_status = '1';
-		}
-		if ($deactivate_on_zero_qty && $products_quantity == 0) {
-			$db_status = '0';
-		}
-
 		// OK, we need to convert the manufacturer's name into id's for the database
 		if ( isset($manufacturers_name) && $manufacturers_name != '' ){
 			$sql = "SELECT man.manufacturers_id as manID
@@ -388,6 +374,13 @@
 			$product['products_date_added'] = isset($date_added) && !empty($date_added) ? date("Y-m-d H:i:s",strtotime($date_added)) : 'NOW()';
 		}
 
+		if (!isset($status) || $status == '') {
+			$status = 1;
+		}
+		if ($deactivate_on_zero_qty && $products_quantity == 0) {
+			$status = 0;
+		}
+
 		$product['products_model']	= $products_model;
 		$product['products_last_modified'] = 'NOW()';
 		$product['products_price'] = $products_price;
@@ -395,21 +388,37 @@
 		$product['products_weight'] = $products_weight;
 		$product['products_tax_class_id'] = $tax_class_id;
 		$product['products_discount_type'] = $products_discount_type;
-		$product['products_discount_type_from'] = $products_discount_type_from;
-		$product['product_is_call'] = $product_is_call;
-		$product['products_sort_order'] = $products_sort_order;
+		// @todo make sure this will apply from a standard file
+		if (isset($products_discount_type_from)) {
+			$product['products_discount_type_from'] = $products_discount_type_from;
+		}
+		if (isset($product_is_call)) {
+			$product['product_is_call'] = $product_is_call;
+		}
+		if (isset($products_sort_order)) {
+			$product['products_sort_order'] = $products_sort_order;
+		}
 		$product['products_quantity_order_min'] = $products_quantity_order_min;
 		$product['products_quantity_order_units'] = $products_quantity_order_units;
 		$product['products_quantity']	= $products_quantity;
 		$product['master_categories_id'] = $categories_id;
 		$product['manufacturers_id'] = $manufacturers_id;
-		$product['products_status'] = $db_status;
-		$product['metatags_title_status'] = $metatags_title_status;
-		$product['metatags_products_name_status']	= $metatags_products_name_status;
-		$product['metatags_model_status'] = $metatags_model_status;
-		$product['metatags_price_status'] = $metatags_price_status;
-		$product['metatags_title_tagline_status']	= $metatags_title_tagline_status;
-
+		$product['products_status'] = $status;
+		if (isset($metatags_title_status)) {
+			$product['metatags_title_status'] = $metatags_title_status;
+		}
+		if (isset($metatags_products_name_status)) {
+			$product['metatags_products_name_status']	= $metatags_products_name_status;
+		}
+		if (isset($metatags_model_status)) {
+			$product['metatags_model_status'] = $metatags_model_status;
+		}
+		if (isset($metatags_price_status)) {
+			$product['metatags_price_status'] = $metatags_price_status;
+		}
+		if (isset($metatags_title_tagline_status)) {
+			$product['metatags_title_tagline_status']	= $metatags_title_tagline_status;
+		}
 		if ($ep_supported_mods['uom']) {
 			$product['products_price_as'] = $products_price_as;
 		}
