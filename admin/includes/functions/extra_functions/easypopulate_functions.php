@@ -551,6 +551,18 @@ function ep_get_config($var = NULL)
 	$config['temp_path'] = DIR_FS_CATALOG . $tempdir;
 	$config['debug_log_path'] = $config['temp_path'];
 
+	$langcode = zen_get_languages();
+	// start array at one, the rest of the code expects it that way
+	$config['langcode'] = array_combine(range(1, count($langcode)), array_values($langcode));
+
+	foreach ($config['langcode'] as $value) {
+		if ($value['code'] == DEFAULT_LANGUAGE) {
+			$epdlanguage_id = $value['id'];
+			break;
+		}
+	}
+	$config['epdlanguage_id'] = $epdlanguage_id;
+
 	ep_get_config($var);
 }
 
