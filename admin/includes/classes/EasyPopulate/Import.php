@@ -142,6 +142,7 @@
 			 */
 			$thecategory_id = $row['categories_id'];// master category id
 
+			$temprow = array();
 			for($categorylevel=1; $categorylevel<$max_categories+1; $categorylevel++){
 				if (!empty($thecategory_id)){
 					$sql2 = "SELECT categories_name
@@ -152,7 +153,6 @@
 					$result2 = ep_query($sql2);
 					$row2 = mysql_fetch_array($result2);
 					$temprow['categories_name_' . $categorylevel] = $row2['categories_name'];
-
 					$sql3 = "SELECT parent_id
 						FROM ".TABLE_CATEGORIES."
 						WHERE categories_id = " . $thecategory_id;
@@ -166,15 +166,16 @@
 						// we have found the top level category for this item,
 						$thecategory_id = false;
 					}
-				} else {
+				} /*else {
 						$temprow['categories_name_' . $categorylevel] = '';
-				}
+				}*/
 			}
+
 			// temprow has the old style low to high level categories.
 			$newlevel = 1;
 			// let's turn them into high to low level categories
 			for( $categorylevel=$max_categories; $categorylevel>0; $categorylevel--){
-				if ($temprow['categories_name_' . $categorylevel] != ''){
+				if (isset($temprow['categories_name_' . $categorylevel])){
 					$row['categories_name_' . $newlevel++] = $temprow['categories_name_' . $categorylevel];
 				}
 			}
@@ -278,14 +279,12 @@
 			$category_strlen_long = false;// checks cat length does not exceed db, else exclude product from upload
 			$newlevel = 1;
 			for($categorylevel=6; $categorylevel>0; $categorylevel--) {
-				if ($items['categories_name_' . $categorylevel] != '') {
+				if (isset($items['categories_name_' . $categorylevel])) {
 					if (strlen($items['categories_name_' . $categorylevel]) > $category_strlen_max) $category_strlen_long = TRUE;
 					$categories_name[$newlevel++] = $items['categories_name_' . $categorylevel]; // adding the category name values to $categories_name array
-				}// null categories are not assigned
+				}
 			}
-			while( $newlevel < $max_categories+1){
-				$categories_name[$newlevel++] = ''; // default the remaining items to nothing
-			}
+
 			if ($category_strlen_long) {
 				$output_class = 'fail';
 				$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
@@ -333,8 +332,8 @@
 			$categories_id = 0;
 			$theparent_id = 0;
 			for ($categorylevel=$max_categories; $categorylevel>0; $categorylevel--) {
-				$thiscategoryname = $categories_name[$categorylevel];
-				if ( $thiscategoryname != ''){
+				if (isset($categories_name[$categorylevel])){
+					$thiscategoryname = $categories_name[$categorylevel];
 					// we found a category name in this field
 
 					// now the subcategory
