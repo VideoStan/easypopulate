@@ -62,7 +62,7 @@ if (isset($_POST['installer'])) {
 
 $ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : NULL;
 if (zen_not_null($ep_dltype)) {
-   require DIR_WS_CLASSES . 'easypopulate/Export.php';
+   require DIR_WS_CLASSES . 'EasyPopulate/Export.php';
 
 	$export_file = 'EP-' . $ep_dltype . strftime('%Y%b%d-%H%M%S') . '.' . (($col_delimiter == ',')? 'csv' : 'txt');
 	// now either stream it to them or put it in the temp directory
@@ -139,7 +139,7 @@ if (isset($_POST['import'])) {
 		$transforms = $_POST['transforms'];
 	}
 
-	require DIR_WS_CLASSES . 'easypopulate/Import.php';
+	require DIR_WS_CLASSES . 'EasyPopulate/Import.php';
 }
 
 if ($ep_stack_sql_error == true) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');

@@ -12,7 +12,7 @@ class EPFileUploadFactory
 {
 	private static function baseDirectory()
 	{
-		return DIR_FS_ADMIN . DIR_WS_CLASSES . 'easypopulate/Handlers/';
+		return DIR_FS_ADMIN . DIR_WS_CLASSES . 'EasyPopulate/Handlers/';
 	}
 
 	/**

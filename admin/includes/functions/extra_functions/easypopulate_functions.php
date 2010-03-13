@@ -14,7 +14,7 @@
  */
 
 define('EASYPOPULATE_VERSION', '3.9.5');
-require_once DIR_WS_CLASSES . 'easypopulate.php';
+require_once DIR_WS_CLASSES . 'EasyPopulate.php';
 
 function ep_handle_uploaded_file($file)
 {
