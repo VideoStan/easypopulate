@@ -49,22 +49,44 @@ function ep_modify_price($price , $modifier = 0)
 	return $price += $modifier;
 }
 
-function ep_get_tax_class_rate($tax_class_id) {
-	$tax_multiplier = 0;
-	$tax_query = mysql_query("select SUM(tax_rate) as tax_rate from " . TABLE_TAX_RATES . " WHERE  tax_class_id = '" . zen_db_input($tax_class_id) . "' GROUP BY tax_priority");
-	if (mysql_num_rows($tax_query)) {
-		while ($tax = mysql_fetch_array($tax_query)) {
-			$tax_multiplier += $tax['tax_rate'];
+/**
+ * Get tax class rate
+ * @param int $tax_class_id
+ * @return int tax rate
+ */
+function ep_get_tax_class_rate($tax_class_id)
+{
+	static $multipliers = array();
+	if (isset($multipliers[$tax_class_id])) {
+		return $multipliers[$tax_class_id];
+	}
+	$multiplier = 0;
+	$query = mysql_query("select SUM(tax_rate) as tax_rate from " . TABLE_TAX_RATES . " WHERE  tax_class_id = '" . zen_db_input($tax_class_id) . "' GROUP BY tax_priority");
+	if (mysql_num_rows($query)) {
+		while ($tax = mysql_fetch_array($query)) {
+			$multiplier += $tax['tax_rate'];
 		}
 	}
-	return $tax_multiplier;
+	$multipliers[$tax_class_id] = $multiplier;
+	return ep_get_tax_class_rate($tax_class_id);
 }
 
-function ep_get_tax_title_class_id($tax_class_title) {
-	$classes_query = mysql_query("select tax_class_id from " . TABLE_TAX_CLASS . " WHERE tax_class_title = '" . zen_db_input($tax_class_title) . "'" );
-	$tax_class_array = mysql_fetch_array($classes_query);
-	$tax_class_id = $tax_class_array['tax_class_id'];
-	return $tax_class_id ;
+/**
+ * Get tax class id by tax class title
+ *
+ * @param string $tax_class_title
+ * @return int tax class id
+ */
+function ep_get_tax_title_class_id($tax_class_title)
+{
+	static $tax_class_ids = array();
+	if (isset($tax_class_ids[$tax_class_title])) {
+		return $tax_class_ids[$tax_class_title];
+	}
+	$query = mysql_query("select tax_class_id from " . TABLE_TAX_CLASS . " WHERE tax_class_title = '" . zen_db_input($tax_class_title) . "'" );
+	$tax_class_array = mysql_fetch_array($query);
+	$tax_class_ids[$tax_class_title] = $tax_class_array['tax_class_id'];
+	return ep_get_tax_title_class_id($tax_class_title);
 }
 
 /**
