@@ -55,6 +55,9 @@
  */
 class EPUploadBNFUSA extends EPUploadStandard
 {
+	const FEED_URL = 'http://www.bnfusa.com/utilities/cgen.lasso?an8=10151431&fmt=csv';
+	const IMAGES_URL = 'http://statics.bnfusa.com/By_Part_Number.zip';
+
 	public $name = 'BNFUSA';
 	public $masterRowCount = 1;
 	public $productIds = array();
@@ -62,24 +65,21 @@ class EPUploadBNFUSA extends EPUploadStandard
 	public function mapFileLayout(array $filelayout)
 	{
 		$rename = array();
-		$rename['products_model']			= 'Parent Number';
-		$rename['products_price']			= 'Each Price';
-		$rename['products_quantity']		= 'Available Inventory';
-		$rename['discount_price_1']			= 'Column 2 Price';
-		$rename['discount_qty_1']			= 'Column 2 Break';
-		$rename['discount_price_2']			= 'Column 3 Price';
-		$rename['discount_qty_2']			= 'Column 3 Break';
-		$rename['discount_price_3']			= 'Column 4 Price';
-		$rename['discount_qty_3']			= 'Column 4 Break';
-		$rename['discount_price_4']			= 'Column 5 Price';
-		$rename['discount_qty_4']			= 'Column 5 Break';
-		$rename['products_weight']			= 'Each Weight (lbs.)';
-		$rename['categories_name_1']			= 'Major Category';
-		$rename['categories_name_2']			= 'Minor Category';
-		$rename['categories_name_3']			= 'Item Status';
-		$rename['x_size_color_desc']			= 'Item Size-Color Desc';
-		$rename['x_size_color_numeric']		= 'Size-Color Key Numeric';
-		$rename['x_item_categories_numeric'] = 'Item Categories (numeric)';
+		$rename['products_model']		= 'Parent Number';
+		$rename['products_price']		= 'Each Price';
+		$rename['products_quantity']	= 'Available Inventory';
+		$rename['discount_price_1']	= 'Column 2 Price';
+		$rename['discount_qty_1']		= 'Column 2 Break';
+		$rename['discount_price_2']	= 'Column 3 Price';
+		$rename['discount_qty_2']		= 'Column 3 Break';
+		$rename['discount_price_3']	= 'Column 4 Price';
+		$rename['discount_qty_3']		= 'Column 4 Break';
+		$rename['discount_price_4']	= 'Column 5 Price';
+		$rename['discount_qty_4']		= 'Column 5 Break';
+		$rename['products_weight']		= 'Each Weight (lbs.)';
+		$rename['categories_name_1']	= 'Major Category';
+		$rename['categories_name_2']	= 'Minor Category';
+		$rename['categories_name_3']	= 'Item Status';
 		$filelayout = str_replace(array_values($rename), array_keys($rename), $filelayout);
 
 		// Everything below here is dynamic, there is no matching field in the file
@@ -123,7 +123,7 @@ class EPUploadBNFUSA extends EPUploadStandard
 			$item['products_image'] = 'no_picture.gif';
 		}
 
-		$desc = $item['x_size_color_desc'];
+		$desc = $item['Item Size-Color Desc'];
 		$item['attributes'] = array();
 		$name = '';
 		if (!empty($desc)) {
@@ -134,16 +134,16 @@ class EPUploadBNFUSA extends EPUploadStandard
 					break;
 				}
 				$optionsId = $this->key();
-				if ((int)$nextItem['x_size_color_numeric'] > 5000) {
+				if ((int)$nextItem['Size-Color Key Numeric'] > 5000) {
 					$name = 'Color';
-				} else if ((int)$nextItem['x_size_color_numeric'] > 1) {
+				} else if ((int)$nextItem['Size-Color Key Numeric'] > 1) {
 					$name = 'Size';
 				}
 				$values = array();
 				$values['name'] = array();
 				$values['id'] = $this->masterRowCount;
 				$values['price'] = 0.00;
-				$values['names'][1]  = $nextItem['x_size_color_desc']; // indexed by language_id
+				$values['names'][1]  = $nextItem['Item Size-Color Desc']; // indexed by language_id
 				$optionValues[] = $values;
 				$this->masterRowCount++;
 				$this->next();
