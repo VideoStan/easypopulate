@@ -563,7 +563,7 @@ function ep_get_config($var = NULL)
 	}
 	$config['epdlanguage_id'] = $epdlanguage_id;
 
-	ep_get_config($var);
+	return ep_get_config($var);
 }
 
 /**
