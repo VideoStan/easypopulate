@@ -509,15 +509,18 @@ function ep_update_handlers()
 	}
 }
 /**
- * Get all Easy Populate config vars or a single one
+ * Get one or all config vars
  *
- * @param string $config get a specific config var (optional)
- * @return array|string all config vars | single var
- * @todo cache the config array
+ * @param string $var get a specific config var (optional)
+ * @return mixed config vars or a single var
  */
-function ep_get_config($var = '')
+function ep_get_config($var = NULL)
 {
-	$config = array();
+	static $config = array();
+	if (!empty($config)) {
+		return !empty($var) ? $config[$var] : $config;
+	}
+
 	$config['col_delimiter'] = EASYPOPULATE_CONFIG_COLUMN_DELIMITER;
 	$config['col_delimiters'] = unserialize(EASYPOPULATE_CONFIG_COLUMN_DELIMITERS);
 	$config['col_enclosure']   = EASYPOPULATE_CONFIG_COLUMN_ENCLOSURE;
@@ -547,11 +550,8 @@ function ep_get_config($var = '')
 	$config['tempdir'] = $tempdir;
 	$config['temp_path'] = DIR_FS_CATALOG . $tempdir;
 	$config['debug_log_path'] = $config['temp_path'];
-	if (!empty($var)) {
-		return $config[$var];
-	} else {
-		return $config;
-	}
+
+	ep_get_config($var);
 }
 
 /**
