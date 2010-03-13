@@ -11,7 +11,7 @@
  * @todo <chadd> change v_products_price_as to v_products_price_uom
  */
 
-require_once ('includes/application_top.php');
+require_once 'includes/application_top.php';
 $original_error_level = error_reporting();
 error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
 $output = array();
@@ -25,7 +25,7 @@ if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { // EasyPopulate is installed
 
 	if ($log_queries) {
 		// new blank log file on each page impression for full testing log (too big otherwise!!)
-		$fp = fopen($temp_path . 'ep_debug_log.txt','w');
+		$fp = fopen($temp_path . 'ep_debug_log.txt', 'w');
 		fclose($fp);
 	}
 
@@ -39,7 +39,6 @@ if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { // EasyPopulate is installed
 
 	ep_update_handlers();
 }
-
 
 /**
  * START check for existence of various mods
@@ -65,21 +64,21 @@ $ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : NULL;
 if (zen_not_null($ep_dltype)) {
    require DIR_WS_CLASSES . 'easypopulate/Export.php';
 
-	$export_file = 'EP-' . $ep_dltype . strftime('%Y%b%d-%H%M%S');
+	$export_file = 'EP-' . $ep_dltype . strftime('%Y%b%d-%H%M%S') . '.' . (($col_delimiter == ',')? 'csv' : 'txt');
 	// now either stream it to them or put it in the temp directory
 	if ($ep_dlmethod == 'stream') {
-		header("Content-type: text/csv");
+		header('Content-type: text/csv');
 		//header("Content-type: application/vnd.ms-excel"); // @todo make this configurable
-		header("Content-disposition: attachment; filename=$export_file" . (($col_delimiter == ",")?".csv":".txt"));
+		header("Content-disposition: attachment; filename=$export_file");
 		// Changed if using SSL, helps prevent program delay/timeout (add to backup.php also)
 		if ($request_type== 'NONSSL'){
-			header("Pragma: no-cache");
+			header('Pragma: no-cache');
 		} else {
-			header("Pragma: ");
+			header('Pragma: ');
 		}
-		header("Expires: 0");
+		header('Expires: 0');
 
-		$fp = fopen("php://temp", "w+");
+		$fp = fopen('php://temp', 'w+');
 		foreach ($filestring as $line) {
 			fputcsv($fp, $line, $col_delimiter, $col_enclosure);
 		}
@@ -87,11 +86,8 @@ if (zen_not_null($ep_dltype)) {
 		echo stream_get_contents($fp);
 		zen_exit();
 	} else {
-		//*******************************
-		// PUT FILE IN TEMP DIR
-		//*******************************
-		$tmpfpath = $temp_path . $export_file . (($col_delimiter == ",")?".csv":".txt");
-		$fp = fopen( $tmpfpath, "w+");
+		$tmpfpath = $temp_path . $export_file;
+		$fp = fopen($tmpfpath, 'w+');
 		foreach ($filestring as $line) {
 			fputcsv($fp, $line, $col_delimiter, $col_enclosure);
 		}
@@ -108,8 +104,6 @@ if (isset($_POST['import'])) {
 	require DIR_WS_CLASSES . 'easypopulate/Import.php';
 }
 
-// END FILE UPLOADS
-
 if ($ep_stack_sql_error == true) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
 
 /**
@@ -118,30 +112,30 @@ if ($ep_stack_sql_error == true) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_
 * @todo langer  data present in table products, but not in descriptions.. user will need product info, and decide to add description, or delete product
 */
 if (!isset($_GET['dross'])) $_GET['dross'] = NULL;
-if ($_GET['dross'] == 'delete') {
-	ep_purge_dross();
-	// now check it is really gone...
-	$dross = ep_get_dross();
-	if (zen_not_null($dross)) {
-		$string = "Product debris corresponding to the following product_id(s) cannot be deleted by EasyPopulate:\n";
-		foreach ($dross as $products_id => $langer) {
-			$string .= $products_id . "\n";
+switch ($_GET['dross']) {
+	case 'delete':
+		ep_purge_dross();
+		// now check it is really gone...
+		$dross = ep_get_dross();
+		if (zen_not_null($dross)) {
+			$string = "Product debris corresponding to the following product_id(s) cannot be deleted by EasyPopulate:\n";
+			foreach ($dross as $products_id => $langer) {
+				$string .= $products_id . "\n";
+			}
+			$string .= "It is recommended that you delete this corrupted data using phpMyAdmin.\n\n";
+			write_debug_log($string);
+			$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_FAIL, 'caution');
+		} else {
+			$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_SUCCESS, 'success');
 		}
-		$string .= "It is recommended that you delete this corrupted data using phpMyAdmin.\n\n";
-		write_debug_log($string);
-		$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_FAIL, 'caution');
-	} else {
-		$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_SUCCESS, 'success');
-	}
-} else { // elseif ($_GET['dross'] == 'check')
-	// we can choose a config option: check always, or only on clicking a button
-	// default action when not deleting existing debris is to check for it and alert when discovered..
-	$dross = ep_get_dross();
-	if (zen_not_null($dross)) {
-		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_DROSS_DETECTED, count($dross), zen_href_link(FILENAME_EASYPOPULATE, 'dross=delete')), 'caution');
-	}
+		break;
+	case 'check': // we can choose a config option: check always, or only on clicking a button
+	default:
+		$dross = ep_get_dross();
+		if (zen_not_null($dross)) {
+			$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_DROSS_DETECTED, count($dross), zen_href_link(FILENAME_EASYPOPULATE, 'dross=delete')), 'caution');
+		}
 }
-
 /**
  * Changes planned for GUI
  * @todo <johnny> process data via xhr method
