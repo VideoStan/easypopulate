@@ -134,6 +134,10 @@ if (isset($_POST['import'])) {
 		$image_path_prefix = $_POST['image_path_prefix'];
 	}
 
+	if (isset($_POST['tax_class_title']) && !empty($_POST['tax_class_title'])) {
+		$tax_class_title = $_POST['tax_class_title'];
+	}
+
 	$transforms = array();
 	if (!empty($_POST['transforms'])) {
 		$transforms = $_POST['transforms'];
@@ -311,6 +315,14 @@ switch ($_GET['dross']) {
 			<div>
 			<label for="price_modifier">Price Modifier (use % for percentage)</label>
 			<input type="text" id="price_modifier" name="price_modifier" size="5" value="">
+			</div>
+			<div>
+			<label for="tax_class_title">Tax Class</label>
+			<?php $tax_classes = array(array('id' => '', 'text' => ''));
+			foreach (ep_get_tax_class_titles() as $v) {
+				$tax_classes[] = array('id' => $v, 'text' => $v);
+			} ?>
+			<?php echo zen_draw_pull_down_menu('tax_class_title', $tax_classes, ''); ?>
 			</div>
 			<div>
 			<label for="import_handler">Import File Handler</label>

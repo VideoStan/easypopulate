@@ -89,6 +89,16 @@ function ep_get_tax_title_class_id($tax_class_title)
 	return ep_get_tax_title_class_id($tax_class_title);
 }
 
+function ep_get_tax_class_titles()
+{
+	$result = mysql_query('SELECT tax_class_title FROM ' . TABLE_TAX_CLASS);
+	$titles = array();
+	while($row = mysql_fetch_array($result)) {
+		$titles[] = $row['tax_class_title'];
+	}
+	return $titles;
+}
+
 /**
  * Print a table row of item values
  *
