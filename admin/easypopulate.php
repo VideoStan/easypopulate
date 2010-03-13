@@ -15,13 +15,9 @@ require_once ('includes/application_top.php');
 $original_error_level = error_reporting();
 error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
 $output = array();
+$products_with_attributes = false; // langer - this will be redundant after html renovation
+$ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
 
-if (isset($_POST['installer'])) {
-	$f = $_POST['installer'] . '_easypopulate';
-	$f();
-	zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
-	//$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_SUCCESS, 'success');
-}
 
 if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { // EasyPopulate is installed
 	$config = ep_get_config();
@@ -43,10 +39,6 @@ if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { // EasyPopulate is installed
 
 	ep_update_handlers();
 }
-$ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
-$products_with_attributes = false; // langer - this will be redundant after html renovation
-// @todo CHECK: maybe below can go in array eg $ep_processed['attributes'] = true, etc.. cold skip all post-upload tasks on check if isset var $ep_processed.
-$has_attributes = false;
 
 
 /**
@@ -62,23 +54,14 @@ $ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIP
  * END check for existance of various mods
  */
 
-/**
- * Pre-flight checks finish here
- */
-
-$langcode = zen_get_languages();
-// start array at one, the rest of the code expects it that way
-$langcode = array_combine(range(1, count($langcode)), array_values($langcode));
-
-foreach ($langcode as $value) {
-	if ($value['code'] == DEFAULT_LANGUAGE) {
-		$epdlanguage_id = $value['id'];
-		break;
-	}
+if (isset($_POST['installer'])) {
+	$f = $_POST['installer'] . '_easypopulate';
+	$f();
+	zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+	//$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_SUCCESS, 'success');
 }
 
 $ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : NULL;
-
 if (zen_not_null($ep_dltype)) {
    require DIR_WS_CLASSES . 'easypopulate/Export.php';
 
