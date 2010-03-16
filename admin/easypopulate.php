@@ -62,9 +62,11 @@ if (isset($_POST['installer'])) {
 
 $ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : NULL;
 if (zen_not_null($ep_dltype)) {
-   require DIR_WS_CLASSES . 'EasyPopulate/Export.php';
+	$column_delimiter = ',';
+	$column_enclosure = '"';
+	require DIR_WS_CLASSES . 'EasyPopulate/Export.php';
 
-	$export_file = 'EP-' . $ep_dltype . strftime('%Y%b%d-%H%M%S') . '.' . (($col_delimiter == ',')? 'csv' : 'txt');
+	$export_file = 'EP-' . $ep_dltype . strftime('%Y%b%d-%H%M%S') . '.' . (($column_delimiter == ',')? 'csv' : 'txt');
 	// now either stream it to them or put it in the temp directory
 	if ($ep_dlmethod == 'stream') {
 		header('Content-type: text/csv');
@@ -80,16 +82,16 @@ if (zen_not_null($ep_dltype)) {
 
 		$fp = fopen('php://temp', 'w+');
 		foreach ($filestring as $line) {
-			fputcsv($fp, $line, $col_delimiter, $col_enclosure);
+			fputcsv($fp, $line, $column_delimiter, $column_enclosure);
 		}
 		rewind($fp);
 		echo stream_get_contents($fp);
-		zen_exit();
+		exit();
 	} else {
 		$tmpfpath = $temp_path . $export_file;
 		$fp = fopen($tmpfpath, 'w+');
 		foreach ($filestring as $line) {
-			fputcsv($fp, $line, $col_delimiter, $col_enclosure);
+			fputcsv($fp, $line, $column_delimiter, $column_enclosure);
 		}
 		fclose($fp);
 		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $export_file, $tempdir), 'success');
