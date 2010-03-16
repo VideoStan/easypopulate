@@ -69,6 +69,18 @@ if (isset($_POST['installer'])) {
 	//$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_SUCCESS, 'success');
 }
 
+if (isset($_GET['preset']) && !empty($_GET['preset'])) {
+	echo json_encode(EPFileUploadFactory::getConfig($_GET['preset']));
+	exit();
+}
+
+if (isset($_POST['preset']) && !empty($_POST['preset'])) {
+	if (isset($_POST['config']) && is_array($_POST['config'])) {
+		EPFileUploadFactory::setConfig($_POST['preset'], $_POST['config']);
+	}
+	exit();
+}
+
 $ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : NULL;
 if (zen_not_null($ep_dltype)) {
 	$column_delimiter = ',';
@@ -236,6 +248,21 @@ switch ($_GET['dross']) {
 			$("#installer").submit();
 		});
 
+		$("#import_handler").change(function() {
+			$.getJSON("easypopulate.php?preset=" + $(this).val(), function(json){
+				$.each(json, function(k, v){
+					$("#" + k).val(v);
+				});
+			});
+		});
+
+		$("#import_form input[name=setconfig]").click(function() {
+			var config = $("#import_form .config").serializeObject();
+			var preset = $("#import_form #import_handler").val();
+			var vals = { "preset" : preset, "config" : config };
+			$.post("easypopulate.php", vals);
+		});
+
 		$(".results_table tr").mouseover(function(){
 			$(this).addClass("over");
 		}).mouseout(function(){
@@ -312,7 +339,7 @@ switch ($_GET['dross']) {
 
 <?php if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { ?>
 <div>
-	<form enctype="multipart/form-data" action="easypopulate.php" method="POST">
+	<form id="import_form" enctype="multipart/form-data" action="easypopulate.php" method="POST">
 		<input type="hidden" name="MAX_FILE_SIZE" value="100000000">
 		<input type="hidden" name="import" value="1">
 		<fieldset>
@@ -360,7 +387,7 @@ switch ($_GET['dross']) {
 			<div id="transforms">
 				<div>
 				<label for="transforms_metatags_keywords">Meta Keywords Patterns</label>
-				<input type="text" id="transforms_metatags_keywords" name="transforms[metatags][keywords]" size="50">
+				<input type="text" class="config" id="transforms_metatags_keywords" name="transforms[metatags_keywords]" size="50">
 				</div>
 				<div>
 				<label for="image_path_prefix">Image Path Prefix</label>
@@ -368,6 +395,7 @@ switch ($_GET['dross']) {
 				</div>
 			</div>
 			<input type="submit" name="import" value="Import">
+			<input type="button" name="setconfig" value="Save Handler Configuration">
 		</fieldset>
 		<?php if (is_dir($temp_path)) { ?>
 			<fieldset>
