@@ -44,6 +44,8 @@ if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { // EasyPopulate is installed
 		$column_enclosure = '"';
 		$local_file = '';
 		ep_update_handlers();
+		$handler_config = EPFileUploadFactory::getConfig($import_handler);
+		extract($handler_config, EXTR_OVERWRITE);
 	}
 }
 
@@ -111,8 +113,13 @@ if (zen_not_null($ep_dltype)) {
 //*******************************
 if (isset($_POST['import'])) {
 
-	$column_delimiter = ep_get_config('col_delimiter');
-	$column_enclosure = ep_get_config('col_enclosure');
+	$import_handler = ep_get_config('import_handler');
+	if (isset($_POST['import_handler']) && !empty($_POST['import_handler'])) {
+		$import_handler = $_POST['import_handler'];
+	}
+
+	$handler_config = EPFileUploadFactory::getConfig($import_handler);
+	extract($handler_config, EXTR_OVERWRITE);
 	if (isset($_POST['column_delimiter']) && !empty($_POST['column_delimiter'])) {
 			$column_delimiter = $_POST['column_delimiter'];
 			if ($column_delimiter == 'tab') $column_delimiter = "\t";
@@ -128,17 +135,10 @@ if (isset($_POST['import'])) {
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
 	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED;
 
-	$import_handler = ep_get_config('import_handler');
-	if (isset($_POST['import_handler']) && !empty($_POST['import_handler'])) {
-		$import_handler = $_POST['import_handler'];
-	}
-
-	$price_modifier = 0;
 	if (isset($_POST['price_modifier']) && !empty($_POST['price_modifier'])) {
-			$price_modifier = $_POST['price_modifier'];
+		$price_modifier = $_POST['price_modifier'];
 	}
 
-	$image_path_prefix = '';
 	if (isset($_POST['image_path_prefix']) && !empty($_POST['image_path_prefix'])) {
 		$image_path_prefix = $_POST['image_path_prefix'];
 	}
