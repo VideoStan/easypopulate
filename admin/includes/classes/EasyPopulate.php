@@ -8,6 +8,8 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  */
 
+define('TABLE_EASYPOPULATE_FEEDS', DB_PREFIX . 'easypopulate_feeds');
+
 class EPFileUploadFactory
 {
 	private static function baseDirectory()
@@ -246,7 +248,7 @@ class EPUploadStandard extends SplFileObject
 	{
 		global $db;
 
-		$query = "SELECT * FROM " . DB_PREFIX . "easypopulate_feeds WHERE name = '" . $this->name . "'";
+		$query = "SELECT * FROM " . TABLE_EASYPOPULATE_FEEDS . " WHERE name = '" . $this->name . "'";
 
 		$result = ep_query($query);
 		$row = mysql_fetch_array($result, MYSQL_ASSOC);
