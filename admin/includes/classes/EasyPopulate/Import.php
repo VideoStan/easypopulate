@@ -48,6 +48,7 @@
 	$file->onFileStart();
 
 	foreach ($file as $items) {
+		$output_message = '';
 		$items = $file->handleRow($items);
 
 		if (!isset($items['products_model']) && !zen_not_null($items['products_model'])) {
@@ -105,7 +106,6 @@
 		$product_is_new = true;
 		while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			$output_class = 'success';
-			$output_message = '';
 			$output_data = array();
 			$product_is_new = false;
 			/*
