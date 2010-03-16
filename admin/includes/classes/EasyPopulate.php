@@ -46,6 +46,44 @@ class EPFileUploadFactory
 			return $classname;
 		}
 	}
+
+	/**
+	 * Get handler config
+	 *
+	 * @param string $name
+	 * @return array array of config values
+	 */
+	public static function getConfig($name)
+	{
+		global $db;
+		$query = "SELECT config FROM  " . TABLE_EASYPOPULATE_FEEDS . "
+					WHERE name = '" . zen_db_input($name) . "'";
+		$result = $db->Execute($query);
+		$config = array();
+		while (!$result->EOF) {
+			$config = json_decode($result->fields['config'], true);
+			$result->MoveNext();
+		}
+		return $config;
+	}
+
+	/**
+	 * Set handler config
+	 *
+	 * @param string $name
+	 * @param array $config array of config entries
+	 * @return bool
+	 */
+	public static function setConfig($name, array $config = array())
+	{
+		global $db;
+		$data = array();
+		$data['config'] = json_encode($config);
+		$where = "name = '" . zen_db_input($name) . "'";
+		$query = ep_db_modify(TABLE_EASYPOPULATE_FEEDS, $data, 'UPDATE', $where);
+		$db->Execute($query);
+		return true;
+	}
 }
 
 /**
