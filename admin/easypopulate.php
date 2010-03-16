@@ -37,7 +37,14 @@ if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { // EasyPopulate is installed
 		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG), 'warning');
 	}
 
-	ep_update_handlers();
+	if (empty($_GET) && empty($_POST)) {
+		$price_modifier = 0;
+		$image_path_prefix = '';
+		$column_delimiter = ',';
+		$column_enclosure = '"';
+		$local_file = '';
+		ep_update_handlers();
+	}
 }
 
 /**
@@ -311,44 +318,44 @@ switch ($_GET['dross']) {
 		<fieldset>
 			<legend>Import delimited files</legend>
 			<div>
-			<label for="uploaded_file">Upload EP File</label>
-			<input id="uploaded_file" name="uploaded_file" type="file" size="50">
-			</div>
-			<div>
-			<label for="local_file">Import from Temp Dir (<?php echo $tempdir; ?>)</label>
-			<input type="text" id="local_file" name="local_file" size="50">
-			</div>
-			<div>
-			<label for="column_delimiter">Column Delimiter</label>
-			<?php $delimiters = array();
-			foreach (ep_get_config('col_delimiters') as $v) {
-				$delimiters[] = array('id' => $v, 'text' => $v);
-			} ?>
-			<?php echo zen_draw_pull_down_menu('column_delimiter', $delimiters, ep_get_config('col_delimiter')); ?>
-			</div>
-			<div>
-			<label for="column_enclosure">Column Enclosure</label>
-			<input type="text" id="column_enclosure" name="column_enclosure" size="1" value="<?php echo htmlspecialchars(ep_get_config('col_enclosure')) ?>">
-			</div>
-			<div>
-			<label for="price_modifier">Price Modifier (use % for percentage)</label>
-			<input type="text" id="price_modifier" name="price_modifier" size="5" value="">
-			</div>
-			<div>
-			<label for="tax_class_title">Tax Class</label>
-			<?php $tax_classes = array(array('id' => '', 'text' => ''));
-			foreach (ep_get_tax_class_titles() as $v) {
-				$tax_classes[] = array('id' => $v, 'text' => $v);
-			} ?>
-			<?php echo zen_draw_pull_down_menu('tax_class_title', $tax_classes, ''); ?>
-			</div>
-			<div>
 			<label for="import_handler">Import File Handler</label>
 			<?php $handlers = array();
 			foreach (EPFileUploadFactory::find() as $v) {
 				$handlers[] = array('id' => $v, 'text' => $v);
 			} ?>
-			<?php echo zen_draw_pull_down_menu('import_handler', $handlers, ep_get_config('import_handler')); ?>
+			<?php echo zen_draw_pull_down_menu('import_handler', $handlers, $import_handler, 'id="import_handler"'); ?>
+			</div>
+			<div>
+			<label for="uploaded_file">Upload EP File</label>
+			<input id="uploaded_file" name="uploaded_file" type="file" size="50">
+			</div>
+			<div>
+			<label for="local_file">Import from Temp Dir (<?php echo $tempdir; ?>)</label>
+			<input type="text" class="config" id="local_file" name="local_file" size="50" value="<?php echo $local_file; ?>">
+			</div>
+			<div>
+			<label for="column_delimiter">Column Delimiter</label>
+			<?php $delimiters = array();
+			foreach (ep_get_config('column_delimiters') as $v) {
+				$delimiters[] = array('id' => $v, 'text' => $v);
+			} ?>
+			<?php echo zen_draw_pull_down_menu('column_delimiter', $delimiters, $column_delimiter, 'class="config" id="column_delimiter"'); ?>
+			</div>
+			<div>
+			<label for="column_enclosure">Column Enclosure</label>
+			<input type="text" class="config" id="column_enclosure" name="column_enclosure" size="1" value="<?php echo htmlspecialchars($column_enclosure); ?>">
+			</div>
+			<div>
+			<label for="price_modifier">Price Modifier (use % for percentage)</label>
+			<input type="text" class="config" id="price_modifier" name="price_modifier" size="5" value="<?php echo $price_modifier ?>">
+			</div>
+			<div>
+			<label for="tax_class_title">Tax Class</label>
+			<?php $tax_class_titles = array(array('id' => '', 'text' => ''));
+			foreach (ep_get_tax_class_titles() as $v) {
+				$tax_class_titles[] = array('id' => $v, 'text' => $v);
+			} ?>
+			<?php echo zen_draw_pull_down_menu('tax_class_title', $tax_class_titles, $tax_class_title, 'class="config" id="tax_class_title"'); ?>
 			</div>
 			<div id="transforms">
 				<div>
@@ -357,7 +364,7 @@ switch ($_GET['dross']) {
 				</div>
 				<div>
 				<label for="image_path_prefix">Image Path Prefix</label>
-				<input type="text" id="image_path_prefix" name="image_path_prefix" size="30" value="">
+				<input type="text" class="config" id="image_path_prefix" name="image_path_prefix" size="30" value="<?php echo $image_path_prefix; ?>">
 				</div>
 			</div>
 			<input type="submit" name="import" value="Import">
