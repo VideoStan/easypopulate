@@ -825,8 +825,8 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 
 	switch ($ep_dltype) {
 		case 'froogle':
-			$col_delimiter = "\t";
-			$col_enclosure = ' ';
+			$column_delimiter = "\t";
+			$column_enclosure = ' ';
 			$filestring = array_map("kill_breaks", $filestring);
 		break;
 	}
