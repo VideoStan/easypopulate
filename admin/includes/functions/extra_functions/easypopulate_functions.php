@@ -385,7 +385,7 @@ function install_easypopulate() {
 							'key' => 'EASYPOPULATE_CONFIG_IMPORT_HANDLER',
 							'value' => 'Standard',
 							'description' => 'Import File Handler (default: Standard).',
-							'set_function' => 'zen_cfg_select_option(array(EPFileUploadFactory::find(),');
+							'set_function' => 'zen_cfg_select_option(EPFileUploadFactory::find(),');
 	$entries[] = array('title' => 'Upload File Date Format',
 							'key' => 'EASYPOPULATE_CONFIG_FILE_DATE_FORMAT',
 							'value' => 'm-d-y',
