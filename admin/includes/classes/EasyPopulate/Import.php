@@ -387,7 +387,9 @@
 		$product['products_image'] = $products_image;
 		$product['products_weight'] = $products_weight;
 		$product['products_tax_class_id'] = $tax_class_id;
-		$product['products_discount_type'] = $products_discount_type;
+		if (isset($products_discount_type)) {
+			$product['products_discount_type'] = $products_discount_type;
+		}
 		// @todo make sure this will apply from a standard file
 		if (isset($products_discount_type_from)) {
 			$product['products_discount_type_from'] = $products_discount_type_from;
