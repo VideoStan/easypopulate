@@ -16,7 +16,7 @@ class EPFileUploadFactory
 	}
 
 	/**
-	 * Find and return list of subclasses
+	 * Find and return list of handlers
 	 *
 	 * @return array
 	 */
@@ -30,11 +30,17 @@ class EPFileUploadFactory
 		return $classFiles;
 	}
 
-	public static function get($type)
+	/**
+	 * Get a handler by name and include it
+	 *
+	 * @param string $name
+	 * @return string name of the handler class
+	 */
+	public static function get($name)
 	{
-		$file = self::baseDirectory() . $type . '.php';
-		if ($type == 'Standard' || include($file)) {
-			$classname = 'EPUpload' . $type;
+		$file = self::baseDirectory() . $name . '.php';
+		if ($name == 'Standard' || require($file)) {
+			$classname = 'EPUpload' . $name;
 			return $classname;
 		}
 	}
