@@ -35,6 +35,13 @@ class EPUploadMegaGoods extends EPUploadStandard
 
 	public $name = 'MegaGoods';
 
+	public static function defaultConfig()
+	{
+		$config = parent::defaultConfig();
+		$config['column_delimiter'] = 'tab';
+		return $config;
+	}
+
 	public function mapFileLayout(array $filelayout)
 	{
 		$filelayout[0] = 'products_model';

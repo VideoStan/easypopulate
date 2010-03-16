@@ -56,14 +56,23 @@ class EPUploadStandard extends SplFileObject
 	public $filelayout = array();
 	public $itemCount = 0;
 	public $transforms = array();
-	public $imagePathPrefix = '';
-	public $columnDelimiter = ',';
 
 	function __construct($file)
 	{
 		@ini_set('auto_detect_line_endings',(int)ep_get_config('detect_line_endings'));
 		parent::__construct($file);
 		$this->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY | SplFileObject::DROP_NEW_LINE);
+	}
+
+	public static function defaultConfig()
+	{
+		$config = array();
+		$config['column_delimiter'] = ',';
+		$config['column_enclosure'] = '"';
+		$config['price_modifier'] = 0;
+		$config['image_path_prefix'] = '';
+		$config['tax_class_title'] = '';
+		return $config;
 	}
 
 	/**
@@ -171,8 +180,8 @@ class EPUploadStandard extends SplFileObject
 				case 'metatags': // only for title,description,keywords
 					if (isset($column[2]) && is_numeric($column[2])) {
 						$newvalue = $value;
-						if (($column[1] == 'keywords') && isset($this->transforms['metatags']['keywords']) && empty($newvalue)) {
-							$newvalue = $this->transformPlaceHolders($olditem, $this->transforms['metatags']['keywords']);
+						if (($column[1] == 'keywords') && isset($this->transforms['metatags_keywords']) && empty($newvalue)) {
+							$newvalue = $this->transformPlaceHolders($olditem, $this->transforms['metatags_keywords']);
 							$newvalue = trim(strip_tags($newvalue));
 						}
 
