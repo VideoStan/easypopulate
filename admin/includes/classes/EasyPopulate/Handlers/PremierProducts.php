@@ -32,7 +32,7 @@
  */
 class EPUploadPremierProducts extends EPUploadStandard
 {
-	const FEED_URL = '';
+	const FEED_URL = 'http://www.hotbuy4u.com/productindexdl.cfm';
 	const IMAGES_URL = 'http://www.hotbuy4u.com/picsdl.cfm';
 
 	public $name = 'PremierProducts';
@@ -55,7 +55,7 @@ class EPUploadPremierProducts extends EPUploadStandard
 	{
 		$item['metatags'] = array();
 		$descriptions = array();
-		$descriptions['name'] = $item['name'];
+		$descriptions['name'] = $item['item'];
 
 		$item['products_quantity_order_min'] = 1;
 		$item['products_quantity_order_units'] = 1;
