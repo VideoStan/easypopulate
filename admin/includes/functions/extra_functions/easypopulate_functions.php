@@ -377,15 +377,6 @@ function install_easypopulate() {
 	$delimiters = unserialize(EASYPOPULATE_CONFIG_COLUMN_DELIMITERS);
 
 	$entries = array();
-	$entries[] = array('title' => 'Column Delimiter',
-							'key' => 'EASYPOPULATE_CONFIG_COLUMN_DELIMITER',
-							'value' => ',',
-							'set_function' => 'zen_cfg_select_option(' . var_export($delimiters, true) . ',',
-							'description' => 'Single character used to separate fields');
-	$entries[] = array('title' => 'Column Enclosure',
-							'key' => 'EASYPOPULATE_CONFIG_COLUMN_ENCLOSURE',
-							'value' => '"',
-							'Single character used to enclose fields');
 	$entries[] = array('title' => 'Uploads Directory',
 							'key' => 'EASYPOPULATE_CONFIG_TEMP_DIR',
 							'value' => 'tempEP/',
@@ -475,7 +466,7 @@ function install_easypopulate() {
 		$count++;
 	}
 
-	$query = 'CREATE TABLE IF NOT EXISTS ' . DB_PREFIX . 'easypopulate_feeds (
+	$query = 'CREATE TABLE IF NOT EXISTS ' . TABLE_EASYPOPULATE_FEEDS . ' (
 				id int(3) NOT NULL AUTO_INCREMENT,
 				name varchar(64),
 				config text,
@@ -508,7 +499,7 @@ function remove_easypopulate() {
                WHERE configuration_group_id = '" . $ep_group . "'");
 		}
 	}
-	$db->Execute('DROP TABLE ' . DB_PREFIX . 'easypopulate_feeds');
+	$db->Execute('DROP TABLE ' . TABLE_EASYPOPULATE_FEEDS);
 	return true;
 }
 
@@ -516,7 +507,7 @@ function ep_update_handlers()
 {
 	global $db;
 
-	$query = "SELECT name FROM " . DB_PREFIX . "easypopulate_feeds";
+	$query = "SELECT name FROM " . TABLE_EASYPOPULATE_FEEDS;
 	$result = ep_query($query);
 
 	$handlers_db = array();
@@ -527,14 +518,14 @@ function ep_update_handlers()
 	$handlers = EPFileUploadFactory::find();
 	foreach ($handlers as $handler) {
 		if (in_array($handler,$handlers_db)) continue;
-
+		$className = EPFileUploadFactory::get($handler);
 		$data = array();
 		$data['name'] = $handler;
-		$data['config'] = serialize(array());
-		$data['last_run_data'] = serialize(array());
+		$data['config'] = json_encode($className::defaultConfig());
+		$data['last_run_data'] = json_encode(array());
 		$data['modified'] = 'NOW()';
 		$data['created'] = 'NOW()';
-		$query = ep_db_modify(DB_PREFIX . 'easypopulate_feeds', $data, 'INSERT');
+		$query = ep_db_modify(TABLE_EASYPOPULATE_FEEDS, $data, 'INSERT');
 		$db->Execute($query);
 	}
 }
@@ -551,9 +542,7 @@ function ep_get_config($var = NULL)
 		return !empty($var) ? $config[$var] : $config;
 	}
 
-	$config['col_delimiter'] = EASYPOPULATE_CONFIG_COLUMN_DELIMITER;
-	$config['col_delimiters'] = unserialize(EASYPOPULATE_CONFIG_COLUMN_DELIMITERS);
-	$config['col_enclosure']   = EASYPOPULATE_CONFIG_COLUMN_ENCLOSURE;
+	$config['column_delimiters'] = unserialize(EASYPOPULATE_CONFIG_COLUMN_DELIMITERS);
 	// @todo do we actually need this if we can query the qty discount table for the MAX() value?
 	// If so, we need to put it in the installer
 	$config['max_qty_discounts'] = 6;
