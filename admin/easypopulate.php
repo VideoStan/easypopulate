@@ -246,7 +246,7 @@ switch ($_GET['dross']) {
 	}
 
 	#uploaded_files {
-	    display: none;
+		display: none;
 	}
 
 	.results_table {
@@ -277,11 +277,11 @@ switch ($_GET['dross']) {
 	<h2>Easy Populate <?php echo EASYPOPULATE_VERSION ?></h2>
 	<form id="installer" enctype="multipart/form-data" action="easypopulate.php" method="POST">
 		<input type="hidden" name="installer" value="">
-	   <?php if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { ?>
-	   <input type="button" name="remove" value="Remove EasyPopulate">
-	   <!-- @todo <input type="button" name="upgrade" value="Upgrade"> -->
-	   <?php } else { ?>
-	   <span><?php echo EASYPOPULATE_ERROR_NOT_INSTALLED ?></span>
+		<?php if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { ?>
+		<input type="button" name="remove" value="Remove EasyPopulate">
+		<!-- @todo <input type="button" name="upgrade" value="Upgrade"> -->
+		<?php } else { ?>
+		<span><?php echo EASYPOPULATE_ERROR_NOT_INSTALLED ?></span>
 		<input type="button" name="install" value="Install EasyPopulate">
 		<?php } ?>
 	</form>
@@ -348,7 +348,7 @@ switch ($_GET['dross']) {
 		</fieldset>
 		<?php if (is_dir($temp_path)) { ?>
 			<fieldset>
-		   <legend><a id="show_uploaded_files" href="#">Show Uploaded Files</a></legend>
+			<legend><a id="show_uploaded_files" href="#">Show Uploaded Files</a></legend>
 			<table id="uploaded_files">
 				<thead>
 				<tr>
@@ -374,9 +374,9 @@ switch ($_GET['dross']) {
 		</fieldset>
 		<?php } ?>
 	</form>
-		  <?php echo zen_draw_form('custom', 'easypopulate.php', 'id="custom"', 'get'); ?>
-          <!--  <form ENCTYPE="multipart/form-data" ACTION="easypopulate.php?download=stream&dltype=full" METHOD="POST"> -->
-                <div align = "left">
+		<?php echo zen_draw_form('custom', 'easypopulate.php', 'id="custom"', 'get'); ?>
+			<!--  <form ENCTYPE="multipart/form-data" ACTION="easypopulate.php?download=stream&dltype=full" METHOD="POST"> -->
+					<div align = "left">
 					<?php
 					$manufacturers_array = array();
 					$manufacturers_array[] = array( "id" => '', 'text' => "Manufacturers" );
@@ -394,7 +394,7 @@ switch ($_GET['dross']) {
 
 					echo zen_draw_input_field('dltype', 'full', ' style="padding: 0px"', false, 'submit');
 					?>
-                </div>
+					</div>
 			</form>
 
 			<b>Download Easy Populate Files</b>
