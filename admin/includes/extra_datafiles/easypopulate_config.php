@@ -9,7 +9,7 @@
  */
 
 define('EASYPOPULATE_CONFIG_COLUMN_DELIMITERS', serialize(
-	array(',', 'tab', '|', ':',';')
+	array(',', 'tab', '|', ':', ';', '^')
 ));
 define('EASYPOPULATE_CONFIG_SMART_TAGS_LIST', serialize(
 	array("\r\n|\r|\n" => '<br />')

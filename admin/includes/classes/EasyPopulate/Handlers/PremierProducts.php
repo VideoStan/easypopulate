@@ -37,6 +37,13 @@ class EPUploadPremierProducts extends EPUploadStandard
 
 	public $name = 'PremierProducts';
 
+	public static function defaultConfig()
+	{
+		$config = parent::defaultConfig();
+		$config['column_delimiter'] = '^';
+		return $config;
+	}
+
 	public function mapFileLayout(array $filelayout)
 	{
 		$filelayout[1] = 'categories_name_1';
