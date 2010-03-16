@@ -252,7 +252,7 @@ class EPUploadStandard extends SplFileObject
 
 		$result = ep_query($query);
 		$row = mysql_fetch_array($result, MYSQL_ASSOC);
-		$lastProductIds = unserialize($row['last_run_data']);
+		$lastProductIds = json_decode($row['last_run_data'], true);
 		if (!empty($lastProductIds)) {
 			$diff = array_diff($lastProductIds, $this->productIds);
 			foreach ($diff as $pid) {
@@ -261,10 +261,10 @@ class EPUploadStandard extends SplFileObject
 		}
 
 		$data = array();
-		$data['last_run_data'] = serialize(array_unique($this->productIds));
+		$data['last_run_data'] = json_encode(array_unique($this->productIds));
 		$data['modified'] = 'NOW()';
 		$where = 'id = ' . $row['id'];
-		$query = ep_db_modify(DB_PREFIX . 'easypopulate_feeds', $data, 'UPDATE', $where);
+		$query = ep_db_modify(TABLE_EASYPOPULATE_FEEDS, $data, 'UPDATE', $where);
 		$db->Execute($query);
 	}
 
