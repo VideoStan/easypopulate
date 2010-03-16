@@ -201,9 +201,25 @@ switch ($_GET['dross']) {
 	<link rel="stylesheet" type="text/css" href="includes/cssjsmenuhover.css" media="all" id="hoverJS">
 	<script language="javascript" type="text/javascript" src="includes/menu.js"></script>
 	<script language="javascript" type="text/javascript" src="includes/general.js"></script>
-	<script language="javascript" type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+	<script language="javascript" type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 
 	<script type="text/javascript">
+	/*! jQuery serializeObject - v0.2 - 1/20/2010 http://benalman.com/projects/jquery-misc-plugins/
+	* Copyright (c) 2010 "Cowboy" Ben Alman  Dual licensed under the MIT and GPL licenses.*/
+	(function($,undefined){
+	'$:nomunge';
+	$.fn.serializeObject = function(){
+		var obj = {};
+		$.each( this.serializeArray(), function(i,o){
+			var n = o.name, v = o.value;
+			obj[n] = obj[n] === undefined ? v
+				: $.isArray( obj[n] ) ? obj[n].concat( v )
+				: [ obj[n], v ];
+		});
+		return obj;
+	};
+	})(jQuery);
+
 	$(document).ready(function() {
 		cssjsmenu('navbar');
 		$('#hoverJS').attr('disabled', 'disabled');
