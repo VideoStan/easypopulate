@@ -503,7 +503,8 @@ function remove_easypopulate() {
                WHERE configuration_group_id = '" . $ep_group . "'");
 		}
 	}
-	$db->Execute('DROP TABLE ' . TABLE_EASYPOPULATE_FEEDS);
+	$db->Execute('DROP TABLE IF EXISTS ' . TABLE_EASYPOPULATE_FEEDS);
+
 	return true;
 }
 
