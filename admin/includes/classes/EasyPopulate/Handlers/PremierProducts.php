@@ -77,7 +77,7 @@ class EPUploadPremierProducts extends EPUploadStandard
 		if (strpos($item['products_model'], '(R)') !== false) {
 			$item['description'] .= '<br> Reconditioned';
 		}
-		$item['description'] =  '<br><em><strong>Retail Price: $' . $item['retailprice'] .
+		$descriptions['description'] =  '<br><em><strong>Retail Price: $' . $item['retailprice'] .
 			'</strong></em><br>' . $item['description'];
 
 		$item['descriptions'][1] = $descriptions;
