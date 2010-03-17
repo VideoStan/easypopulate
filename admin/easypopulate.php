@@ -71,6 +71,7 @@ if (isset($_POST['installer'])) {
 
 if (isset($_GET['preset']) && !empty($_GET['preset'])) {
 	echo json_encode(EPFileUploadFactory::getConfig($_GET['preset']));
+	error_reporting($original_error_level);
 	exit();
 }
 
@@ -78,6 +79,7 @@ if (isset($_POST['preset']) && !empty($_POST['preset'])) {
 	if (isset($_POST['config']) && is_array($_POST['config'])) {
 		EPFileUploadFactory::setConfig($_POST['preset'], $_POST['config']);
 	}
+	error_reporting($original_error_level);
 	exit();
 }
 
@@ -107,6 +109,7 @@ if (zen_not_null($ep_dltype)) {
 		}
 		rewind($fp);
 		echo stream_get_contents($fp);
+		error_reporting($original_error_level);
 		exit();
 	} else {
 		$tmpfpath = $temp_path . $export_file;
