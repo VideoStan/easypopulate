@@ -29,7 +29,31 @@ function ep_handle_uploaded_file($file)
 	} else {
 		$target = $file;
 	}
+
 	return $target;
+}
+
+/**
+ * Get bytes from K/M/G sizes
+ *
+ * echo ini_get('post_max_size'); // 8M
+ * echo ep_get_bytes('8M'); // 8388608 
+ * 
+ * @param string $val number with g/k/m suffix
+ * @return int bytes from $val
+ */ 
+function ep_get_bytes($val) {
+    $val = trim($val);
+    $unit = strtolower(substr($val,strlen($val/1),1));
+    switch($unit) {
+        case 'g':
+            $val *= 1024;
+        case 'm':
+            $val *= 1024;
+        case 'k':
+            $val *= 1024;
+    }
+    return $val;
 }
 
 /**

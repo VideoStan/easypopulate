@@ -38,6 +38,7 @@ if (defined('EASYPOPULATE_CONFIG_VERSION')) { // EasyPopulate is installed
 	}
 
 	if (empty($_GET) && empty($_POST)) {
+		$max_file_size = min(ep_get_bytes(ini_get('upload_max_filesize')), ep_get_bytes(ini_get('post_max_size')));
 		$price_modifier = 0;
 		$image_path_prefix = '';
 		$column_delimiter = ',';
@@ -347,7 +348,7 @@ switch ($_GET['dross']) {
 <?php if (defined('EASYPOPULATE_CONFIG_VERSION')) { ?>
 <div>
 	<form id="import_form" enctype="multipart/form-data" action="easypopulate.php" method="POST">
-		<input type="hidden" name="MAX_FILE_SIZE" value="100000000">
+		<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $max_file_size ?>">
 		<input type="hidden" name="import" value="1">
 		<fieldset>
 			<legend>Import delimited files</legend>
