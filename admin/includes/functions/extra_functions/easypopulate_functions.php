@@ -519,9 +519,10 @@ function ep_update_handlers()
 	foreach ($handlers as $handler) {
 		if (in_array($handler,$handlers_db)) continue;
 		$className = EPFileUploadFactory::get($handler);
+		$config = call_user_func_array(array($className, 'defaultConfig'), array());
 		$data = array();
 		$data['name'] = $handler;
-		$data['config'] = json_encode($className::defaultConfig());
+		$data['config'] = json_encode($config);
 		$data['last_run_data'] = json_encode(array());
 		$data['modified'] = 'NOW()';
 		$data['created'] = 'NOW()';
