@@ -446,6 +446,10 @@ function install_easypopulate() {
 							'key' => 'EASYPOPULATE_CONFIG_TIME_LIMIT',
 							'value' => '1200',
 							'description' => '(In Seconds) You can change this if your script is taking too long to process. This functionality may be not always be enabled by your server administrator (Default: 1200)');
+	$entries[] = array('title' => 'Easy Populate Version',
+							'key' => 'EASYPOPULATE_CONFIG_VERSION',
+							'value' => '3.9.5',
+							'description' => 'Easy Populate version. DO NOT TOUCH!!!');
 	$count = 1;
 	foreach($entries as $entry) {
 		$data = array();

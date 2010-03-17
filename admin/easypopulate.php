@@ -19,7 +19,7 @@ $products_with_attributes = false; // langer - this will be redundant after html
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
 
 
-if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { // EasyPopulate is installed
+if (defined('EASYPOPULATE_CONFIG_VERSION')) { // EasyPopulate is installed
 	$config = ep_get_config();
 	extract($config); // Brings all the configuration variables into the current symbol table
 
@@ -136,6 +136,7 @@ if (isset($_POST['import'])) {
 			$column_delimiter = $_POST['column_delimiter'];
 			if ($column_delimiter == 'tab') $column_delimiter = "\t";
 	}
+	//die(var_dump($column_delimiter));
 	if (isset($_POST['column_enclosure']) && !empty($_POST['column_enclosure'])) {
 			$column_enclosure = $_POST['column_enclosure'];
 	}
@@ -327,7 +328,7 @@ switch ($_GET['dross']) {
 	<h2>Easy Populate <?php echo EASYPOPULATE_VERSION ?></h2>
 	<form id="installer" enctype="multipart/form-data" action="easypopulate.php" method="POST">
 		<input type="hidden" name="installer" value="">
-		<?php if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { ?>
+		<?php if (defined('EASYPOPULATE_CONFIG_VERSION')) { ?>
 		<input type="button" name="remove" value="Remove EasyPopulate">
 		<!-- @todo <input type="button" name="upgrade" value="Upgrade"> -->
 		<?php } else { ?>
@@ -337,7 +338,7 @@ switch ($_GET['dross']) {
 	</form>
 </div>
 
-<?php if (defined('EASYPOPULATE_CONFIG_TEMP_DIR')) { ?>
+<?php if (defined('EASYPOPULATE_CONFIG_VERSION')) { ?>
 <div>
 	<form id="import_form" enctype="multipart/form-data" action="easypopulate.php" method="POST">
 		<input type="hidden" name="MAX_FILE_SIZE" value="100000000">
