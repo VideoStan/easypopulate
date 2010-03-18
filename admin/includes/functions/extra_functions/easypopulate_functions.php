@@ -155,31 +155,16 @@ function ep_field_name_exists($tbl,$fld) {
   }
 }
 
-function ep_remove_product($product_model) {
-  global $db, $ep_debug_logging, $log_queries, $ep_stack_sql_error;
+function ep_remove_product($product_model)
+{
+	$query = "SELECT products_id FROM " . TABLE_PRODUCTS . "
+	WHERE products_model = '" . zen_db_input($product_model) . "'";
+	$result = ep_query($sql);
 
-  $sql = "select products_id
-                           from " . TABLE_PRODUCTS . "
-                           where products_model = '" . zen_db_input($product_model) . "'";
-  $products = $db->Execute($sql);
-
-	if (mysql_errno()) {
-		$ep_stack_sql_error = true;
-		if ($ep_debug_logging == true) {
-			// langer - will add time & date..
-			$string = "MySQL error ".mysql_errno().": ".mysql_error()."\nWhen executing:\n$sql\n";
-			write_debug_log($string);
-		}
-	} elseif ($log_queries) {
-		$string = "MySQL PASSED\nWhen executing:\n$sql\n";
-		write_debug_log($string);
+	while ($row = mysql_fetch_array($result)) {
+		zen_remove_product($row['products_id']);
 	}
-
-  while (!$products->EOF) {
-    zen_remove_product($products->fields['products_id']);
-    $products->MoveNext();
-  }
-  return;
+	return;
 }
 
 function ep_purge_dross() {
