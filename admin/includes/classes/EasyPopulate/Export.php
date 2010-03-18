@@ -55,6 +55,17 @@ if (zen_not_null($ep_dltype)) {
       $sql_filter .= ' AND p.products_status = ' . (int)$_GET['ep_status_filter'];
     }
 
+	//	START custom fields
+	$custom_filelayout_sql = ' ';
+	if(count($custom_fields) > 0) {
+		foreach($custom_fields as $f) {
+			if (empty($f)) continue;
+			$filelayout[] = 'v_'.$f;
+			$custom_filelayout_sql .= ', p.'.$f.' as v_'.$f.' ';
+		}
+	}
+	// END custom fields
+
 	switch($ep_dltype){
 	case 'full': // FULL products download
 		// The file layout is dynamically made depending on the number of languages
@@ -121,17 +132,6 @@ if (zen_not_null($ep_dltype)) {
 
 		$filelayout[] = 'v_tax_class_title';
 		$filelayout[] = 'v_status';
-
-		//	START custom fields
-		$custom_filelayout_sql = ' ';
-		if(count($custom_fields) > 0) {
-			foreach($custom_fields as $f) {
-				if (empty($f)) continue;
-				$filelayout[] = 'v_'.$f;
-				$custom_filelayout_sql .= ', p.'.$f.' as v_'.$f.' ';
-			}
-		}
-		// END custom fields
 
 		$filelayout = array_merge($filelayout, $fileMeta);
 
@@ -243,7 +243,8 @@ if (zen_not_null($ep_dltype)) {
 			p.products_price as v_products_price,
 			p.products_quantity as v_products_quantity,
 			p.products_last_modified as v_last_modified,
-			p.products_status as v_status
+			p.products_status as v_status,
+			p.products_tax_class_id  as v_tax_class_id
 			FROM '
 			.TABLE_PRODUCTS.' as p';
 
@@ -272,7 +273,8 @@ if (zen_not_null($ep_dltype)) {
 		$filelayout_sql = 'SELECT
 			p.products_id            as v_products_id,
 			p.products_model         as v_products_model,
-			p.products_price         as v_products_price,';
+			p.products_price         as v_products_price,
+			p.products_tax_class_id  as v_tax_class_id';
 
 		if ($ep_supported_mods['uom']) {
 			$filelayout_sql .=  'p.products_price_as as v_products_price_as,';
@@ -531,6 +533,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		// build the long full froogle image path
 		// check for a large image else use medium else use small else no link
 		// thanks to Tim Kroeger - www.breakmyzencart.com
+		if (isset($row['v_products_image'])) {
 		$products_image = (($row['v_products_image'] == PRODUCTS_IMAGE_NO_IMAGE) ? '' : $row['v_products_image']);
 		$products_image_extension = substr($products_image, strrpos($products_image, '.'));
 		$products_image_base = ereg_replace($products_image_extension . '$', '', $products_image);
@@ -547,7 +550,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		}
 
 		$row['v_products_fullpath_image'] = $image_url;
-
+		}
 		// Other froogle defaults go here for now
 		$row['v_froogle_instock']     = 'Y';
 		$row['v_froogle_shipping']    = '';
@@ -592,13 +595,9 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 			$row['v_products_url_' . $lid]    = $row2['products_url'];
 
 			// froogle advanced format needs the quotes around the name and desc
-
 			$row['v_froogle_products_name_' . $lid] = '"' . html_entity_decode(strip_tags(str_replace('"','""',$row2['products_name']))) . '"';
 			$row['v_froogle_products_description_' . $lid] = '"' . html_entity_decode(strip_tags(str_replace('"','""',$row2['products_description']))) . '"';
-			/*
-			$row['v_froogle_products_name_' . $lid] = '"' . html_entity_decode(removeTags(str_replace('"','""',$row2['products_name']))) . '"';
-			$row['v_froogle_products_description_' . $lid] = '"' . html_entity_decode(removeTags(str_replace('"','""',$row2['products_description']))) . '"';
-			*/
+			$row['v_froogle_products_url_' . $lid] = $row['v_products_url_' . $lid];
 		}
 
 		// START specials
@@ -631,6 +630,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 		 * If parent_id is not null, then follow it up.
 		 * We'll populate an array first, then decide where it goes in the layout
 		 */
+		if (isset($row['v_categories_id'])) {
 		$thecategory_id = $row['v_categories_id'];
 		$fullcategory = ''; // this will have the entire category stack for froogle
 		for( $categorylevel=1; $categorylevel<$max_categories+1; $categorylevel++){
@@ -678,7 +678,7 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 				$row['v_categories_name_' . $newlevel++] = '';
 			}
 		}
-
+		}
 		if (isset($filelayout['v_manufacturers_name'])){
 			$row['v_manufacturers_name'] = '';
 			if (!empty($row['v_manufacturers_id'])) {
@@ -810,9 +810,11 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 
 		//We check the value of tax class and title instead of the id
 		//Then we add the tax to price if $price_with_tax is set to 1
-		$row_tax_multiplier     = ep_get_tax_class_rate($row['v_tax_class_id']);
-		$row['v_tax_class_title']   = zen_get_tax_class_title($row['v_tax_class_id']);
-		$row['v_products_price']  = round($row['v_products_price'] + ($price_with_tax * $row['v_products_price'] * $row_tax_multiplier / 100),2);
+		if (isset($filelayout['v_products_price'])) {
+			$row_tax_multiplier     = ep_get_tax_class_rate($row['v_tax_class_id']);
+			$row['v_tax_class_title']   = zen_get_tax_class_title($row['v_tax_class_id']);
+			$row['v_products_price']  = round($row['v_products_price'] + ($price_with_tax * $row['v_products_price'] * $row_tax_multiplier / 100),2);
+		}
 
 		$tempcsvrow = array();
 		foreach( $filelayout as $key => $value ){
