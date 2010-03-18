@@ -120,6 +120,7 @@ if (zen_not_null($ep_dltype)) {
 		}
 		fclose($fp);
 		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $export_file, $tempdir), 'success');
+		zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
 	}
 }
 
