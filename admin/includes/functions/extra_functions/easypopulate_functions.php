@@ -320,17 +320,18 @@ function write_debug_log($string)
 	return;
 }
 
-function ep_query($query) {
-	global $ep_debug_logging, $log_queries, $ep_stack_sql_error;
+function ep_query($query)
+{
+	global $ep_stack_sql_error;
 	$result = mysql_query($query);
 	if (mysql_errno()) {
 		$ep_stack_sql_error = true;
-		if ($ep_debug_logging == true) {
-			// langer - will add time & date..
+		if (ep_get_config('ep_debug_logging')) {
+			// @todo langer - will add time & date..
 			$string = "MySQL error ".mysql_errno().": ".mysql_error()."\nWhen executing:\n$query\n";
 			write_debug_log($string);
 		}
-	} elseif ($log_queries) {
+	} elseif (ep_get_config('log_queries')) {
 		$string = "MySQL PASSED\nWhen executing:\n$query\n";
 		write_debug_log($string);
 	}
