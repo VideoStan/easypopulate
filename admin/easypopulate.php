@@ -256,7 +256,7 @@ switch ($_GET['dross']) {
 		$("#import_handler").change(function() {
 			$.getJSON("easypopulate.php?preset=" + $(this).val(), function(json){
 				$.each(json, function(k, v){
-					$("#" + k).val(v);
+					$("#" + k).val(unescape(v));
 				});
 			});
 		});
