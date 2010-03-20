@@ -118,6 +118,8 @@ function ep_get_tax_class_rate($tax_class_id)
  *
  * @param string $tax_class_title
  * @return int tax class id
+ *
+ * @todo should we error out if the tax class doesn't exist? or continue to fail silently?
  */
 function ep_get_tax_title_class_id($tax_class_title)
 {
@@ -125,9 +127,13 @@ function ep_get_tax_title_class_id($tax_class_title)
 	if (isset($tax_class_ids[$tax_class_title])) {
 		return $tax_class_ids[$tax_class_title];
 	}
-	$query = mysql_query("select tax_class_id from " . TABLE_TAX_CLASS . " WHERE tax_class_title = '" . zen_db_input($tax_class_title) . "'" );
-	$tax_class_array = mysql_fetch_array($query);
-	$tax_class_ids[$tax_class_title] = $tax_class_array['tax_class_id'];
+	$query = "SELECT tax_class_id FROM " . TABLE_TAX_CLASS . "
+	WHERE tax_class_title = '" . zen_db_input($tax_class_title) . "'" ;
+	$tax_class = mysql_fetch_array(mysql_query($query));
+	if (!is_array($tax_class) || empty($tax_class)) {
+		$tax_class = array('tax_class_id' => 0);
+	}
+	$tax_class_ids[$tax_class_title] = $tax_class['tax_class_id'];
 	return ep_get_tax_title_class_id($tax_class_title);
 }
 
