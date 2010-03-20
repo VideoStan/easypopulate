@@ -10,8 +10,8 @@
 
 define('EASYPOPULATE_DISPLAY_SPLIT_LOCATION','You can also download your split files from your %s directory');
 
-define('EASYPOPULATE_DISPLAY_FILE_NOT_EXIST','File does not exist');
-define('EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED','Could not open file');
+define('EASYPOPULATE_DISPLAY_FILE_NOT_EXIST','File does not exist: %s');
+define('EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED','Could not open file: %s');
 define('EASYPOPULATE_DISPLAY_FILE_SPEC','File uploaded.<br /><b>File Name: %s</b><br />Size: %s');
 
 // product results
