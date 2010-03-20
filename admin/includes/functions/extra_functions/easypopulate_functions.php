@@ -18,13 +18,13 @@ require_once DIR_WS_CLASSES . 'EasyPopulate.php';
 
 function ep_handle_uploaded_file($file)
 {
+	$target = '';
 	$temp_path = ep_get_config('temp_path');
 	if (is_array($file) && !empty($file)) {
 		if (is_uploaded_file($file['tmp_name'])) {
-			$target = $temp_path . $file['name'];
-			move_uploaded_file($file['tmp_name'], $target);
+			move_uploaded_file($file['tmp_name'], $temp_path . $file['name']);
 		}
-	} else if (is_string($file) && !empty($file) && file_exists($temp_path . $file)) {
+	} else if (is_string($file) && !empty($file)) {
 		$target = $temp_path . $file;
 	} else {
 		$target = $file;
@@ -37,38 +37,39 @@ function ep_set_error($field = '', $error = '')
 {
 	if (empty($field)) return;
 	$_SESSION['easypopulate']['errors'][$field] = $error;
-	return true;	
+	return true;
 }
 
-function ep_get_error($field = '') 
+function ep_get_error($field = '')
 {
 	if (!empty($field) && isset($_SESSION['easypopulate']['errors'][$field])) {;
 		return $_SESSION['easypopulate']['errors'][$field];
 	}
 	return '';
 }
- 
+
 /**
  * Get bytes from K/M/G sizes
  *
  * echo ini_get('post_max_size'); // 8M
- * echo ep_get_bytes('8M'); // 8388608 
- * 
+ * echo ep_get_bytes('8M'); // 8388608
+ *
  * @param string $val number with g/k/m suffix
  * @return int bytes from $val
- */ 
-function ep_get_bytes($val) {
-    $val = trim($val);
-    $unit = strtolower(substr($val,strlen($val/1),1));
-    switch($unit) {
-        case 'g':
-            $val *= 1024;
-        case 'm':
-            $val *= 1024;
-        case 'k':
-            $val *= 1024;
-    }
-    return $val;
+ */
+function ep_get_bytes($val)
+{
+	$val = trim($val);
+	$unit = strtolower(substr($val,strlen($val/1),1));
+	switch($unit) {
+		case 'g':
+			$val *= 1024;
+		case 'm':
+			$val *= 1024;
+		case 'k':
+			$val *= 1024;
+	}
+	return $val;
 }
 
 /**
@@ -100,9 +101,11 @@ function ep_get_tax_class_rate($tax_class_id)
 		return $multipliers[$tax_class_id];
 	}
 	$multiplier = 0;
-	$query = mysql_query("select SUM(tax_rate) as tax_rate from " . TABLE_TAX_RATES . " WHERE  tax_class_id = '" . zen_db_input($tax_class_id) . "' GROUP BY tax_priority");
-	if (mysql_num_rows($query)) {
-		while ($tax = mysql_fetch_array($query)) {
+	$query = "SELECT SUM(tax_rate) AS tax_rate FROM " . TABLE_TAX_RATES . "
+	WHERE  tax_class_id = '" . zen_db_input($tax_class_id) . "' GROUP BY tax_priority");
+	$result = mysql_query($query);
+	if (mysql_num_rows($result)) {
+		while ($tax = mysql_fetch_array($result)) {
 			$multiplier += $tax['tax_rate'];
 		}
 	}
@@ -144,13 +147,14 @@ function ep_get_tax_class_titles()
  * @param string $value
  * @
  */
-function print_el($value)
+function print_el($value = '')
 {
 	return substr(strip_tags($value), 0, 10);
 }
 
-function smart_tags($string,$tags, $doit) {
-	if ($doit == true) {
+function smart_tags($string, $tags, $doit = true)
+{
+	if ($doit) {
 		foreach ($tags as $tag => $new) {
 			$tag = '/('.$tag.')/';
 			$string = preg_replace($tag,$new,$string);
@@ -162,103 +166,122 @@ function smart_tags($string,$tags, $doit) {
 	return $string;
 }
 
-function ep_field_name_exists($tbl,$fld) {
-  if (zen_not_null(zen_field_type($tbl,$fld))) {
-  	return true;
-  } else {
-  	return false;
-  }
+
+function ep_field_name_exists($tbl, $fld)
+{
+	if (zen_not_null(zen_field_type($tbl, $fld))) {
+		return true;
+	}
+	return false;
 }
 
-function ep_remove_product($product_model)
+/**
+ * Remove product by model
+ *
+ * @param string $model
+ */
+function ep_remove_product($model)
 {
 	$query = "SELECT products_id FROM " . TABLE_PRODUCTS . "
-	WHERE products_model = '" . zen_db_input($product_model) . "'";
-	$result = ep_query($sql);
+	WHERE products_model = '" . zen_db_input($model) . "'";
+	$result = ep_query($query);
 
 	while ($row = mysql_fetch_array($result)) {
 		zen_remove_product($row['products_id']);
 	}
-	return;
+	return true;
 }
 
-function ep_purge_dross() {
+function ep_purge_dross()
+{
 	$dross = ep_get_dross();
 	foreach ($dross as $products_id => $langer) {
 		zen_remove_product($products_id);
 	}
 }
 
-function ep_get_dross() {
+/**
+ * Find deleted products entries in other ZenCart tables
+ *
+ * @todo <johnny> is reviews really supported, an old comment suggested so, but i don't believe it
+ * @todo <johnny> look for other data debris
+ *
+ * @return array product_id => "dross", so duplicate products simply over-write same in array
+ */
+function ep_get_dross()
+{
 	global $db;
-	$target_tables = array(TABLE_PRODUCTS_DESCRIPTION,
-												TABLE_SPECIALS,
-												TABLE_PRODUCTS_TO_CATEGORIES,
-												TABLE_PRODUCTS_ATTRIBUTES,
-												TABLE_FEATURED,
-												TABLE_CUSTOMERS_BASKET,
-												TABLE_CUSTOMERS_BASKET_ATTRIBUTES,
-												TABLE_PRODUCTS_DISCOUNT_QUANTITY);
-												// can add others I guess, though this probably catches all possible data debris...
-												// reviews uses reviews_id, but if it is in reviews, it is probably detected above anyway
-												// This array needs to work with all versions - could break EP on older versions I think.. with each additional table, test on older versions
+	$tables = array(TABLE_PRODUCTS_DESCRIPTION,
+						TABLE_SPECIALS,
+						TABLE_PRODUCTS_TO_CATEGORIES,
+						TABLE_PRODUCTS_ATTRIBUTES,
+						TABLE_FEATURED,
+						TABLE_CUSTOMERS_BASKET,
+						TABLE_CUSTOMERS_BASKET_ATTRIBUTES,
+						TABLE_PRODUCTS_DISCOUNT_QUANTITY);
 
 	$dross = array();
-	foreach ($target_tables as $table) {
+	foreach ($tables as $table) {
 		//lets check the tables for deleted products
-		$sql = "select distinct t.products_id from " . $table . " as t left join " . TABLE_PRODUCTS . " as p on t.products_id = p.products_id where p.products_id is NULL";
+		$sql = "SELECT distinct t.products_id
+				FROM " . $table . " AS t LEFT JOIN " . TABLE_PRODUCTS . " AS p
+				ON t.products_id = p.products_id WHERE p.products_id is NULL";
 		$products = $db->Execute($sql);
 		while (!$products->EOF) {
 			$dross[$products->fields['products_id']] = 'dross';
 			$products->MoveNext();
 		}
 	}
-	// our array has product_id => "dross", so duplicate products simply over-write same in array
-	//print_r($dross);
-  return $dross;
+
+	return $dross;
 }
 
-function ep_update_cat_ids() {
-  // reset products master categories ID
+/**
+ * Reset products master categories ID
+ */
+function ep_update_cat_ids()
+{
 	global $db;
+	$products = $db->Execute("SELECT products_id FROM " . TABLE_PRODUCTS);
+	while (!$products->EOF) {
+		$sql = "SELECT products_id, categories_id
+		FROM " . TABLE_PRODUCTS_TO_CATEGORIES . "
+		WHERE products_id = '" . $products->fields['products_id'] . "'";
+		$db->Execute($sql);
+		$sql = "UPDATE " . TABLE_PRODUCTS . " SET
+		master_categories_id = '" . $check_category->fields['categories_id'] . "'
+		WHERE products_id = '" . $check_products->fields['products_id'] . "'";
+		$db->Execute($sql);
 
-  $sql = "select products_id from " . TABLE_PRODUCTS;
-  $check_products = $db->Execute($sql);
-  while (!$check_products->EOF) {
-
-    $sql = "select products_id, categories_id from " . TABLE_PRODUCTS_TO_CATEGORIES . " where products_id='" . $check_products->fields['products_id'] . "'";
-    $check_category = $db->Execute($sql);
-
-    $sql = "update " . TABLE_PRODUCTS . " set master_categories_id='" . $check_category->fields['categories_id'] . "' where products_id='" . $check_products->fields['products_id'] . "'";
-    $update_viewed = $db->Execute($sql);
-
-    $check_products->MoveNext();
-  }
+		$products->MoveNext();
+	}
 }
 
-function ep_update_prices() {
+/**
+ * Reset products price sorting
+ */
+function ep_update_prices()
+{
 	global $db;
+	$products = $db->Execute("SELECT products_id FROM " . TABLE_PRODUCTS);
 
-  // reset products_price_sorter for searches etc.
-  $sql = "select products_id from " . TABLE_PRODUCTS;
-  $update_prices = $db->Execute($sql);
-
-  while (!$update_prices->EOF) {
-    zen_update_products_price_sorter($update_prices->fields['products_id']);
-    $update_prices->MoveNext();
-  }
+	while (!$products->EOF) {
+		zen_update_products_price_sorter($products->fields['products_id']);
+		$products->MoveNext();
+	}
 }
 
-function ep_update_attributes_sort_order() {
+function ep_update_attributes_sort_order()
+{
 	global $db;
-	$all_products_attributes= $db->Execute("select p.products_id, pa.products_attributes_id from " .
-	TABLE_PRODUCTS . " p, " .
+	$query = "SELECT p.products_id, pa.products_attributes_id
+	FROM " . TABLE_PRODUCTS . " p, " .
 	TABLE_PRODUCTS_ATTRIBUTES . " pa " . "
-	where p.products_id= pa.products_id"
-	);
-	while (!$all_products_attributes->EOF) {
-	  zen_update_attributes_products_option_values_sort_order($all_products_attributes->fields['products_id']);
-	  $all_products_attributes->MoveNext();
+	WHERE p.products_id= pa.products_id";
+	$db->Execute($query);
+	while (!$attributes->EOF) {
+		zen_update_attributes_products_option_values_sort_order($attributes->fields['products_id']);
+		$attributes->MoveNext();
 	}
 }
 
@@ -284,9 +307,9 @@ function ep_filelayout_attributes()
 		}
 
 		$attribute_values_query = "SELECT products_options_values_id
-											FROM " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . "
-											WHERE products_options_id = '" . (int)$attribute_options_values['products_options_id'] . "'
-											ORDER BY products_options_values_id";
+		FROM " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . "
+		WHERE products_options_id = '" . (int)$attribute_options_values['products_options_id'] . "'
+		ORDER BY products_options_values_id";
 		$attribute_values_values = ep_query($attribute_values_query);
 
 		$attribute_values_count = 1;
@@ -353,8 +376,8 @@ function ep_query($query)
  */
 function ep_db_modify($table, $data, $action = 'INSERT', $parameters = '')
 {
-   $action = strtoupper($action);
-   if ($action == 'INSERT') {
+	$action = strtoupper($action);
+	if ($action == 'INSERT') {
 		$query = 'INSERT INTO ' . $table . ' SET';
 	} elseif ($action == 'UPDATE') {
 		$query = 'UPDATE ' . $table . ' SET ';
@@ -525,7 +548,7 @@ function remove_easypopulate() {
 			$db->Execute("DELETE FROM " . TABLE_CONFIGURATION_GROUP . "
 			WHERE configuration_group_id = '" . (int)$ep_group . "'");
 			$db->Execute("DELETE FROM " . TABLE_CONFIGURATION . "
-               WHERE configuration_group_id = '" . $ep_group . "'");
+			WHERE configuration_group_id = '" . $ep_group . "'");
 		}
 	}
 	$db->Execute('DROP TABLE IF EXISTS ' . TABLE_EASYPOPULATE_FEEDS);
@@ -596,7 +619,7 @@ function ep_get_config($var = NULL)
 	$config['import_handler'] = EASYPOPULATE_CONFIG_IMPORT_HANDLER;
 	$tempdir = EASYPOPULATE_CONFIG_TEMP_DIR;
 	if (substr($tempdir, -1) != '/') $tempdir .= '/';
-   if (substr($tempdir, 0, 1) == '/') $tempdir = substr($tempdir, 1);
+	if (substr($tempdir, 0, 1) == '/') $tempdir = substr($tempdir, 1);
 	$config['tempdir'] = $tempdir;
 	$config['temp_path'] = DIR_FS_CATALOG . $tempdir;
 	$config['debug_log_path'] = $config['temp_path'];
