@@ -14,6 +14,13 @@
 require_once 'includes/application_top.php';
 $original_error_level = error_reporting();
 error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
+if (!isset($_SESSION['easypopulate'])) {
+	$_SESSION['easypopulate'] = array();
+}
+if (!isset($_SESSION['easypopulate']['errors'])) {
+	$_SESSION['easypopulate']['errors'] = array();
+}
+
 $output = array();
 $products_with_attributes = false; // langer - this will be redundant after html renovation
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
@@ -325,6 +332,10 @@ switch ($_GET['dross']) {
 	.results_table tr.alt {
 		background-color: #E7E6E0;
 	}
+	.error {
+		color: red;
+		font-weight: bold;	
+	}
 	</style>
 </head>
 <body>
@@ -364,10 +375,12 @@ switch ($_GET['dross']) {
 			<div>
 			<label for="uploaded_file">Upload EP File</label>
 			<input id="uploaded_file" name="uploaded_file" type="file" size="50">
+			<span class="error"><?php echo ep_get_error('uploaded_file'); ?></span>
 			</div>
 			<div>
 			<label for="local_file">Import from Temp Dir (<?php echo $tempdir; ?>)</label>
 			<input type="text" class="config" id="local_file" name="local_file" size="50" value="<?php echo $local_file; ?>">
+			<span class="error"><?php echo ep_get_error('local_file'); ?></span>
 			</div>
 			<div>
 			<label for="column_delimiter">Column Delimiter</label>
@@ -556,6 +569,7 @@ switch ($_GET['dross']) {
 </div>
 <?php } ?>
 <?php error_reporting($original_error_level); ?>
+<?php $_SESSION['easypopulate']['errors'] = array(); ?>
 <?php require(DIR_WS_INCLUDES . 'footer.php'); ?>
 </body>
 </html>

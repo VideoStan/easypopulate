@@ -33,6 +33,21 @@ function ep_handle_uploaded_file($file)
 	return $target;
 }
 
+function ep_set_error($field = '', $error = '')
+{
+	if (empty($field)) return;
+	$_SESSION['easypopulate']['errors'][$field] = $error;
+	return true;	
+}
+
+function ep_get_error($field = '') 
+{
+	if (!empty($field) && isset($_SESSION['easypopulate']['errors'][$field])) {;
+		return $_SESSION['easypopulate']['errors'][$field];
+	}
+	return '';
+}
+ 
 /**
  * Get bytes from K/M/G sizes
  *
