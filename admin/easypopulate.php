@@ -134,39 +134,42 @@ if (zen_not_null($ep_dltype)) {
 // UPLOADING OF FILES STARTS HERE
 //*******************************
 if (isset($_POST['import'])) {
-
-	$import_handler = ep_get_config('import_handler');
+	$config = array();
+	$config['import_handler'] = ep_get_config('import_handler');
 	if (isset($_POST['import_handler']) && !empty($_POST['import_handler'])) {
-		$import_handler = $_POST['import_handler'];
+		$config['import_handler'] = $_POST['import_handler'];
 	}
 
-	$handler_config = EPFileUploadFactory::getConfig($import_handler);
-	extract($handler_config, EXTR_OVERWRITE);
-	if (isset($_POST['column_delimiter']) && !empty($_POST['column_delimiter'])) {
-			$column_delimiter = $_POST['column_delimiter'];
-			if ($column_delimiter == 'tab') $column_delimiter = "\t";
+	if (isset($_POST['local_file']) && !empty($_POST['local_file'])) {
+		$config['local_file'] = $_POST['local_file'];
 	}
-	//die(var_dump($column_delimiter));
+
+	if (isset($_POST['column_delimiter']) && !empty($_POST['column_delimiter'])) {
+		$config['column_delimiter'] = $_POST['column_delimiter'];
+	}
+
 	if (isset($_POST['column_enclosure']) && !empty($_POST['column_enclosure'])) {
-			$column_enclosure = $_POST['column_enclosure'];
+		$config['column_enclosure'] = $_POST['column_enclosure'];
 	}
 
 	if (isset($_POST['price_modifier']) && !empty($_POST['price_modifier'])) {
-		$price_modifier = $_POST['price_modifier'];
+		$config['price_modifier'] = $_POST['price_modifier'];
 	}
 
 	if (isset($_POST['image_path_prefix']) && !empty($_POST['image_path_prefix'])) {
-		$image_path_prefix = $_POST['image_path_prefix'];
+		$config['image_path_prefix'] = $_POST['image_path_prefix'];
 	}
 
 	if (isset($_POST['tax_class_title']) && !empty($_POST['tax_class_title'])) {
-		$tax_class_title = $_POST['tax_class_title'];
+		$config['tax_class_title'] = $_POST['tax_class_title'];
 	}
 
-	$transforms = array();
-	if (!empty($_POST['transforms'])) {
-		$transforms = $_POST['transforms'];
+	if (isset($_POST['transform']) && !empty($_POST['transforms'])) {
+		$config['transforms'] = $_POST['transforms'];
 	}
+
+	$saved_config = EPFileUploadFactory::getConfig($config['import_handler']);
+	$config = array_merge($saved_config, $config);
 
 	$file_location = '';
 	if (isset($config['local_file']) && !empty($config['local_file'])) {
@@ -356,7 +359,7 @@ switch ($_GET['dross']) {
 	}
 	.error {
 		color: red;
-		font-weight: bold;	
+		font-weight: bold;
 	}
 	</style>
 </head>

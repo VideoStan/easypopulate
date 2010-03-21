@@ -34,7 +34,8 @@ class EasyPopulateImport
 	$ep_supported_mods['psd'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_short_desc');
 	$ep_supported_mods['uom'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_as'); // uom = unit of measure
 	$ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
-	extract($this->config);
+	extract(ep_get_config());
+	extract($this->config, EXTR_OVERWRITE);
 	$smart_tags = ep_get_config('smart_tags');
 	if (ep_get_config('enable_advanced_smart_tags')) {
 		 $smart_tags = array_merge(ep_get_config($advanced_smart_tags), $smart_tags);
