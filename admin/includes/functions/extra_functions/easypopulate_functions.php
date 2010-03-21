@@ -33,6 +33,30 @@ function ep_handle_uploaded_file($file)
 	return $target;
 }
 
+function ep_get_upload_error($error_code = 0)
+{
+	switch ($error_code) {
+		case UPLOAD_ERR_OK:
+			return 'The file was successfully uploaded';
+		case UPLOAD_ERR_INI_SIZE:
+			return 'The uploaded file exceeds the upload_max_filesize directive in php.ini';
+		case UPLOAD_ERR_FORM_SIZE:
+				return 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form';
+		case UPLOAD_ERR_PARTIAL:
+				return 'The file was only partially uploaded';
+		case UPLOAD_ERR_NO_FILE:
+				return 'No file was uploaded';
+		case UPLOAD_ERR_NO_TMP_DIR:
+				return 'System (not EasyPopulate) temp directory was not found';
+		case UPLOAD_ERR_CANT_WRITE:
+				return 'Failed to write file to disk';
+		case UPLOAD_ERR_EXTENSION:
+				return 'File upload stopped by extension';
+		default:
+				return 'Unknown upload error';
+	}
+}
+
 function ep_set_error($field = '', $error = '')
 {
 	if (empty($field)) return;
@@ -102,7 +126,7 @@ function ep_get_tax_class_rate($tax_class_id)
 	}
 	$multiplier = 0;
 	$query = "SELECT SUM(tax_rate) AS tax_rate FROM " . TABLE_TAX_RATES . "
-	WHERE  tax_class_id = '" . zen_db_input($tax_class_id) . "' GROUP BY tax_priority");
+	WHERE  tax_class_id = '" . zen_db_input($tax_class_id) . "' GROUP BY tax_priority";
 	$result = mysql_query($query);
 	if (mysql_num_rows($result)) {
 		while ($tax = mysql_fetch_array($result)) {

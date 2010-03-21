@@ -153,13 +153,6 @@ if (isset($_POST['import'])) {
 			$column_enclosure = $_POST['column_enclosure'];
 	}
 
-	// @todo more error checking here
-	$uploaded_file = !empty($_POST['local_file']) ? $_POST['local_file'] : $_FILES['uploaded_file'];
-	$file_location = ep_handle_uploaded_file($uploaded_file);
-
-	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_NOT_EXIST;
-	//$output['errors'][] = EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED;
-
 	if (isset($_POST['price_modifier']) && !empty($_POST['price_modifier'])) {
 		$price_modifier = $_POST['price_modifier'];
 	}
@@ -175,6 +168,34 @@ if (isset($_POST['import'])) {
 	$transforms = array();
 	if (!empty($_POST['transforms'])) {
 		$transforms = $_POST['transforms'];
+	}
+
+	$file_location = '';
+	if (isset($config['local_file']) && !empty($config['local_file'])) {
+		$file_location = ep_handle_uploaded_file($config['local_file']);
+	}
+	if (isset($_FILES['uploaded_file'])) {
+		if (!empty($_FILES['uploaded_file']['type'])) {
+			$error = $_FILES['uploaded_file']['error'];
+			if ($error > 0) {
+				ep_set_error('uploaded_file', ep_get_upload_error($error));
+				zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+			} else {
+				$file_location = ep_handle_uploaded_file($_FILES['uploaded_file']);
+			}
+		}
+	}
+
+	$fileInfo = new SplFileInfo($file_location);
+
+	if (!$fileInfo->isFile()) {
+		ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_NOT_EXIST, $file_location));
+		zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+	}
+
+	if (!$fileInfo->isReadable()) {
+		ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED, $file_location));
+		zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
 	}
 
 	require DIR_WS_CLASSES . 'EasyPopulate/Import.php';
