@@ -43,18 +43,16 @@ if (defined('EASYPOPULATE_CONFIG_VERSION')) { // EasyPopulate is installed
 	if (!$chmod_check) {
 		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG), 'warning');
 	}
+	$max_file_size = min(ep_get_bytes(ini_get('upload_max_filesize')), ep_get_bytes(ini_get('post_max_size')));
 
-	if (empty($_GET) && empty($_POST)) {
-		$max_file_size = min(ep_get_bytes(ini_get('upload_max_filesize')), ep_get_bytes(ini_get('post_max_size')));
-		$price_modifier = 0;
-		$image_path_prefix = '';
-		$column_delimiter = ',';
-		$column_enclosure = '"';
-		$local_file = '';
-		ep_update_handlers();
-		$handler_config = EPFileUploadFactory::getConfig($import_handler);
-		extract($handler_config, EXTR_OVERWRITE);
-	}
+	$price_modifier = 0;
+	$image_path_prefix = '';
+	$column_delimiter = ',';
+	$column_enclosure = '"';
+	$local_file = '';
+	$tax_class_title = '';
+	ep_update_handlers();
+	extract(EPFileUploadFactory::getConfig($import_handler), EXTR_OVERWRITE);
 }
 
 /**
