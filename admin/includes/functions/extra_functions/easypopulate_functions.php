@@ -97,23 +97,6 @@ function ep_get_bytes($val)
 }
 
 /**
- * Modifiy a price by a flat price or a percentage
- *
- * @param int $price a price
- * @param mixed $modifier positive or negative value
- *
- * @return int
- */
-function ep_modify_price($price , $modifier = 0)
-{
-	if (strpos($modifier, '%') !== false) {
-		$modifier = str_replace('%', '', $modifier);
-		$modifier = $price * ((int)$modifier / 100);
-	}
-	return $price += $modifier;
-}
-
-/**
  * Get tax class rate
  * @param int $tax_class_id
  * @return int tax rate
@@ -205,23 +188,6 @@ function ep_field_name_exists($tbl, $fld)
 	return false;
 }
 
-/**
- * Remove product by model
- *
- * @param string $model
- */
-function ep_remove_product($model)
-{
-	$query = "SELECT products_id FROM " . TABLE_PRODUCTS . "
-	WHERE products_model = '" . zen_db_input($model) . "'";
-	$result = ep_query($query);
-
-	while ($row = mysql_fetch_array($result)) {
-		zen_remove_product($row['products_id']);
-	}
-	return true;
-}
-
 function ep_purge_dross()
 {
 	$dross = ep_get_dross();
@@ -264,55 +230,6 @@ function ep_get_dross()
 	}
 
 	return $dross;
-}
-
-/**
- * Reset products master categories ID
- */
-function ep_update_cat_ids()
-{
-	global $db;
-	$products = $db->Execute("SELECT products_id FROM " . TABLE_PRODUCTS);
-	while (!$products->EOF) {
-		$sql = "SELECT products_id, categories_id
-		FROM " . TABLE_PRODUCTS_TO_CATEGORIES . "
-		WHERE products_id = '" . $products->fields['products_id'] . "'";
-		$db->Execute($sql);
-		$sql = "UPDATE " . TABLE_PRODUCTS . " SET
-		master_categories_id = '" . $check_category->fields['categories_id'] . "'
-		WHERE products_id = '" . $check_products->fields['products_id'] . "'";
-		$db->Execute($sql);
-
-		$products->MoveNext();
-	}
-}
-
-/**
- * Reset products price sorting
- */
-function ep_update_prices()
-{
-	global $db;
-	$products = $db->Execute("SELECT products_id FROM " . TABLE_PRODUCTS);
-
-	while (!$products->EOF) {
-		zen_update_products_price_sorter($products->fields['products_id']);
-		$products->MoveNext();
-	}
-}
-
-function ep_update_attributes_sort_order()
-{
-	global $db;
-	$query = "SELECT p.products_id, pa.products_attributes_id
-	FROM " . TABLE_PRODUCTS . " p, " .
-	TABLE_PRODUCTS_ATTRIBUTES . " pa " . "
-	WHERE p.products_id= pa.products_id";
-	$db->Execute($query);
-	while (!$attributes->EOF) {
-		zen_update_attributes_products_option_values_sort_order($attributes->fields['products_id']);
-		$attributes->MoveNext();
-	}
 }
 
 /**

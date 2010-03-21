@@ -137,7 +137,7 @@ class EasyPopulateImport
 				if (isset($items['status']) && $items['status'] == 9) {
 					$output_status = EASYPOPULATE_DISPLAY_RESULT_DELETED;
 					$output_class = 'success deleted';
-					ep_remove_product($items['products_model']);
+					$this->removeProductByModel($items['products_model']);
 					continue 2;
 				}
 
@@ -273,7 +273,7 @@ class EasyPopulateImport
 			extract($items);
 
 			// Modify a price based on the submitted price modifier
-			$products_price = ep_modify_price($products_price, $price_modifier);
+			$products_price = $this->modifyPrice($products_price, $price_modifier);
 
 			//elari... we get the tax_clas_id from the tax_title - from zencart??
 			//on screen will still be displayed the tax_class_title instead of the id....
@@ -522,7 +522,7 @@ class EasyPopulateImport
 					$data['discount_id'] = $discount;
 					$data['products_id'] = $products_id;
 					$data['discount_qty'] = $items['discount_qty_' .$discount];
-					$data['discount_price'] = ep_modify_price($items['discount_price_' . $discount], $price_modifier);
+					$data['discount_price'] = $this->modifyPrice($items['discount_price_' . $discount], $price_modifier);
 					$sql = ep_db_modify(TABLE_PRODUCTS_DISCOUNT_QUANTITY, $data, 'INSERT');
 					$result = ep_query($sql);
 				}
@@ -783,16 +783,101 @@ class EasyPopulateImport
 		$file->onFileFinish();
 
 		$this->itemCount = $file->itemCount;
-		ep_update_prices();
+		$this->updatePriceSortOrder();
 
 		if (!empty($output['specials'])) {
 			zen_expire_specials();
 		}
 
 		if (isset($has_attributes)) {
-			ep_update_attributes_sort_order();
+			$this->updateAttributesSortOrder();
 		}
 		return $output;
+	}
+
+	/**
+	 * Remove product by model
+	 *
+	 * @param string $model
+	 */
+	private function removeProductByModel($model)
+	{
+		$query = "SELECT products_id FROM " . TABLE_PRODUCTS . "
+		WHERE products_model = '" . zen_db_input($model) . "'";
+		$result = ep_query($query);
+
+		while ($row = mysql_fetch_array($result)) {
+			zen_remove_product($row['products_id']);
+		}
+		return true;
+	}
+
+	/**
+	 * Modifiy a price (pre-tax) by a flat price or a percentage
+	 *
+	 * @param int $price a price
+	 * @param mixed $modifier positive or negative value
+	 *
+	 * @return int
+	 */
+	private function modifyPrice($price , $modifier = 0)
+	{
+		if (strpos($modifier, '%') !== false) {
+			$modifier = str_replace('%', '', $modifier);
+			$modifier = $price * ((int)$modifier / 100);
+		}
+		return $price += $modifier;
+	}
+
+	/**
+	 * Reset products price sorting
+	 */
+	private function updatePriceSortOrder()
+	{
+		global $db;
+		$products = $db->Execute("SELECT products_id FROM " . TABLE_PRODUCTS);
+
+		while (!$products->EOF) {
+			zen_update_products_price_sorter($products->fields['products_id']);
+			$products->MoveNext();
+		}
+	}
+	
+	private function updateAttributesSortOrder()
+	{
+		global $db;
+		$query = "SELECT p.products_id, pa.products_attributes_id
+		FROM " . TABLE_PRODUCTS . " p, " .
+		TABLE_PRODUCTS_ATTRIBUTES . " pa " . "
+		WHERE p.products_id= pa.products_id";
+		$db->Execute($query);
+		while (!$attributes->EOF) {
+			zen_update_attributes_products_option_values_sort_order($attributes->fields['products_id']);
+			$attributes->MoveNext();
+		}
+	}
+	
+	/**
+	 * Reset products master categories ID
+	 * 
+	 * @todo use it or remove it
+	 */
+	private function updateCategoryIds()
+	{
+		global $db;
+		$products = $db->Execute("SELECT products_id FROM " . TABLE_PRODUCTS);
+		while (!$products->EOF) {
+			$sql = "SELECT products_id, categories_id
+			FROM " . TABLE_PRODUCTS_TO_CATEGORIES . "
+			WHERE products_id = '" . $products->fields['products_id'] . "'";
+			$category = $db->Execute($sql);
+			$sql = "UPDATE " . TABLE_PRODUCTS . " SET
+			master_categories_id = '" . $category->fields['categories_id'] . "'
+			WHERE products_id = '" . $products->fields['products_id'] . "'";
+			$db->Execute($sql);
+
+			$products->MoveNext();
+		}
 	}
 }
 ?>
