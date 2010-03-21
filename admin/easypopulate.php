@@ -178,6 +178,9 @@ if (isset($_POST['import'])) {
 	}
 
 	require DIR_WS_CLASSES . 'EasyPopulate/Import.php';
+	$import = new EasyPopulateImport($config);
+	$output = $import->run($fileInfo);
+	$output['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $fileInfo->getFileName(), $fileInfo->getSize());
 }
 
 if ($ep_stack_sql_error == true) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
@@ -516,14 +519,14 @@ switch ($_GET['dross']) {
 				<?php } ?>
 			<?php } ?>
 			<?php if (!empty($output['items'])) { ?>
-			<div><h2><?php echo EASYPOPULATE_DISPLAY_HEADING; ?></h2> Items Uploaded(<?php echo $file->itemCount;?>)</div>
+			<div><h2><?php echo EASYPOPULATE_DISPLAY_HEADING; ?></h2> Items Uploaded(<?php echo $import->itemCount;?>)</div>
 			<table id="uploaded_products" class="results_table">
 				<thead>
 				<tr>
 					<th><?php echo EASYPOPULATE_DISPLAY_STATUS; ?></th>
 					<th><?php echo EASYPOPULATE_DISPLAY_MESSAGE; ?></th>
 					<!-- @todo make sure the headers line up with the text in all cases -->
-					<?php foreach (array_keys($filelayout) as $header) { ?>
+					<?php foreach (array_keys($import->filelayout) as $header) { ?>
 						<th><?php echo ucwords(str_replace('_', ' ', $header)); ?></th>
 					<?php } ?>
 				</tr>

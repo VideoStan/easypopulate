@@ -11,23 +11,41 @@
  * @todo <johnny> actually make it a class
  */
 
-	// @todo CHECK: maybe below can go in array eg $ep_processed['attributes'] = true, etc.. cold skip all post-upload tasks on check if isset var $ep_processed.
-	$has_attributes = false;
+// @todo this sucks, make it better. simply encapsulating to find out where 
+// we are using global vars
+class EasyPopulateImport
+{
+	public $config = array();
+	public $itemCount = 0;
+
+	public function __construct(array $config = array())
+	{
+		$this->config = $config;
+	}
+
+	public function run(SplFileInfo $fileInfo)
+	{
+
 	$transforms = array();
 	$output['specials'] = array();
 	$output['errors'] = array();
 	$output['info'] = '';
-
-	// BEGIN PROCESSING DATA
-	$fileInfo = new SplFileInfo($file_location);
-
-	$output['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $fileInfo->getFileName(), $fileInfo->getSize());
-
-	if ($enable_advanced_smart_tags) $smart_tags = array_merge($advanced_smart_tags,$smart_tags);
+	$ep_supported_mods = array();
+	$ep_supported_mods['psd'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_short_desc');
+	$ep_supported_mods['uom'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_as'); // uom = unit of measure
+	$ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
+	extract($this->config);
+	$smart_tags = ep_get_config('smart_tags');
+	if (ep_get_config('enable_advanced_smart_tags')) {
+		 $smart_tags = array_merge(ep_get_config($advanced_smart_tags), $smart_tags);
+	}
 
 	$fileInfo->setFileClass(EPFileUploadFactory::get($import_handler));
 	$file = $fileInfo->openFile('r');
 
+	if ($column_delimiter == 'tab') {
+		$column_delimiter = "\t";
+	}
 	$file->setCsvControl($column_delimiter, stripslashes($column_enclosure));
 
 	// model name length error handling
@@ -45,6 +63,7 @@
 	$file->transforms = $transforms;
 
 	if ($filelayout = $file->getFileLayout()) {
+	$this->filelayout = $filelayout; 
 	$file->onFileStart();
 
 	foreach ($file as $items) {
@@ -762,13 +781,17 @@
 	*/
 	$file->onFileFinish();
 
+	$this->itemCount = $file->itemCount;
 	ep_update_prices();
 
 	if (!empty($output['specials'])) {
 		zen_expire_specials();
 	}
 
-	if ($has_attributes) {
+	if (isset($has_attributes)) {
 		ep_update_attributes_sort_order();
 	}
+	return $output;
+}
+}
 ?>
