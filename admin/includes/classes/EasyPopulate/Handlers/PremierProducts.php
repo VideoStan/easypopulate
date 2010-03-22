@@ -32,7 +32,6 @@
  */
 class EPUploadPremierProducts extends EPUploadStandard
 {
-	const FEED_URL = 'http://www.hotbuy4u.com/productindexdl.cfm';
 	const IMAGES_URL = 'http://www.hotbuy4u.com/picsdl.cfm';
 
 	public $name = 'PremierProducts';
@@ -40,6 +39,7 @@ class EPUploadPremierProducts extends EPUploadStandard
 	public static function defaultConfig()
 	{
 		$config = parent::defaultConfig();
+		$config['feed_url'] = 'http://www.hotbuy4u.com/productindexdl.cfm';
 		$config['column_delimiter'] = '^';
 		return $config;
 	}

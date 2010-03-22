@@ -30,7 +30,6 @@
  */
 class EPUploadMegaGoods extends EPUploadStandard
 {
-	const FEED_URL = 'https://www.megagoods.com/export.php?show=format_tab';
 	const IMAGES_URL = 'https://www.megagoods.com/pimages/regular.zip';
 
 	public $name = 'MegaGoods';
@@ -39,6 +38,7 @@ class EPUploadMegaGoods extends EPUploadStandard
 	{
 		$config = parent::defaultConfig();
 		$config['column_delimiter'] = 'tab';
+		$config['feed_url'] = 'https://www.megagoods.com/export.php?show=format_tab';
 		return $config;
 	}
 
