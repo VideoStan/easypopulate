@@ -165,6 +165,15 @@ function print_el($value = '')
 	return substr(strip_tags($value), 0, 10);
 }
 
+/**
+ * Clean out newlines/carriage returns from products
+ * and optionally apply a regular expression
+ *
+ * @param string $string
+ * @param array $tags key => value list of regular expressions to apply
+ * @param bool $doit whether to apply tags or not
+ * @return string modified string
+ */  
 function smart_tags($string, $tags, $doit = true)
 {
 	if ($doit) {
@@ -355,7 +364,8 @@ function ep_db_modify($table, $data, $action = 'INSERT', $parameters = '')
  *
  * @todo do something with the db errors
  */
-function install_easypopulate() {
+function install_easypopulate()
+{
 	global $db;
 	$data = array();
 	$data['configuration_group_id'] = '';
@@ -481,7 +491,8 @@ function install_easypopulate() {
 /**
  * Remove Easy Populate configuration entries
  */
-function remove_easypopulate() {
+function remove_easypopulate()
+{
 	global $db;
 
 	$sql = "SELECT configuration_group_id
