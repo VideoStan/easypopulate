@@ -485,7 +485,6 @@ function install_easypopulate()
 				PRIMARY KEY (id)
 				)';
 	$db->Execute($query);
-	ep_update_handlers();
 }
 
 /**
