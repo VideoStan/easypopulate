@@ -77,6 +77,10 @@ class EPFileUploadFactory
 	public static function setConfig($name, array $config = array())
 	{
 		global $db;
+		unset($config['feed_url']);
+		unset($config['images_url']);
+		$defaultConfig = call_user_func_array(array(EPFileUploadFactory::get($name), 'defaultConfig'), array()); 
+		$config = array_merge($defaultConfig, $config);
 		$data = array();
 		$data['config'] = json_encode($config);
 		$where = "name = '" . zen_db_input($name) . "'";
