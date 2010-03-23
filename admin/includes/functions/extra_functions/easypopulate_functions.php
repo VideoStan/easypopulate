@@ -22,7 +22,7 @@ function ep_handle_uploaded_file($file)
 	$temp_path = ep_get_config('temp_path');
 	if (is_array($file) && !empty($file)) {
 		if (is_uploaded_file($file['tmp_name'])) {
-			$target = $temp_path . $file['name']
+			$target = $temp_path . $file['name'];
 			move_uploaded_file($file['tmp_name'], $target);
 		}
 	}
@@ -235,55 +235,6 @@ function ep_get_dross()
 	}
 
 	return $dross;
-}
-
-/**
- * Return the filelayout for attributes
- *
- * @return array
- */
-function ep_filelayout_attributes()
-{
-	$filelayout = array();
-	$languages = zen_get_languages();
-
-	$attribute_options_count = 1;
-	foreach ($attribute_options_array as $attribute_options_values) {
-		$key1 = 'v_attribute_options_id_' . $attribute_options_count;
-		$filelayout[] = $key1;
-
-		for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
-			$l_id = $languages[$i]['id'];
-			$key2 = 'v_attribute_options_name_' . $attribute_options_count . '_' . $l_id;
-			$filelayout[] = $key2;
-		}
-
-		$attribute_values_query = "SELECT products_options_values_id
-		FROM " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . "
-		WHERE products_options_id = '" . (int)$attribute_options_values['products_options_id'] . "'
-		ORDER BY products_options_values_id";
-		$attribute_values_values = ep_query($attribute_values_query);
-
-		$attribute_values_count = 1;
-		while ($attribute_values = mysql_fetch_array($attribute_values_values)) {
-			$key3 = 'v_attribute_values_id_' . $attribute_options_count . '_' . $attribute_values_count;
-			$filelayout[] = $key3;
-
-			$key4 = 'v_attribute_values_price_' . $attribute_options_count . '_' . $attribute_values_count;
-			$filelayout[] = $key4;
-
-			for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
-				$l_id = $languages[$i]['id'];
-
-				$key5 = 'v_attribute_values_name_' . $attribute_options_count . '_' . $attribute_values_count . '_' . $l_id;
-				$filelayout[] = $key5;
-			}
-
-			$attribute_values_count++;
-		}
-		$attribute_options_count++;
-	}
-	return $filelayout;
 }
 
 function write_debug_log($string)
@@ -590,18 +541,6 @@ function ep_get_config($var = NULL)
 	$config['epdlanguage_id'] = $epdlanguage_id;
 
 	return ep_get_config($var);
-}
-
-/**
- * Kills all line breaks and tabs
- *
- * Used for Froogle (Google Products)
- *
- * @param string $line line to kill breaks on
- */
-function kill_breaks($line) {
-	if (is_array($line)) return array_map('kill_breaks', $line);
-	return str_replace(array("\r","\n","\t")," ",$line);
 }
 
 /**
