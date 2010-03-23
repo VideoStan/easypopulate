@@ -27,12 +27,6 @@ if (defined('EASYPOPULATE_CONFIG_VERSION')) { // EasyPopulate is installed
 	$config = ep_get_config();
 	extract($config); // Brings all the configuration variables into the current symbol table
 
-	if ($log_queries) {
-		// new blank log file on each page impression for full testing log (too big otherwise!!)
-		$fp = fopen($temp_path . 'ep_debug_log.txt', 'w');
-		fclose($fp);
-	}
-
 	// @todo move this to where the file processing actually takes place
 	@set_time_limit($time_limit);
 	@ini_set('max_input_time', $time_limit);
@@ -195,7 +189,7 @@ switch ($_GET['dross']) {
 				$string .= $products_id . "\n";
 			}
 			$string .= "It is recommended that you delete this corrupted data using phpMyAdmin.\n\n";
-			write_debug_log($string);
+			write_debug_log($string, 'dross');
 			$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_FAIL, 'caution');
 		} else {
 			$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_SUCCESS, 'success');

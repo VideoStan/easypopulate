@@ -193,12 +193,21 @@ function ep_field_name_exists($tbl, $fld)
 	return false;
 }
 
-function write_debug_log($string)
+/**
+ * Write debugging information to a log file
+ *
+ * @param string $string string to write to the log file
+ * @param string $type type of log to write
+ * @todo use a log class
+ */
+function write_debug_log($string, $type = 'debug')
 {
-	$logFile = ep_get_config('debug_log_path') . 'ep_debug_log.txt';
-	$fp = fopen($logFile,'ab');
+	static $fopenFlags = 'w';
+	$logFile = ep_get_config('debug_log_path') . 'log_' . $type . '.txt';
+	$fp = fopen($logFile, $fopenFlags);
 	fwrite($fp, $string);
 	fclose($fp);
+	$fopenFlags = 'ab';
 	return;
 }
 
@@ -211,11 +220,11 @@ function ep_query($query)
 		if (ep_get_config('ep_debug_logging')) {
 			// @todo langer - will add time & date..
 			$string = "MySQL error ".mysql_errno().": ".mysql_error()."\nWhen executing:\n$query\n";
-			write_debug_log($string);
+			write_debug_log($string, 'sql_errors');
 		}
 	} elseif (ep_get_config('log_queries')) {
 		$string = "MySQL PASSED\nWhen executing:\n$query\n";
-		write_debug_log($string);
+		write_debug_log($string, 'queries');
 	}
 	return $result;
 }
