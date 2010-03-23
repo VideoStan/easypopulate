@@ -178,15 +178,22 @@ if ($ep_stack_sql_error == true) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_
 * this check ought to be last, so it checks the tasks just performed as a quality check of EP...
 * @todo langer  data present in table products, but not in descriptions.. user will need product info, and decide to add description, or delete product
 */
-if (!isset($_GET['dross'])) $_GET['dross'] = NULL;
+if (!isset($_GET['dross'])) $_GET['dross'] = 'check';
 switch ($_GET['dross']) {
+	case !empty($GET['dross']): // we can choose a config option: check always, or only on clicking a button
+		$dross = EasyPopulateImport::getDross();
+		if (!empty($dross)) {
+			$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_DROSS_DETECTED, count($dross), zen_href_link(FILENAME_EASYPOPULATE, 'dross=delete')), 'caution');
+		} else {
+			break;
+		}
 	case 'delete':
-		ep_purge_dross();
+		EasyPopulateImport::purgeDross($dross);
 		// now check it is really gone...
-		$dross = ep_get_dross();
-		if (zen_not_null($dross)) {
+		$dross = EasyPopulateImport::getDross();
+		if (!empty($dross)) {
 			$string = "Product debris corresponding to the following product_id(s) cannot be deleted by EasyPopulate:\n";
-			foreach ($dross as $products_id => $langer) {
+			foreach ($dross as $products_id) {
 				$string .= $products_id . "\n";
 			}
 			$string .= "It is recommended that you delete this corrupted data using phpMyAdmin.\n\n";
@@ -196,12 +203,6 @@ switch ($_GET['dross']) {
 			$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_SUCCESS, 'success');
 		}
 		break;
-	case 'check': // we can choose a config option: check always, or only on clicking a button
-	default:
-		$dross = ep_get_dross();
-		if (zen_not_null($dross)) {
-			$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_DROSS_DETECTED, count($dross), zen_href_link(FILENAME_EASYPOPULATE, 'dross=delete')), 'caution');
-		}
 }
 /**
  * Changes planned for GUI

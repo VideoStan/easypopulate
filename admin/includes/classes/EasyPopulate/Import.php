@@ -872,5 +872,48 @@ class EasyPopulateImport
 			$products->MoveNext();
 		}
 	}
+	
+	/**
+	 * Find deleted products entries in other ZenCart tables
+	 *
+	 * @todo <johnny> is reviews really supported, an old comment suggested so, but i don't believe it
+	 * @todo <johnny> look for other data debris
+	 *
+	 * @return array product_id => "dross", so duplicate products simply over-write same in array
+	 */
+	public static function getDross()
+	{
+		global $db;
+		$tables = array(TABLE_PRODUCTS_DESCRIPTION,
+							TABLE_SPECIALS,
+							TABLE_PRODUCTS_TO_CATEGORIES,
+							TABLE_PRODUCTS_ATTRIBUTES,
+							TABLE_FEATURED,
+							TABLE_CUSTOMERS_BASKET,
+							TABLE_CUSTOMERS_BASKET_ATTRIBUTES,
+							TABLE_PRODUCTS_DISCOUNT_QUANTITY);
+	
+		$dross = array();
+		foreach ($tables as $table) {
+			//lets check the tables for deleted products
+			$sql = "SELECT distinct t.products_id
+					FROM " . $table . " AS t LEFT JOIN " . TABLE_PRODUCTS . " AS p
+					ON t.products_id = p.products_id WHERE p.products_id is NULL";
+			$products = $db->Execute($sql);
+			while (!$products->EOF) {
+				$dross[] = $products->fields['products_id'];
+				$products->MoveNext();
+			}
+		}
+		$dross = array_unique($dross);
+		return $dross;
+	}
+	
+	public static function purgeDross($dross)
+	{
+		foreach ($dross as $productId) {
+			zen_remove_product($productId);
+		}
+	}
 }
 ?>
