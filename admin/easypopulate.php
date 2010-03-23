@@ -22,8 +22,6 @@ if (!isset($_SESSION['easypopulate']['errors'])) {
 }
 
 $output = array();
-$ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
-
 
 if (defined('EASYPOPULATE_CONFIG_VERSION')) { // EasyPopulate is installed
 	$config = ep_get_config();
@@ -171,7 +169,7 @@ if (isset($_POST['import'])) {
 	$output['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $fileInfo->getFileName(), $fileInfo->getSize());
 }
 
-if ($ep_stack_sql_error == true) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
+if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
 
 /**
 * this is a rudimentary date integrity check for references to any non-existant product_id entries
