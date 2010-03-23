@@ -55,8 +55,6 @@
  */
 class EPUploadBNFUSA extends EPUploadStandard
 {
-	const IMAGES_URL = 'http://statics.bnfusa.com/By_Part_Number.zip';
-
 	public $name = 'BNFUSA';
 	public $masterRowCount = 1;
 	public $productIds = array();
@@ -65,6 +63,8 @@ class EPUploadBNFUSA extends EPUploadStandard
 	{
 		$config = parent::defaultConfig();
 		$config['feed_url'] = 'http://www.bnfusa.com/utilities/cgen.lasso?an8=10151431&fmt=csv';
+		$config['local_file'] = 'BNFUSA.csv';
+		$config['images_url'] = 'http://statics.bnfusa.com/By_Part_Number.zip';
 		return $config;	
 	}
 
