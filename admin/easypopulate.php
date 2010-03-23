@@ -22,7 +22,6 @@ if (!isset($_SESSION['easypopulate']['errors'])) {
 }
 
 $output = array();
-$products_with_attributes = false; // langer - this will be redundant after html renovation
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
 
 
@@ -494,12 +493,6 @@ switch ($_GET['dross']) {
 			<?php } ?>
 			</tbody>
 			</table>
-			<?php if ($products_with_attributes) { ?>
-					<span class="fieldRequired"> * Attributes Included in Complete</span>
-			<?php } else { ?>
-					<span class="fieldRequired"> * Attributes Not Included in Complete</span>
-			<?php } ?>
-			<br />
 			<?php if (isset($output['info'])) echo '<p>' . $output['info'] . '</p>'; ?>
 			<?php if (!empty($output['errors'])) { ?>
 				<p>Errors:</p>
