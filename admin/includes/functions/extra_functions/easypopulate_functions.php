@@ -22,14 +22,10 @@ function ep_handle_uploaded_file($file)
 	$temp_path = ep_get_config('temp_path');
 	if (is_array($file) && !empty($file)) {
 		if (is_uploaded_file($file['tmp_name'])) {
-			move_uploaded_file($file['tmp_name'], $temp_path . $file['name']);
+			$target = $temp_path . $file['name']
+			move_uploaded_file($file['tmp_name'], $target);
 		}
-	} else if (is_string($file) && !empty($file)) {
-		$target = $temp_path . $file;
-	} else {
-		$target = $file;
 	}
-
 	return $target;
 }
 
