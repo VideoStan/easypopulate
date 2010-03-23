@@ -12,8 +12,24 @@
  */
 class EasyPopulateExport
 {
-	public function run($ep_dltype = 'full')
+	public $fileName = '';
+	private $type = 'full';
+	private $columnDelimiter = ',';
+	private $columnEnclosure = '"';
+	private $lines = array();
+
+	function __construct($type = 'full')
 	{
+		if ($type == 'froogle') {
+			$this->columnDelimiter = "\t";
+			$this->columnEnclosure = ' ';
+		}
+		$this->type = $type;
+		$this->fileName = 'EP-' . $type . strftime('%Y%b%d-%H%M%S') . '.' . (($this->columnDelimiter == ',') ? 'csv' : 'txt');
+	}
+	public function run()
+	{
+		$ep_dltype = $this->type;
 		/**
 		 * START check for existence of various mods
 		 */
@@ -537,7 +553,7 @@ class EasyPopulateExport
 		}
 	
 		$filestring = array();
-		$filestring[] = array_keys($filelayout_header);
+		$this->lines[] = array_keys($filelayout_header);
 	
 		$num_of_langs = count($langcode);
 	
@@ -834,18 +850,56 @@ class EasyPopulateExport
 				// only the specified keys are used
 				$tempcsvrow[] = $row[$key];
 			}
-			$filestring[] = $tempcsvrow;
+			$this->lines[] = $tempcsvrow;
 	
 		}
 	
 		switch ($ep_dltype) {
 			case 'froogle':
-				$column_delimiter = "\t";
-				$column_enclosure = ' ';
 				$filestring = array_map("kill_breaks", $filestring);
 			break;
 		}
 		return $filestring;
+	}
+	
+	/**
+	 * Stream the file
+	 *
+	 * @todo make Content-Type configurable
+	 */
+	public function streamFile()
+	{
+		global $request_type;
+		header('Content-type: text/csv');
+		//header("Content-type: application/vnd.ms-excel");
+		header('Content-disposition: attachment; filename=' . $this->fileName);
+		// Changed if using SSL, helps prevent program delay/timeout (add to backup.php also)
+		if ($request_type == 'NONSSL'){
+			header('Pragma: no-cache');
+		} else {
+			header('Pragma: ');
+		}
+		header('Expires: 0');
+		$fp = $this->write('php://temp');
+		rewind($fp);
+		echo stream_get_contents($fp);
+		fclose($fp);
+	}
+	
+	public function saveFile()
+	{
+		$tmpfpath = ep_get_config('temp_path') . $this->fileName;
+		$fp = $this->write($tmpfpath);
+		fclose($fp);
+	}
+
+	private function write($fileName)
+	{
+		$fp = fopen($fileName, 'w+');
+		foreach ($this->lines as $line) {
+			fputcsv($fp, $line, $this->columnDelimiter, $this->columnEnclosure);
+		}
+		return $fp;
 	}
 }
 ?>

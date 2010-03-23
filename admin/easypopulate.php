@@ -77,49 +77,25 @@ if (isset($_POST['preset']) && !empty($_POST['preset'])) {
 	exit();
 }
 
-$ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : NULL;
-if (zen_not_null($ep_dltype)) {
+if (isset($_GET['dltype'])) {
+	$dltype = !empty($_GET['dltype']) ? $_GET['dltype'] : 'full';
+
 	require DIR_WS_CLASSES . 'EasyPopulate/Export.php';
-	$export = new EasyPopulateExport();
-	$filestring = $export->run();
+	$export = new EasyPopulateExport($dltype);
+	$export->run();
 
-	$column_delimiter = ',';
-	$column_enclosure = '"';
 	$ep_dlmethod = isset($_GET['download']) ? $_GET['download'] : 'stream';
-	$export_file = 'EP-' . $ep_dltype . strftime('%Y%b%d-%H%M%S') . '.' . (($column_delimiter == ',')? 'csv' : 'txt');
-	// now either stream it to them or put it in the temp directory
-	if ($ep_dlmethod == 'stream') {
-		header('Content-type: text/csv');
-		//header("Content-type: application/vnd.ms-excel"); // @todo make this configurable
-		header("Content-disposition: attachment; filename=$export_file");
-		// Changed if using SSL, helps prevent program delay/timeout (add to backup.php also)
-		if ($request_type== 'NONSSL'){
-			header('Pragma: no-cache');
-		} else {
-			header('Pragma: ');
-		}
-		header('Expires: 0');
 
-		$fp = fopen('php://temp', 'w+');
-		foreach ($filestring as $line) {
-			fputcsv($fp, $line, $column_delimiter, $column_enclosure);
-		}
-		rewind($fp);
-		echo stream_get_contents($fp);
+	if ($ep_dlmethod == 'stream') {
+		$export->streamFile();
 		error_reporting($original_error_level);
 		exit();
 	} else {
-		$tmpfpath = $temp_path . $export_file;
-		$fp = fopen($tmpfpath, 'w+');
-		foreach ($filestring as $line) {
-			fputcsv($fp, $line, $column_delimiter, $column_enclosure);
-		}
-		fclose($fp);
-		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $export_file, $tempdir), 'success');
+		$export->saveFile();
+		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $export->fileName, ep_get_config('temp_path')), 'success');
 		zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
 	}
 }
-
 
 //*******************************
 // UPLOADING OF FILES STARTS HERE
