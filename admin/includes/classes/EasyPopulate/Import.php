@@ -54,7 +54,8 @@ class EasyPopulateImport
 		$category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
 
 		$file->imagePathPrefix = $image_path_prefix;
-		$file->transforms = $transforms;
+		$file->transforms['metatags_keywords'] = $metatags_keywords;
+
 
 		if ($filelayout = $file->getFileLayout()) {
 		$this->filelayout = $filelayout;

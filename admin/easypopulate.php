@@ -122,8 +122,8 @@ if (isset($_POST['import'])) {
 		$config['tax_class_title'] = $_POST['tax_class_title'];
 	}
 
-	if (isset($_POST['transform']) && !empty($_POST['transforms'])) {
-		$config['transforms'] = $_POST['transforms'];
+	if (isset($_POST['metatags_keywords']) && !empty($_POST['metatags_keywords'])) {
+		$config['metatags_keywords'] = $_POST['metatags_keywords'];
 	}
 
 	$saved_config = EPFileUploadFactory::getConfig($config['import_handler']);
@@ -392,8 +392,8 @@ switch ($_GET['dross']) {
 			</div>
 			<div id="transforms">
 				<div>
-				<label for="transforms_metatags_keywords">Meta Keywords Patterns</label>
-				<input type="text" class="config" id="transforms_metatags_keywords" name="transforms[metatags_keywords]" size="50">
+				<label for="metatags_keywords">Meta Keywords Patterns</label>
+				<input type="text" class="config" id="metatags_keywords" name="metatags_keywords" size="50">
 				</div>
 				<div>
 				<label for="image_path_prefix">Image Path Prefix</label>
