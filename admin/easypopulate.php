@@ -296,7 +296,7 @@ switch ($_GET['dross']) {
 
 	label {
 		font-weight: bold;
-		width: 22em;
+		width: 23em;
 		float: left;
 	}
 
@@ -343,7 +343,7 @@ switch ($_GET['dross']) {
 		<?php } else if(defined('EASYPOPULATE_CONFIG_TEMP_DIR') && !defined('EASYPOPULATE_CONFIG_VERSION')) { ?>
 			<input type="button" name="remove" value="Remove Old Version">
 		<?php } else { ?>
-		<span><?php echo EASYPOPULATE_ERROR_NOT_INSTALLED ?></span>
+		<span class="error"><?php echo EASYPOPULATE_ERROR_NOT_INSTALLED ?></span>
 		<input type="button" name="install" value="Install EasyPopulate">
 		<?php } ?>
 	</form>
