@@ -10,7 +10,24 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  * @todo <johnny> actually make it a class 
  */
-if (zen_not_null($ep_dltype)) {
+class EasyPopulateExport
+{
+	public function run($ep_dltype = 'full')
+	{
+	/**
+	 * START check for existence of various mods
+	 */
+	// all mods go in this array as 'name' => 'true' if exist. eg $ep_supported_mods['psd'] = true; means it exists.
+	// @todo scan array in future to reveal if any mods for inclusion in downloads
+	$ep_supported_mods = array();
+	$ep_supported_mods['psd'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_short_desc');
+	$ep_supported_mods['uom'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_as'); // uom = unit of measure
+	$ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
+	/**
+	 * END check for existance of various mods
+	 */
+	$products_with_attributes = false;
+	extract(ep_get_config());
 	// START Create attributes array
 	$attribute_options_array = array();
 	if (isset($attribute_options_select) && is_array($attribute_options_select) && (count($attribute_options_select) > 0)) {
@@ -483,16 +500,12 @@ if (zen_not_null($ep_dltype)) {
 	$fileheaders = array_flip($fileheaders);
 	$filelayout_count = count($filelayout);
 
-}
-
 //*******************************
 //*******************************
 // END INITIALIZATION
 //*******************************
 //*******************************
 
-$ep_dlmethod = isset($_GET['download']) ? $_GET['download'] : NULL;
-if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 	//*******************************
 	//*******************************
 	// DOWNLOAD FILE
@@ -831,6 +844,8 @@ if ($ep_dlmethod == 'stream' or  $ep_dlmethod == 'tempfile'){
 			$column_enclosure = ' ';
 			$filestring = array_map("kill_breaks", $filestring);
 		break;
+	}
+	return $filestring;
 	}
 }
 ?>

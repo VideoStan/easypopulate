@@ -51,22 +51,10 @@ if (defined('EASYPOPULATE_CONFIG_VERSION')) { // EasyPopulate is installed
 	$column_enclosure = '"';
 	$local_file = '';
 	$tax_class_title = '';
+	$feed_url = '';
 	ep_update_handlers();
 	extract(EPFileUploadFactory::getConfig($import_handler), EXTR_OVERWRITE);
 }
-
-/**
- * START check for existence of various mods
- */
-// all mods go in this array as 'name' => 'true' if exist. eg $ep_supported_mods['psd'] = true; means it exists.
-// @todo scan array in future to reveal if any mods for inclusion in downloads
-$ep_supported_mods = array();
-$ep_supported_mods['psd'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_short_desc');
-$ep_supported_mods['uom'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_as'); // uom = unit of measure
-$ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
-/**
- * END check for existance of various mods
- */
 
 if (isset($_POST['installer'])) {
 	$f = $_POST['installer'] . '_easypopulate';
@@ -91,10 +79,13 @@ if (isset($_POST['preset']) && !empty($_POST['preset'])) {
 
 $ep_dltype = (isset($_GET['dltype'])) ? $_GET['dltype'] : NULL;
 if (zen_not_null($ep_dltype)) {
+	require DIR_WS_CLASSES . 'EasyPopulate/Export.php';
+	$export = new EasyPopulateExport();
+	$filestring = $export->run();
+
 	$column_delimiter = ',';
 	$column_enclosure = '"';
-	require DIR_WS_CLASSES . 'EasyPopulate/Export.php';
-
+	$ep_dlmethod = isset($_GET['download']) ? $_GET['download'] : 'stream';
 	$export_file = 'EP-' . $ep_dltype . strftime('%Y%b%d-%H%M%S') . '.' . (($column_delimiter == ',')? 'csv' : 'txt');
 	// now either stream it to them or put it in the temp directory
 	if ($ep_dlmethod == 'stream') {
