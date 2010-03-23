@@ -50,15 +50,8 @@ class EasyPopulateImport
 		$file->setCsvControl($column_delimiter, stripslashes($column_enclosure));
 
 		// model name length error handling
-		$model_varchar = zen_field_length(TABLE_PRODUCTS, 'products_model');
-		if (!isset($model_varchar)) {
-			$messageStack->add(EASYPOPULATE_MSGSTACK_MODELSIZE_DETECT_FAIL, 'warning');
-			$modelsize = 32;
-		} else {
-			$modelsize = $model_varchar;
-		}
-
-	   $category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
+		$modelsize = zen_field_length(TABLE_PRODUCTS, 'products_model');
+		$category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
 
 		$file->imagePathPrefix = $image_path_prefix;
 		$file->transforms = $transforms;
