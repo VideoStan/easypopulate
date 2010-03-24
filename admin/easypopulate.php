@@ -72,7 +72,6 @@ if (isset($_POST['preset']) && !empty($_POST['preset'])) {
 if (isset($_GET['dltype'])) {
 	$dltype = !empty($_GET['dltype']) ? $_GET['dltype'] : 'full';
 
-	require DIR_WS_CLASSES . 'EasyPopulate/Export.php';
 	$export = new EasyPopulateExport($dltype);
 	$export->run();
 
@@ -99,8 +98,32 @@ if (isset($_POST['import'])) {
 		$config['import_handler'] = $_POST['import_handler'];
 	}
 
+	$saved_config = EPFileUploadFactory::getConfig($config['import_handler']);
+	$config = array_merge($saved_config, $config);
+
 	if (isset($_POST['local_file']) && !empty($_POST['local_file'])) {
 		$config['local_file'] = $_POST['local_file'];
+	}
+
+	if (isset($_FILES['uploaded_file'])) {
+		if (!empty($_FILES['uploaded_file']['type'])) {
+			$result_code = $_FILES['uploaded_file']['error'];
+			if ($result_code != UPLOAD_ERR_OK) {
+				ep_set_error('uploaded_file', ep_get_upload_error($result_code));
+				zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+			} else {
+				$config['local_file'] = ep_handle_uploaded_file($_FILES['uploaded_file']);
+			}
+		}
+	}
+	$config['local_file'] = $temp_path . $config['local_file'];
+	if (isset($_POST['remote_file']) && !empty($_POST['remote_file'])
+	&& !empty($config['local_file']) && isset($config['feed_url'])) {
+		if(!@copy($config['feed_url'], $config['local_file'])) {
+			$error = error_get_last();
+			ep_set_error('local_file', sprintf('Unable to save %s to %s because: %s', $config['feed_url'], $config['local_file'], $error['message']));
+			zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+		}
 	}
 
 	if (isset($_POST['column_delimiter']) && !empty($_POST['column_delimiter'])) {
@@ -127,38 +150,18 @@ if (isset($_POST['import'])) {
 		$config['metatags_keywords'] = $_POST['metatags_keywords'];
 	}
 
-	$saved_config = EPFileUploadFactory::getConfig($config['import_handler']);
-	$config = array_merge($saved_config, $config);
-
-	$file_location = '';
-	if (isset($config['local_file']) && !empty($config['local_file'])) {
-		$file_location = ep_handle_uploaded_file($config['local_file']);
-	}
-	if (isset($_FILES['uploaded_file'])) {
-		if (!empty($_FILES['uploaded_file']['type'])) {
-			$error = $_FILES['uploaded_file']['error'];
-			if ($error > 0) {
-				ep_set_error('uploaded_file', ep_get_upload_error($error));
-				zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
-			} else {
-				$file_location = ep_handle_uploaded_file($_FILES['uploaded_file']);
-			}
-		}
-	}
-
-	$fileInfo = new SplFileInfo($file_location);
+	$fileInfo = new SplFileInfo($config['local_file']);
 
 	if (!$fileInfo->isFile()) {
-		ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_NOT_EXIST, $file_location));
+		ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_NOT_EXIST, $fileInfo->getFileName()));
 		zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
 	}
 
 	if (!$fileInfo->isReadable()) {
-		ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED, $file_location));
+		ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED, $fileInfo->getFileName()));
 		zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
 	}
 
-	require DIR_WS_CLASSES . 'EasyPopulate/Import.php';
 	$import = new EasyPopulateImport($config);
 	$output = $import->run($fileInfo);
 	$output['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $fileInfo->getFileName(), $fileInfo->getSize());
@@ -248,9 +251,13 @@ switch ($_GET['dross']) {
 
 		$("#import_handler").change(function() {
 			$.getJSON("easypopulate.php?preset=" + $(this).val(), function(json){
+				$("#remote_file").attr("disabled", "disabled");
 				$.each(json, function(k, v){
 					$("#" + k).val(unescape(v));
 				});
+				if (json["feed_url"] != null) {
+					$("#remote_file").removeAttr("disabled");
+				}
 			});
 		});
 
@@ -366,6 +373,13 @@ switch ($_GET['dross']) {
 			<label for="local_file">Import from Temp Dir (<?php echo $tempdir; ?>)</label>
 			<input type="text" class="config" id="local_file" name="local_file" size="50" value="<?php echo $local_file; ?>">
 			<span class="error"><?php echo ep_get_error('local_file'); ?></span>
+			</div>
+			<div>
+				<label for="remote_file">Update from Supplier List URL</label>
+				<?php $enabled = !empty($config['feed_url']) ? '' : 'disabled="disabled"'; ?>
+				<?php echo zen_draw_checkbox_field('remote_file', '', (bool)$feed_url, '', 'id="remote_file" ' . $enabled) ?>
+				<span class="error"><?php echo ep_get_error('remote_file'); ?></span>
+
 			</div>
 			<div>
 			<label for="column_delimiter">Column Delimiter</label>

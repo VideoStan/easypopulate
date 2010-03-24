@@ -22,8 +22,8 @@ function ep_handle_uploaded_file($file)
 	$temp_path = ep_get_config('temp_path');
 	if (is_array($file) && !empty($file)) {
 		if (is_uploaded_file($file['tmp_name'])) {
-			$target = $temp_path . $file['name'];
-			move_uploaded_file($file['tmp_name'], $target);
+			$target = $file['name'];
+			move_uploaded_file($file['tmp_name'], $temp_path . $target);
 		}
 	}
 	return $target;
