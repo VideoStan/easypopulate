@@ -8,11 +8,11 @@
  * @author too many to list, see history.txt
  * @copyright 200?-2010
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
- * @todo <johnny> actually make it a class
+ * @todo <johnny> make it a better class
+ * @todo <chadd> change v_products_price_as to v_products_price_uom
  */
 
-// @todo this sucks, make it better. simply encapsulating to find out where
-// we are using global vars
+
 class EasyPopulateImport
 {
 	public $config = array();

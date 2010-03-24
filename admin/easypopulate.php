@@ -7,10 +7,7 @@
  * @author too many to list, see history.txt
  * @copyright 200?-2010
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
- *
- * @todo <chadd> change v_products_price_as to v_products_price_uom
  */
-
 require_once 'includes/application_top.php';
 $original_error_level = error_reporting();
 error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
@@ -331,7 +328,7 @@ switch ($_GET['dross']) {
 	</style>
 </head>
 <body>
-<?php error_reporting($orginal_error_level); ?>
+<?php error_reporting($original_error_level); ?>
 <?php require(DIR_WS_INCLUDES . 'header.php'); ?>
 <?php error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3 ?>
 <div id="ep_header">
