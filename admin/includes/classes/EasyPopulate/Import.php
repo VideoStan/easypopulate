@@ -308,7 +308,8 @@ class EasyPopulateImport
 			}
 
 			// OK, we need to convert the manufacturer's name into id's for the database
-			if ( isset($manufacturers_name) && $manufacturers_name != '' ){
+			$manufacturers_id = NULL;
+			if ( isset($manufacturers_name) && $manufacturers_name != '' ) {
 				$sql = "SELECT man.manufacturers_id as manID
 					FROM ".TABLE_MANUFACTURERS." as man
 					WHERE
@@ -844,7 +845,7 @@ class EasyPopulateImport
 		FROM " . TABLE_PRODUCTS . " p, " .
 		TABLE_PRODUCTS_ATTRIBUTES . " pa " . "
 		WHERE p.products_id= pa.products_id";
-		$db->Execute($query);
+		$attributes = $db->Execute($query);
 		while (!$attributes->EOF) {
 			zen_update_attributes_products_option_values_sort_order($attributes->fields['products_id']);
 			$attributes->MoveNext();
