@@ -331,7 +331,9 @@ switch ($_GET['dross']) {
 	</style>
 </head>
 <body>
+<?php error_reporting($orginal_error_level); ?>
 <?php require(DIR_WS_INCLUDES . 'header.php'); ?>
+<?php error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3 ?>
 <div id="ep_header">
 	<h2>Easy Populate <?php echo EASYPOPULATE_VERSION ?></h2>
 	<form id="installer" enctype="multipart/form-data" action="easypopulate.php" method="POST">
