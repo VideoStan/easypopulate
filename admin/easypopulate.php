@@ -43,6 +43,7 @@ if (defined('EASYPOPULATE_CONFIG_VERSION')) { // EasyPopulate is installed
 	$local_file = '';
 	$tax_class_title = '';
 	$feed_url = '';
+	$metatags_keywords = '';
 	ep_update_handlers();
 	extract(EPFileUploadFactory::getConfig($import_handler), EXTR_OVERWRITE);
 }
@@ -393,7 +394,7 @@ switch ($_GET['dross']) {
 			<div id="transforms">
 				<div>
 				<label for="metatags_keywords">Meta Keywords Patterns</label>
-				<input type="text" class="config" id="metatags_keywords" name="metatags_keywords" size="50">
+				<input type="text" class="config" id="metatags_keywords" name="metatags_keywords" size="50" value="<?php echo $metatags_keywords; ?>">
 				</div>
 				<div>
 				<label for="image_path_prefix">Image Path Prefix</label>
