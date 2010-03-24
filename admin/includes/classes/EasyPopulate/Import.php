@@ -25,7 +25,6 @@ class EasyPopulateImport
 
 	public function run(SplFileInfo $fileInfo)
 	{
-
 		$transforms = array();
 		$output['specials'] = array();
 		$output['errors'] = array();
@@ -308,8 +307,7 @@ class EasyPopulateImport
 			}
 
 			// OK, we need to convert the manufacturer's name into id's for the database
-			$manufacturers_id = NULL;
-			if ( isset($manufacturers_name) && $manufacturers_name != '' ) {
+			if (isset($manufacturers_name) && !empty($manufacturers_name)) {
 				$sql = "SELECT man.manufacturers_id as manID
 					FROM ".TABLE_MANUFACTURERS." as man
 					WHERE
@@ -326,7 +324,10 @@ class EasyPopulateImport
 					$result = ep_query($query);
 					$manufacturers_id = mysql_insert_id();
 				}
+			} else {
+				$manufacturers_id = NULL;
 			}
+				
 			// if the categories names are set then try to update them
 			if (isset($categories_name_1)) {
 				// start from the highest possible category and work our way down from the parent
