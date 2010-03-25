@@ -325,7 +325,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 			} else {
 				$manufacturers_id = NULL;
 			}
-				
+
 			// if the categories names are set then try to update them
 			if (isset($categories_name_1)) {
 				// start from the highest possible category and work our way down from the parent
@@ -859,7 +859,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 			$products->MoveNext();
 		}
 	}
-	
+
 	private function updateAttributesSortOrder()
 	{
 		global $db;
@@ -873,10 +873,10 @@ class EasyPopulateImport extends EasyPopulateProcess
 			$attributes->MoveNext();
 		}
 	}
-	
+
 	/**
 	 * Reset products master categories ID
-	 * 
+	 *
 	 * @todo use it or remove it
 	 */
 	private function updateCategoryIds()
@@ -896,7 +896,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 			$products->MoveNext();
 		}
 	}
-	
+
 	/**
 	 * Find deleted products entries in other ZenCart tables
 	 *
@@ -916,7 +916,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 							TABLE_CUSTOMERS_BASKET,
 							TABLE_CUSTOMERS_BASKET_ATTRIBUTES,
 							TABLE_PRODUCTS_DISCOUNT_QUANTITY);
-	
+
 		$dross = array();
 		foreach ($tables as $table) {
 			//lets check the tables for deleted products
@@ -932,7 +932,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 		$dross = array_unique($dross);
 		return $dross;
 	}
-	
+
 	public static function purgeDross($dross)
 	{
 		foreach ($dross as $productId) {
