@@ -36,8 +36,35 @@ class EasyPopulateProcess
 		$this->taxClassMultipliers[$taxClassId] = $multiplier;
 		return $multiplier;
 	}
-	
+
+	/**
+	 * Clean out newlines/carriage returns from products
+	 * and optionally apply a regular expression
+	 *
+	 * @param string $string
+	 * @param array $tags key => value list of regular expressions to apply
+	 * @param bool $doit whether to apply tags or not
+	 * @return string modified string
+ 	*/  
+	protected function smartTags($string, $doit = true)
+	{
+		if ($doit) {
+			$tags = ep_get_config('smart_tags');
+			if (ep_get_config('enable_advanced_smart_tags')) {
+				$advancedSmartTags = ep_get_config('advanced_smart_tags');
+				$tags = array_merge($advancedSmartTags, $smartTags);
+			}
+			foreach ($tags as $tag => $new) {
+				$tag = '/('.$tag.')/';
+				$string = preg_replace($tag,$new,$string);
+			}
+		}
+
+		$string = preg_replace("/(\r\n|\n|\r)/", "", $string);
+		return $string;
+	}
 }
+
 require DIR_WS_CLASSES . 'EasyPopulate/Import.php';
 require DIR_WS_CLASSES . 'EasyPopulate/Export.php';
 

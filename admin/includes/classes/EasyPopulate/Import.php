@@ -37,10 +37,6 @@ class EasyPopulateImport extends EasyPopulateProcess
 		$ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
 		extract(ep_get_config());
 		extract($this->config, EXTR_OVERWRITE);
-		$smart_tags = ep_get_config('smart_tags');
-		if (ep_get_config('enable_advanced_smart_tags')) {
-			 $smart_tags = array_merge(ep_get_config($advanced_smart_tags), $smart_tags);
-		}
 
 		$fileInfo->setFileClass(EPFileUploadFactory::get($import_handler));
 		$file = $fileInfo->openFile('r');
@@ -535,12 +531,12 @@ class EasyPopulateImport extends EasyPopulateProcess
 					$data = array();
 					$data['products_id']	= $products_id;
 					$data['language_id']	= $key;
-					if (isset($value['name'])) $data['products_name'] = smart_tags($value['name'], $smart_tags, false);
+					if (isset($value['name'])) $data['products_name'] = $this->smartTags($value['name'], false);
 					if (isset($value['description'])) $data['products_description']	= $value['description'];
-					if (isset($value['url'])) $data['products_url'] = smart_tags($value['url'], $smart_tags, false);
+					if (isset($value['url'])) $data['products_url'] = $this->smartTags($value['url'], false);
 
 					if ($ep_supported_mods['psd']) {
-						$data['products_short_desc'] = smart_tags($value['short_desc'], $smart_tags, $strip_smart_tags);
+						$data['products_short_desc'] = $this->smartTags($value['short_desc'], $strip_smart_tags);
 					}
 					if (mysql_num_rows($result) == 0) {
 						$query = ep_db_modify(TABLE_PRODUCTS_DESCRIPTION, $data, 'INSERT');

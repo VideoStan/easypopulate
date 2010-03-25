@@ -113,30 +113,6 @@ function print_el($value = '')
 	return substr(strip_tags($value), 0, 10);
 }
 
-/**
- * Clean out newlines/carriage returns from products
- * and optionally apply a regular expression
- *
- * @param string $string
- * @param array $tags key => value list of regular expressions to apply
- * @param bool $doit whether to apply tags or not
- * @return string modified string
- */  
-function smart_tags($string, $tags, $doit = true)
-{
-	if ($doit) {
-		foreach ($tags as $tag => $new) {
-			$tag = '/('.$tag.')/';
-			$string = preg_replace($tag,$new,$string);
-		}
-	}
-	// we remove problem characters here anyway as they are not wanted..
-	$string = preg_replace("/(\r\n|\n|\r)/", "", $string);
-	// $crsub is redundant - may add it again later though..
-	return $string;
-}
-
-
 function ep_field_name_exists($tbl, $fld)
 {
 	if (zen_not_null(zen_field_type($tbl, $fld))) {
