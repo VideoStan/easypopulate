@@ -9,6 +9,35 @@
  */
 
 define('TABLE_EASYPOPULATE_FEEDS', DB_PREFIX . 'easypopulate_feeds');
+
+class EasyPopulateProcess
+{
+	protected $taxClassMultipliers = array();
+
+	/**
+	 * Get tax class rate
+	 * @param int $taxClassId
+	 * @return int tax rate
+	 */
+	protected function getTaxClassRate($taxClassId)
+	{
+		if (isset($this->taxClassMultipliers[$taxClassId])) {
+			return $this->taxClassMultipliers[$taxClassId];
+		}
+		$multiplier = 0;
+		$query = "SELECT SUM(tax_rate) AS tax_rate FROM " . TABLE_TAX_RATES . "
+		WHERE  tax_class_id = '" . zen_db_input($taxClassId) . "' GROUP BY tax_priority";
+		$result = mysql_query($query);
+		if (mysql_num_rows($result)) {
+			while ($row = mysql_fetch_array($result)) {
+				$multiplier += $row['tax_rate'];
+			}
+		}
+		$this->taxClassMultipliers[$taxClassId] = $multiplier;
+		return $multiplier;
+	}
+	
+}
 require DIR_WS_CLASSES . 'EasyPopulate/Import.php';
 require DIR_WS_CLASSES . 'EasyPopulate/Export.php';
 

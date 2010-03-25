@@ -13,10 +13,12 @@
  */
 
 
-class EasyPopulateImport
+class EasyPopulateImport extends EasyPopulateProcess
 {
 	public $config = array();
 	public $itemCount = 0;
+
+	protected $taxClassIds = array();
 
 	public function __construct(array $config = array())
 	{
@@ -212,7 +214,7 @@ class EasyPopulateImport
 				 * We check the value of tax class and title instead of the id
 				 *Then we add the tax to price if $price_with_tax is set to true
 				 */
-				$row_tax_multiplier = ep_get_tax_class_rate($row['tax_class_id']);
+				$row_tax_multiplier = $this->getTaxClassRate($row['tax_class_id']);
 				$row['tax_class_title'] = zen_get_tax_class_title($row['tax_class_id']);
 				if ($price_with_tax){
 					$row['products_price'] = round($row['products_price'] + ($row['products_price'] * $row_tax_multiplier / 100),2);
@@ -271,10 +273,10 @@ class EasyPopulateImport
 			//elari... we get the tax_clas_id from the tax_title - from zencart??
 			//on screen will still be displayed the tax_class_title instead of the id....
 			if (isset($tax_class_title)){
-				$tax_class_id = ep_get_tax_title_class_id($tax_class_title);
+				$tax_class_id = $this->getTaxTitleClassId($tax_class_title);
 			}
-			//we check the tax rate of this tax_class_id
-			$row_tax_multiplier = ep_get_tax_class_rate($tax_class_id);
+
+			$row_tax_multiplier = $this->getTaxClassRate($tax_class_id);
 
 			//And we recalculate price without the included tax...
 			//Since it seems display is made before, the displayed price will still include tax
@@ -823,6 +825,29 @@ class EasyPopulateImport
 			$modifier = $price * ((int)$modifier / 100);
 		}
 		return $price += $modifier;
+	}
+
+	/**
+	 * Get tax class id by tax class title
+	 *
+	 * @param string $taxClassTitle
+	 * @return int tax class id
+	 *
+	 * @todo should we error out if the tax class doesn't exist? or continue to fail silently?
+	 */
+	private function getTaxTitleClassId($taxClassTitle)
+	{
+		if (isset($this->taxClassIds[$taxClassTitle])) {
+			return $this->taxClassIds[$taxClassTitle];
+		}
+		$query = "SELECT tax_class_id FROM " . TABLE_TAX_CLASS . "
+		WHERE tax_class_title = '" . zen_db_input($taxClassTitle) . "'" ;
+		$row = mysql_fetch_array(mysql_query($query));
+		if (!is_array($row) || empty($row)) {
+			$row = array('tax_class_id' => 0);
+		}
+		$this->taxClassIds[$taxClassTitle] = $row['tax_class_id'];
+		return $row['tax_class_id'];
 	}
 
 	/**

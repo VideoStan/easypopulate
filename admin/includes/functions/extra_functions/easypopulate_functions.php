@@ -92,54 +92,6 @@ function ep_get_bytes($val)
 	return $val;
 }
 
-/**
- * Get tax class rate
- * @param int $tax_class_id
- * @return int tax rate
- */
-function ep_get_tax_class_rate($tax_class_id)
-{
-	static $multipliers = array();
-	if (isset($multipliers[$tax_class_id])) {
-		return $multipliers[$tax_class_id];
-	}
-	$multiplier = 0;
-	$query = "SELECT SUM(tax_rate) AS tax_rate FROM " . TABLE_TAX_RATES . "
-	WHERE  tax_class_id = '" . zen_db_input($tax_class_id) . "' GROUP BY tax_priority";
-	$result = mysql_query($query);
-	if (mysql_num_rows($result)) {
-		while ($tax = mysql_fetch_array($result)) {
-			$multiplier += $tax['tax_rate'];
-		}
-	}
-	$multipliers[$tax_class_id] = $multiplier;
-	return ep_get_tax_class_rate($tax_class_id);
-}
-
-/**
- * Get tax class id by tax class title
- *
- * @param string $tax_class_title
- * @return int tax class id
- *
- * @todo should we error out if the tax class doesn't exist? or continue to fail silently?
- */
-function ep_get_tax_title_class_id($tax_class_title)
-{
-	static $tax_class_ids = array();
-	if (isset($tax_class_ids[$tax_class_title])) {
-		return $tax_class_ids[$tax_class_title];
-	}
-	$query = "SELECT tax_class_id FROM " . TABLE_TAX_CLASS . "
-	WHERE tax_class_title = '" . zen_db_input($tax_class_title) . "'" ;
-	$tax_class = mysql_fetch_array(mysql_query($query));
-	if (!is_array($tax_class) || empty($tax_class)) {
-		$tax_class = array('tax_class_id' => 0);
-	}
-	$tax_class_ids[$tax_class_title] = $tax_class['tax_class_id'];
-	return ep_get_tax_title_class_id($tax_class_title);
-}
-
 function ep_get_tax_class_titles()
 {
 	$result = mysql_query('SELECT tax_class_title FROM ' . TABLE_TAX_CLASS);

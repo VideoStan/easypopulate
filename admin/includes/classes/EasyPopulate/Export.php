@@ -10,7 +10,7 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  * @todo <johnny> actually make it a class 
  */
-class EasyPopulateExport
+class EasyPopulateExport extends EasyPopulateProcess
 {
 	public $fileName = '';
 	private $type = 'full';
@@ -840,7 +840,7 @@ class EasyPopulateExport
 			//We check the value of tax class and title instead of the id
 			//Then we add the tax to price if $price_with_tax is set to 1
 			if (isset($filelayout['v_products_price'])) {
-				$row_tax_multiplier     = ep_get_tax_class_rate($row['v_tax_class_id']);
+				$row_tax_multiplier     = $this->getTaxClassRate($row['v_tax_class_id']);
 				$row['v_tax_class_title']   = zen_get_tax_class_title($row['v_tax_class_id']);
 				$row['v_products_price']  = round($row['v_products_price'] + ($price_with_tax * $row['v_products_price'] * $row_tax_multiplier / 100),2);
 			}
