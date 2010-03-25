@@ -69,42 +69,16 @@ class EasyPopulateImport extends EasyPopulateProcess
 				continue;
 			}
 
-			// @todo should we just SELECT * ?
-			$sql = 'SELECT
-				p.products_id,
-				p.products_model,
-				p.products_image,
-				p.products_price,';
 
-			if ($ep_supported_mods['uom'] == true) {
-				$sql .=  'p.products_price_as,';
-			}
-			if ($ep_supported_mods['upc'] == true) {
-				$sql .=  'p.products_upc,';
-			}
-
-			$sql .= 'p.products_weight,
-				p.products_discount_type,
-				p.products_discount_type_from,
-				p.product_is_call,
-				p.products_sort_order,
-				p.products_quantity_order_min,
-				p.products_quantity_order_units,
-				p.products_date_added,
-				p.products_date_available,
-				p.products_tax_class_id,
-				p.products_quantity,
-				p.products_status,
-				p.manufacturers_id,
-				subc.categories_id as categories_id'.
-				" FROM
-				".TABLE_PRODUCTS." as p,
-				".TABLE_CATEGORIES." as subc,
-				".TABLE_PRODUCTS_TO_CATEGORIES." as ptoc
-				WHERE
-				p.products_id = ptoc.products_id AND
-				p.products_model = '" . zen_db_input($items['products_model']) . "' AND
-				ptoc.categories_id = subc.categories_id";
+			$sql = 'SELECT	p.*, subc.categories_id'.
+			" FROM
+			".TABLE_PRODUCTS." as p,
+			".TABLE_CATEGORIES." as subc,
+			".TABLE_PRODUCTS_TO_CATEGORIES." as ptoc
+			WHERE
+			p.products_id = ptoc.products_id AND
+			p.products_model = '" . zen_db_input($items['products_model']) . "' AND
+			ptoc.categories_id = subc.categories_id";
 
 			$result = ep_query($sql);
 
