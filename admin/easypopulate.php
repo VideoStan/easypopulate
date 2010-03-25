@@ -24,9 +24,6 @@ if (defined('EASYPOPULATE_CONFIG_VERSION')) { // EasyPopulate is installed
 	$config = ep_get_config();
 	extract($config); // Brings all the configuration variables into the current symbol table
 
-	// @todo move this to where the file processing actually takes place
-	@set_time_limit($time_limit);
-	@ini_set('max_input_time', $time_limit);
 	$chmod_check = is_dir($temp_path) && is_writable($temp_path);
 	if (!$chmod_check) {
 		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG), 'warning');
@@ -69,7 +66,8 @@ if (isset($_POST['preset']) && !empty($_POST['preset'])) {
 if (isset($_GET['dltype'])) {
 	$dltype = !empty($_GET['dltype']) ? $_GET['dltype'] : 'full';
 
-	$export = new EasyPopulateExport($dltype);
+	$export = new EasyPopulateExport($config);
+	$export->setFormat($dltype);
 	$export->run();
 
 	$ep_dlmethod = isset($_GET['download']) ? $_GET['download'] : 'stream';

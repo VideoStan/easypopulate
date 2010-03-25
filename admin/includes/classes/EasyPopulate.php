@@ -13,6 +13,14 @@ define('TABLE_EASYPOPULATE_FEEDS', DB_PREFIX . 'easypopulate_feeds');
 class EasyPopulateProcess
 {
 	protected $taxClassMultipliers = array();
+	protected $config = array();
+
+	public function __construct(array $config = array())
+	{
+		$this->config = $config;
+		@set_time_limit($config['time_limit']);
+		@ini_set('max_input_time', $config['time_limit']);	
+	}
 
 	/**
 	 * Get tax class rate

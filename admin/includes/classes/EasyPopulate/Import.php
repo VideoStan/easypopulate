@@ -15,15 +15,9 @@
 
 class EasyPopulateImport extends EasyPopulateProcess
 {
-	public $config = array();
 	public $itemCount = 0;
 
 	protected $taxClassIds = array();
-
-	public function __construct(array $config = array())
-	{
-		$this->config = $config;
-	}
 
 	public function run(SplFileInfo $fileInfo)
 	{
@@ -210,8 +204,8 @@ class EasyPopulateImport extends EasyPopulateProcess
 				 * We check the value of tax class and title instead of the id
 				 *Then we add the tax to price if $price_with_tax is set to true
 				 */
-				$row_tax_multiplier = $this->getTaxClassRate($row['tax_class_id']);
-				$row['tax_class_title'] = zen_get_tax_class_title($row['tax_class_id']);
+				$row_tax_multiplier = $this->getTaxClassRate($row['products_tax_class_id']);
+				$row['tax_class_title'] = zen_get_tax_class_title($row['products_tax_class_id']);
 				if ($price_with_tax){
 					$row['products_price'] = round($row['products_price'] + ($row['products_price'] * $row_tax_multiplier / 100),2);
 				}
@@ -269,10 +263,10 @@ class EasyPopulateImport extends EasyPopulateProcess
 			//elari... we get the tax_clas_id from the tax_title - from zencart??
 			//on screen will still be displayed the tax_class_title instead of the id....
 			if (isset($tax_class_title)){
-				$tax_class_id = $this->getTaxTitleClassId($tax_class_title);
+				$products_tax_class_id = $this->getTaxTitleClassId($tax_class_title);
 			}
 
-			$row_tax_multiplier = $this->getTaxClassRate($tax_class_id);
+			$row_tax_multiplier = $this->getTaxClassRate($products_tax_class_id);
 
 			//And we recalculate price without the included tax...
 			//Since it seems display is made before, the displayed price will still include tax

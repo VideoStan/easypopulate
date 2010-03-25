@@ -18,7 +18,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 	private $columnEnclosure = '"';
 	private $lines = array();
 
-	function __construct($type = 'full')
+	public function setFormat($type = 'full')
 	{
 		if ($type == 'froogle') {
 			$this->columnDelimiter = "\t";
@@ -27,6 +27,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 		$this->type = $type;
 		$this->fileName = 'EP-' . $type . strftime('%Y%b%d-%H%M%S') . '.' . (($this->columnDelimiter == ',') ? 'csv' : 'txt');
 	}
+
 	public function run()
 	{
 		$ep_dltype = $this->type;
