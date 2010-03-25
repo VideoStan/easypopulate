@@ -217,6 +217,9 @@ class EPUploadStandard extends SplFileObject
 	{
 		foreach ($filelayout as &$column) {
 			$column = str_replace('v_', '', $column);
+			if ($column == 'status') $column = 'products_status';
+			if ($column == 'date_added') $column = 'products_date_added';
+			if ($column == 'date_avail') $column = 'products_date_available';
 		}
 		return array_flip($filelayout);
 	}

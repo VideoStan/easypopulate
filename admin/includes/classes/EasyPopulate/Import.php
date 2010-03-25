@@ -90,9 +90,9 @@ class EasyPopulateImport extends EasyPopulateProcess
 				p.products_sort_order,
 				p.products_quantity_order_min,
 				p.products_quantity_order_units,
-				p.products_date_added as date_added,
-				p.products_date_available as date_avail,
-				p.products_tax_class_id as tax_class_id,
+				p.products_date_added,
+				p.products_date_available,
+				p.products_tax_class_id,
 				p.products_quantity,
 				p.products_status,
 				p.manufacturers_id,
@@ -119,7 +119,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 				*/
 
 				// let's check and delete it if requested
-				if (isset($items['status']) && $items['status'] == 9) {
+				if (isset($items['products_status']) && $items['products_status'] == 9) {
 					$output_status = EASYPOPULATE_DISPLAY_RESULT_DELETED;
 					$output_class = 'success deleted';
 					$this->removeProductByModel($items['products_model']);
@@ -372,21 +372,21 @@ class EasyPopulateImport extends EasyPopulateProcess
 			$product = array();
 
 			$product['products_date_available'] = 'NOW()';
-			if (isset($date_avail) && !empty($date_avail)) {
-				$product['products_date_available'] = date('Y-m-d H:i:s', strtotime($date_avail));
+			if (isset($products_date_available) && !empty($products_date_available)) {
+				$product['products_date_available'] = date('Y-m-d H:i:s', strtotime($products_date_available));
 			}
 
-			if (isset($row['date_added'])) {
-				$product['products_date_added'] = $row['date_added'];
+			if (isset($row['products_date_added'])) {
+				$product['products_date_added'] = $row['products_date_added'];
 			} else {
-				$product['products_date_added'] = isset($date_added) && !empty($date_added) ? date("Y-m-d H:i:s",strtotime($date_added)) : 'NOW()';
+				$product['products_date_added'] = isset($products_date_added) && !empty($products_date_added) ? date("Y-m-d H:i:s",strtotime($products_date_added)) : 'NOW()';
 			}
 
-			if (!isset($status) || $status == '') {
-				$status = 1;
+			if (!isset($products_status) || $products_status == '') {
+				$products_status = 1;
 			}
 			if ($deactivate_on_zero_qty && $products_quantity == 0) {
-				$status = 0;
+				$products_status = 0;
 			}
 
 			$product['products_model']	= $products_model;
@@ -394,7 +394,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 			$product['products_price'] = $products_price;
 			$product['products_image'] = $products_image;
 			$product['products_weight'] = $products_weight;
-			$product['products_tax_class_id'] = $tax_class_id;
+			$product['products_tax_class_id'] = $products_tax_class_id;
 			if (isset($products_discount_type)) {
 				$product['products_discount_type'] = $products_discount_type;
 			}
@@ -413,7 +413,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 			$product['products_quantity']	= $products_quantity;
 			$product['master_categories_id'] = $categories_id;
 			$product['manufacturers_id'] = $manufacturers_id;
-			$product['products_status'] = $status;
+			$product['products_status'] = $products_status;
 			if (isset($metatags_title_status)) {
 				$product['metatags_title_status'] = $metatags_title_status;
 			}
