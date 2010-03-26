@@ -160,18 +160,9 @@ class EasyPopulateImport extends EasyPopulateProcess
 					}
 				}
 
-				/**
-				* retrieve current manufacturer name from db for this product if exist
-				*/
-				$row['manufacturers_name'] = '';
-				if (!empty($row['manufacturers_id'])) {
-					$sql2 = "SELECT manufacturers_name
-						FROM ".TABLE_MANUFACTURERS."
-						WHERE
-						manufacturers_id = " . $row['manufacturers_id'];
-					$result2 = ep_query($sql2);
-					$row2 =  mysql_fetch_array($result2);
-					$row['manufacturers_name'] = $row2['manufacturers_name'];
+				$row['v_manufacturers_name'] = '';
+				if (!empty($row['v_manufacturers_id'])) {
+					$row['v_manufacturers_name'] = $this->getManufacturerName($row['manufacturers_id']);
 				}
 
 				/**

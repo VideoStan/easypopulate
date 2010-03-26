@@ -46,6 +46,22 @@ class EasyPopulateProcess
 	}
 
 	/**
+	 * Get Manufacturer Name By ID
+	 *
+	 * @param int $id manufacturer id
+	 * @return string manufacturer name
+	 */
+	protected function getManufacturerName($id)
+	{
+		$sql = "SELECT manufacturers_name FROM ".TABLE_MANUFACTURERS."
+		WHERE manufacturers_id = " . zen_db_input($id);
+		$result = ep_query($sql);
+		$row =  mysql_fetch_array($result);
+		if (empty($row)) return '';
+		return $row['manufacturers_name'];
+	}
+
+	/**
 	 * Clean out newlines/carriage returns from products
 	 * and optionally apply a regular expression
 	 *
