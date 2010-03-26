@@ -143,9 +143,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 							// we have found the top level category for this item,
 							$thecategory_id = false;
 						}
-					} /*else {
-							$temprow['categories_name_' . $categorylevel] = '';
-					}*/
+					}
 				}
 
 				// temprow has the old style low to high level categories.
@@ -164,8 +162,6 @@ class EasyPopulateImport extends EasyPopulateProcess
 
 				/**
 				 * Get tax info for this product
-				 * We check the value of tax class and title instead of the id
-				 *Then we add the tax to price if $price_with_tax is set to true
 				 */
 				$row_tax_multiplier = $this->getTaxClassRate($row['products_tax_class_id']);
 				$row['tax_class_title'] = zen_get_tax_class_title($row['products_tax_class_id']);
@@ -182,14 +178,15 @@ class EasyPopulateImport extends EasyPopulateProcess
 				extract($row);
 			}
 			/**
-			* We have now set our PRODUCT_TABLE vars for existing products, and got our default descriptions & categories in $row still
-			* new products start here!
-			*/
+			 * We have now set our PRODUCT_TABLE vars for existing products, and got our default descriptions & categories in $row still
+			 *
+			 * New products start here!
+			 */
 
 			/**
-			* Data error checking
-			* inputs: $items; $filelayout; $product_is_new (no reliance on $row)
-			*/
+			 * Data error checking
+			 * inputs: $items; $filelayout; $product_is_new (no reliance on $row)
+			 */
 			if ($product_is_new == true) {
 				if (!zen_not_null(trim($items['categories_name_1']))) {
 					// let's skip this new product without a master category..
@@ -202,28 +199,29 @@ class EasyPopulateImport extends EasyPopulateProcess
 				if (!zen_not_null(trim($items['categories_name_1'])) && isset($filelayout['categories_name_1'])) {
 					// let's skip this existing product without a master category but has the column heading
 					// or should we just update it to result of $row (it's current category..)??
+					// @todo <johnny> If product exists and doesn't have a master category, use the current one
 					$output_class = 'fail';
 					$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
 					$output_message  = sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NOT_FOUND, '');
 					continue;
 				}
 			}
-			/*
-			* End data checking
-			**/
+			/**
+			 * End data checking
+			 */
 
 
 			/**
-			* langer - assign to our vars any new data from $items (from our file)
-			* output is: $products_model = "modelofthing", $products_description_1 = "descofthing", etc for each file heading
-			* any existing (default) data assigned above is overwritten here with the new vals from file
-			*/
+			 * langer - assign to our vars any new data from $items (from our file)
+			 * output is: $products_model = "modelofthing", $products_description_1 = "descofthing", etc for each file heading
+			 * any existing (default) data assigned above is overwritten here with the new vals from file
+			 */
 			extract($items);
 
 			// Modify a price based on the submitted price modifier
 			$products_price = $this->modifyPrice($products_price, $price_modifier);
 
-			//elari... we get the tax_clas_id from the tax_title - from zencart??
+			//elari... we get the tax_class_id from the tax_title - from zencart??
 			//on screen will still be displayed the tax_class_title instead of the id....
 			if (isset($tax_class_title)){
 				$products_tax_class_id = $this->getTaxTitleClassId($tax_class_title);
@@ -231,9 +229,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 
 			$row_tax_multiplier = $this->getTaxClassRate($products_tax_class_id);
 
-			//And we recalculate price without the included tax...
-			//Since it seems display is made before, the displayed price will still include tax
-			//This is same problem for the tax_class_id that display tax_class_title
+			// Recalculate price without the included tax
 			if ($price_with_tax) {
 				$products_price = round( $products_price / (1 + ( $row_tax_multiplier * $price_with_tax/100) ), 4);
 			}
@@ -244,12 +240,12 @@ class EasyPopulateImport extends EasyPopulateProcess
 
 			if (isset($filelayout['categories_name_1'])) { // does category 1 column exist in our file..
 
-				$category_strlen_long = false;// checks cat length does not exceed db, else exclude product from upload
+				$category_strlen_long = false;
 				$newlevel = 1;
 				for($categorylevel=6; $categorylevel>0; $categorylevel--) {
 					if (isset($items['categories_name_' . $categorylevel])) {
 						if (strlen($items['categories_name_' . $categorylevel]) > $category_strlen_max) $category_strlen_long = TRUE;
-						$categories_name[$newlevel++] = $items['categories_name_' . $categorylevel]; // adding the category name values to $categories_name array
+						$categories_name[$newlevel++] = $items['categories_name_' . $categorylevel];
 					}
 				}
 
@@ -261,15 +257,13 @@ class EasyPopulateImport extends EasyPopulateProcess
 				}
 			}
 
-			// OK, we need to convert the manufacturer's name into id's for the database
+			// Get manufacturer ID by name
 			if (isset($manufacturers_name) && !empty($manufacturers_name)) {
-				$sql = "SELECT man.manufacturers_id as manID
-					FROM ".TABLE_MANUFACTURERS." as man
-					WHERE
-						man.manufacturers_name = '" . zen_db_input($manufacturers_name) . "' LIMIT 1";
+				$sql = "SELECT manufacturers_id FROM ".TABLE_MANUFACTURERS."
+				WHERE manufacturers_name = '" . zen_db_input($manufacturers_name) . "' LIMIT 1";
 				$result = ep_query($sql);
-				if ( $row =  mysql_fetch_array($result) ){
-					$manufacturers_id = $row['manID'];
+				if ($row =  mysql_fetch_array($result)) {
+					$manufacturers_id = $row['manufacturers_id'];
 				} else {
 					$data = array();
 					$data['manufacturers_name'] = $manufacturers_name;
@@ -361,7 +355,6 @@ class EasyPopulateImport extends EasyPopulateProcess
 			if (isset($products_discount_type)) {
 				$product['products_discount_type'] = $products_discount_type;
 			}
-			// @todo make sure this will apply from a standard file
 			if (isset($products_discount_type_from)) {
 				$product['products_discount_type_from'] = $products_discount_type_from;
 			}
@@ -399,8 +392,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 					$product['products_upc'] = $products_upc;
 			}
 
-			if ($row = mysql_fetch_array($result)) {
-				//UPDATING PRODUCT
+			if ($row = mysql_fetch_array($result)) { //UPDATING PRODUCT
 				$products_id = $row['products_id'];
 
 				$query = ep_db_modify(TABLE_PRODUCTS, $product, 'UPDATE', "products_id = $products_id");
@@ -413,8 +405,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 					$output_status =  EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT_FAIL;
 					$output_message = EASYPOPULATE_DISPLAY_RESULT_SQL_ERROR;
 				}
-			} else {
-				//NEW PRODUCT
+			} else { //NEW PRODUCT
 				$query = ep_db_modify(TABLE_PRODUCTS, $product, 'INSERT');
 				if ( ep_query($query) ) {
 					$products_id = mysql_insert_id();
@@ -424,14 +415,14 @@ class EasyPopulateImport extends EasyPopulateProcess
 					$output_class = 'new fail';
 					$output_status = EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT_FAIL;
 					$output_message = EASYPOPULATE_DISPLAY_RESULT_SQL_ERROR;
-					continue; // langer - any new categories however have been created by now..Adding into product table needs to be 1st action?
+					continue; // @todo CHECKME langer - any new categories however have been created by now..Adding into product table needs to be 1st action?
 				}
 			}
 
 
-			//*************************
-			// Product Meta Start
-			//*************************
+			/**
+			 * Product Meta Start
+			 */
 			foreach ($metatags as $key => $metaData) {
 				$data = array();
 				$data['products_id'] = $products_id;
@@ -459,6 +450,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 			if (isset($items['products_discount_type']) && !empty($items['products_discount_type'])) {
 				$sql = "SELECT `products_id` FROM ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." WHERE (`products_id` = '$products_id') LIMIT 1 ";
 				$result = ep_query($sql);
+				// Easier to start over than try to update individual discounts
 				if ($row = mysql_fetch_array($result)) {
 					$sql = "DELETE FROM ".TABLE_PRODUCTS_DISCOUNT_QUANTITY." WHERE (`products_id` = '$products_id') ";
 					$result = ep_query($sql);
@@ -468,7 +460,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 					if (!isset($items['discount_price_' .$discount])) break;
 					if (empty($items['discount_qty_' .$discount])) continue;
 					if (empty($items['discount_price_' .$discount])) continue;
-					// Easier to start over than try to update individual discounts
+
 					$data = array();
 					$data['discount_id'] = $discount;
 					$data['products_id'] = $products_id;
@@ -504,9 +496,9 @@ class EasyPopulateImport extends EasyPopulateProcess
 						$result = ep_query($query);
 					}
 			}
-			//*************************
-			// Products Descriptions End
-			//*************************
+			/**
+			 * Products Descriptions End
+			 */
 
 			/**
 			 * Assign product to category if linked
