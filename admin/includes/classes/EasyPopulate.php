@@ -141,11 +141,13 @@ class EPFileUploadFactory
 		$query = "SELECT config FROM  " . TABLE_EASYPOPULATE_FEEDS . "
 					WHERE name = '" . zen_db_input($name) . "'";
 		$result = $db->Execute($query);
+		$defaultConfig = call_user_func_array(array(EPFileUploadFactory::get($name), 'defaultConfig'), array());
 		$config = array();
 		while (!$result->EOF) {
 			$config = json_decode($result->fields['config'], true);
 			$result->MoveNext();
 		}
+		$config = array_merge($defaultConfig, $config);
 		return $config;
 	}
 
@@ -206,6 +208,8 @@ class EPUploadStandard extends SplFileObject
 		$config['price_modifier'] = 0;
 		$config['image_path_prefix'] = '';
 		$config['tax_class_title'] = '';
+		$config['metatags_keywords'] = '';
+		$config['metatags_description'] = '';
 		return $config;
 	}
 
