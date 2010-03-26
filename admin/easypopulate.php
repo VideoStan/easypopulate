@@ -38,6 +38,7 @@ if (defined('EASYPOPULATE_CONFIG_VERSION')) { // EasyPopulate is installed
 	$tax_class_title = '';
 	$feed_url = '';
 	$metatags_keywords = '';
+	$metatags_description = '';
 	ep_update_handlers();
 	extract(EPFileUploadFactory::getConfig($import_handler), EXTR_OVERWRITE);
 }
@@ -143,6 +144,10 @@ if (isset($_POST['import'])) {
 
 	if (isset($_POST['metatags_keywords']) && !empty($_POST['metatags_keywords'])) {
 		$config['metatags_keywords'] = $_POST['metatags_keywords'];
+	}
+
+	if (isset($_POST['metatags_description']) && !empty($_POST['metatags_description'])) {
+		$config['metatags_description'] = $_POST['metatags_description'];
 	}
 
 	$fileInfo = new SplFileInfo($config['local_file']);
@@ -406,6 +411,10 @@ switch ($_GET['dross']) {
 				<div>
 				<label for="metatags_keywords">Meta Keywords Patterns</label>
 				<input type="text" class="config" id="metatags_keywords" name="metatags_keywords" size="50" value="<?php echo $metatags_keywords; ?>">
+				</div>
+				<div>
+				<label for="metatags_description">Meta Description Patterns</label>
+				<input type="text" class="config" id="metatags_description" name="metatags_description" size="50" value="<?php echo $metatags_description; ?>">
 				</div>
 				<div>
 				<label for="image_path_prefix">Image Path Prefix</label>

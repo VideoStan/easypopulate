@@ -305,6 +305,10 @@ class EPUploadStandard extends SplFileObject
 							$newvalue = $this->transformPlaceHolders($olditem, $this->transforms['metatags_keywords']);
 							$newvalue = trim(strip_tags($newvalue));
 						}
+						if (($column[1] == 'description') && isset($this->transforms['metatags_description']) && empty($newvalue)) {
+							$newvalue = $this->transformPlaceHolders($olditem, $this->transforms['metatags_description']);
+							$newvalue = trim(strip_tags($newvalue));
+						}
 
 						if (empty($newvalue)) break;
 						$metatags[$column[2]][$column[1]] = $newvalue; //indexed by language_id
