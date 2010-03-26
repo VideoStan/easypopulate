@@ -35,9 +35,6 @@ class EasyPopulateImport extends EasyPopulateProcess
 		$fileInfo->setFileClass(EPFileUploadFactory::get($import_handler));
 		$file = $fileInfo->openFile('r');
 
-		if ($column_delimiter == 'tab') {
-			$column_delimiter = "\t";
-		}
 		$file->setCsvControl($column_delimiter, stripslashes($column_enclosure));
 
 		// model name length error handling
