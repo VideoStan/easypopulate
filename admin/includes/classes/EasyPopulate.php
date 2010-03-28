@@ -123,7 +123,7 @@ class EPFileUploadFactory
 	public static function get($name)
 	{
 		$file = self::baseDirectory() . $name . '.php';
-		if ($name == 'Standard' || require($file)) {
+		if ($name == 'Standard' || require_once($file)) {
 			$classname = 'EPUpload' . $name;
 			return $classname;
 		}
