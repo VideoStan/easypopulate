@@ -254,24 +254,15 @@ class EasyPopulateImport extends EasyPopulateProcess
 				}
 			}
 
-			// Get manufacturer ID by name
-			if (isset($manufacturers_name) && !empty($manufacturers_name)) {
-				$sql = "SELECT manufacturers_id FROM ".TABLE_MANUFACTURERS."
-				WHERE manufacturers_name = '" . zen_db_input($manufacturers_name) . "' LIMIT 1";
-				$result = ep_query($sql);
-				if ($row =  mysql_fetch_array($result)) {
-					$manufacturers_id = $row['manufacturers_id'];
-				} else {
-					$data = array();
-					$data['manufacturers_name'] = $manufacturers_name;
-					$data['date_added'] = 'NOW()';
-					$data['last_modified'] = 'NOW()';
-					$query = ep_db_modify(TABLE_MANUFACTURERS, $data, 'INSERT');
-					$result = ep_query($query);
-					$manufacturers_id = mysql_insert_id();
-				}
-			} else {
-				$manufacturers_id = NULL;
+			$manufacturers_id = $this->getManufacturerIdByName($manufacturers_name);
+			if (empty($manufacturers_id)) {
+				$data = array();
+				$data['manufacturers_name'] = $manufacturers_name;
+				$data['date_added'] = 'NOW()';
+				$data['last_modified'] = 'NOW()';
+				$query = ep_db_modify(TABLE_MANUFACTURERS, $data, 'INSERT');
+				$result = ep_query($query);
+				$manufacturers_id = mysql_insert_id();
 			}
 
 			// if the categories names are set then try to update them
@@ -767,6 +758,48 @@ class EasyPopulateImport extends EasyPopulateProcess
 			$modifier = $price * ((int)$modifier / 100);
 		}
 		return $price += $modifier;
+	}
+
+	/**
+	 * Get table field defaults
+	 *
+	 * @param string $table
+	 * @return array array containing default values for each field in the table (field => value)
+	 */
+	protected function getTableDefaults($table)
+	{
+		if (isset($this->tableDefaults[$table])) {
+			return $this->taxClassIds[$table];
+		}
+		$query = 'SHOW COLUMNS FROM ' . $table;
+		$result = mysql_query($query);
+		if (!mysql_num_rows($result)) return array();
+		$defaults = array();
+		while ($row = mysql_fetch_assoc($result)) {
+			$defaults[$row['Field']] = $row['Default'];
+		}
+		$this->tableDefaults[$table] = $defaults;
+		return $defaults;
+	}
+
+	/**
+	 * Get manufacturer id by name
+	 *
+	 * @param name
+	 * @return int
+	 * @todo cache it?
+	 */
+	private function getManufacturerIdByName($name = '')
+	{
+		if (empty($name)) return NULL;
+		$id = NULL;
+		$query = "SELECT manufacturers_id FROM ".TABLE_MANUFACTURERS."
+		WHERE manufacturers_name = '" . zen_db_input($name) . "' LIMIT 1";
+		$result = ep_query($query);
+		if ($row =  mysql_fetch_array($result)) {
+			$id = $row['manufacturers_id'];
+		}
+		return $id;
 	}
 
 	/**
