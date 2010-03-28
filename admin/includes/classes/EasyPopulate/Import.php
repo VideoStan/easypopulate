@@ -155,10 +155,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 					}
 				}
 
-				$row['v_manufacturers_name'] = '';
-				if (!empty($row['v_manufacturers_id'])) {
-					$row['v_manufacturers_name'] = $this->getManufacturerName($row['manufacturers_id']);
-				}
+				$row['manufacturers_name'] = $this->getManufacturerName($row['manufacturers_id']);
 
 				/**
 				 * Get tax info for this product

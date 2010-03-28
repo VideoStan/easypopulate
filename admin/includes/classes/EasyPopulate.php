@@ -51,11 +51,12 @@ class EasyPopulateProcess
 	 * @param int $id manufacturer id
 	 * @return string manufacturer name
 	 */
-	protected function getManufacturerName($id)
+	protected function getManufacturerName($id = NULL)
 	{
-		$sql = "SELECT manufacturers_name FROM ".TABLE_MANUFACTURERS."
+		if (empty($id)) return '';
+		$query = "SELECT manufacturers_name FROM ".TABLE_MANUFACTURERS."
 		WHERE manufacturers_id = " . zen_db_input($id);
-		$result = ep_query($sql);
+		$result = ep_query($query);
 		$row =  mysql_fetch_array($result);
 		if (empty($row)) return '';
 		return $row['manufacturers_name'];
