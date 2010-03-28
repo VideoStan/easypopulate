@@ -433,11 +433,12 @@ class EPUploadStandard extends SplFileObject
 	 * @param string $delimiter
 	 * @param string $enclosure
 	 * @param string $escape
+	 * @todo bring back the escape argument to the parent method when we can depend on a higher php version
 	 */
 	public function setCsvControl($delimiter = ',', $enclosure = '"', $escape = '\\')
 	{
 		if ($delimiter == 'tab') $delimiter = "\t";
-		parent::setCsvControl($delimiter, $enclosure, $escape);
+		parent::setCsvControl($delimiter, $enclosure);
 	}
 }
 ?>
