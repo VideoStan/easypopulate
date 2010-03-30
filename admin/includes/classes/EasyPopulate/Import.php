@@ -44,6 +44,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 		$file->imagePathPrefix = $image_path_prefix;
 		$file->transforms['metatags_keywords'] = $metatags_keywords;
 		$file->transforms['metatags_description'] = $metatags_description;
+		$file->transforms['metatags_title'] = $metatags_title;
 
 
 		if ($filelayout = $file->getFileLayout()) {

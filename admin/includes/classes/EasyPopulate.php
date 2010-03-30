@@ -248,6 +248,7 @@ class EPUploadStandard extends SplFileObject
 		$config['tax_class_title'] = '';
 		$config['metatags_keywords'] = '';
 		$config['metatags_description'] = '';
+		$config['metatags_title'] = '';
 		return $config;
 	}
 
@@ -357,6 +358,7 @@ class EPUploadStandard extends SplFileObject
 					}
 					break;
 				case 'metatags': // only for title,description,keywords
+					// @todo don't hardcode which fields we can use with the placeholders
 					if (isset($column[2]) && is_numeric($column[2])) {
 						$newvalue = $value;
 						if (($column[1] == 'keywords') && isset($this->transforms['metatags_keywords']) && empty($newvalue)) {
@@ -367,7 +369,10 @@ class EPUploadStandard extends SplFileObject
 							$newvalue = $this->transformPlaceHolders($olditem, $this->transforms['metatags_description']);
 							$newvalue = trim(strip_tags($newvalue));
 						}
-
+						if (($column[1] == 'title') && isset($this->transforms['metatags_title']) && empty($newvalue)) {
+							$newvalue = $this->transformPlaceHolders($olditem, $this->transforms['metatags_title']);
+							$newvalue = trim(strip_tags($newvalue));
+						}
 						if (empty($newvalue)) break;
 						$metatags[$column[2]][$column[1]] = $newvalue; //indexed by language_id
 						break;
