@@ -110,49 +110,9 @@ class EasyPopulateImport extends EasyPopulateProcess
 					}
 				}
 
-				/**
-				 * START Categories
-				 * Start with v_categories_id
-				 * Get the category description
-				 * Set the appropriate variable name
-				 * If parent_id is not null, then follow it up.
-				 */
-				$thecategory_id = $row['categories_id'];// master category id
-
-				$temprow = array();
-				for($categorylevel=1; $categorylevel<$max_categories+1; $categorylevel++){
-					if (!empty($thecategory_id)){
-						$sql2 = "SELECT categories_name
-							FROM ".TABLE_CATEGORIES_DESCRIPTION."
-							WHERE
-								categories_id = " . $thecategory_id . " AND
-								language_id = " . $epdlanguage_id ;
-						$result2 = ep_query($sql2);
-						$row2 = mysql_fetch_array($result2);
-						$temprow['categories_name_' . $categorylevel] = $row2['categories_name'];
-						$sql3 = "SELECT parent_id
-							FROM ".TABLE_CATEGORIES."
-							WHERE categories_id = " . $thecategory_id;
-						$result3 = ep_query($sql3);
-						$row3 =  mysql_fetch_array($result3);
-						$theparent_id = $row3['parent_id'];
-						if ($theparent_id != ''){
-							// there was a parent ID, lets set $thecategory_id to get the next level
-							$thecategory_id = $theparent_id;
-						} else {
-							// we have found the top level category for this item,
-							$thecategory_id = false;
-						}
-					}
-				}
-
-				// temprow has the old style low to high level categories.
-				$newlevel = 1;
-				// let's turn them into high to low level categories
-				for( $categorylevel=$max_categories; $categorylevel>0; $categorylevel--){
-					if (isset($temprow['categories_name_' . $categorylevel])){
-						$row['categories_name_' . $newlevel++] = $temprow['categories_name_' . $categorylevel];
-					}
+				$categories = $this->getCategories($row['categories_id']);
+				foreach ($categories as $k => $v) {
+					$row['categories_name_' . ($k + 1)] = $categories[$k];
 				}
 
 				$row['manufacturers_name'] = $this->getManufacturerName($row['manufacturers_id']);
@@ -231,7 +191,6 @@ class EasyPopulateImport extends EasyPopulateProcess
 				$products_price = round( $products_price / (1 + ( $row_tax_multiplier * $price_with_tax/100) ), 4);
 			}
 
-			// if they give us one category, they give us all 6 categories
 			// @todo this does not appear to support more than 7 categories??
 			unset ($categories_name); // default to not set.
 
@@ -239,10 +198,13 @@ class EasyPopulateImport extends EasyPopulateProcess
 
 				$category_strlen_long = false;
 				$newlevel = 1;
-				for($categorylevel=6; $categorylevel>0; $categorylevel--) {
+				// @todo decouple import from max_categories altogether
+				for ($categorylevel = 10; $categorylevel>0; $categorylevel--) {
 					if (isset($items['categories_name_' . $categorylevel])) {
 						if (strlen($items['categories_name_' . $categorylevel]) > $category_strlen_max) $category_strlen_long = TRUE;
-						$categories_name[$newlevel++] = $items['categories_name_' . $categorylevel];
+						if (!empty($items['categories_name_' . $categorylevel])) {
+							$categories_name[$newlevel++] = $items['categories_name_' . $categorylevel];
+						}
 					}
 				}
 
@@ -270,7 +232,8 @@ class EasyPopulateImport extends EasyPopulateProcess
 				// start from the highest possible category and work our way down from the parent
 				$categories_id = 0;
 				$theparent_id = 0;
-				for ($categorylevel=$max_categories; $categorylevel>0; $categorylevel--) {
+				// @todo decouple import from max categories altogetherr
+				for ($categorylevel = 10; $categorylevel>0; $categorylevel--) {
 					if (isset($categories_name[$categorylevel])){
 						$thiscategoryname = $categories_name[$categorylevel];
 						// we found a category name in this field

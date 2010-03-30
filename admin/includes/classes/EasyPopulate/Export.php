@@ -650,65 +650,24 @@ class EasyPopulateExport extends EasyPopulateProcess
 				}
 			}
 			// END specials
-	
-			/**
-			 * We need to keep looping until we find the root category
-			 *
-			 * Start with v_categories_id
-			 * Get the category description
-			 * Set the appropriate variable name
-			 * If parent_id is not null, then follow it up.
-			 * We'll populate an array first, then decide where it goes in the layout
-			 */
+
 			if (isset($row['v_categories_id'])) {
-			$thecategory_id = $row['v_categories_id'];
-			$fullcategory = ''; // this will have the entire category stack for froogle
-			for( $categorylevel=1; $categorylevel<$max_categories+1; $categorylevel++){
-				if (!empty($thecategory_id)){
-					$sql2 = "SELECT categories_name
-						FROM ".TABLE_CATEGORIES_DESCRIPTION."
-						WHERE
-							categories_id = " . $thecategory_id . " AND
-							language_id = " . $epdlanguage_id ;
-					$result2 = ep_query($sql2);
-					$row2 =  mysql_fetch_array($result2);
-					// only set it if we found something
-					$temprow['v_categories_name_' . $categorylevel] = $row2['categories_name'];
-					// now get the parent ID if there was one
-					$sql3 = "SELECT parent_id
-						FROM ".TABLE_CATEGORIES."
-						WHERE
-							categories_id = " . $thecategory_id;
-					$result3 = ep_query($sql3);
-					$row3 =  mysql_fetch_array($result3);
-					$theparent_id = $row3['parent_id'];
-					if ($theparent_id != ''){
-						// there was a parent ID, lets set thecategoryid to get the next level
-						$thecategory_id = $theparent_id;
-					} else {
-						// we have found the top level category for this item,
-						$thecategory_id = false;
+				$categories = $this->getCategories($row['v_categories_id']);
+				$categories = array_slice($categories, 0, $max_categories, true);		
+				if ($ep_dltype == 'froogle') {
+					$fullcategory = ''; // @todo move to froogle output
+					foreach ($categories as $k => $v) {
+						$fullcategory .= $v . ' > ';
 					}
-					$fullcategory = $row2['categories_name'] . " > " . $fullcategory;
-				} else {
-					$temprow['v_categories_name_' . $categorylevel] = '';
+					// now trim off the last ">" from the category stack
+					$row['v_category_fullpath'] = substr($fullcategory,0,strlen($fullcategory)-3);
+				}
+				$categories = array_pad($categories, $max_categories, '');
+				foreach ($categories as $k => $v) {
+					$row['v_categories_name_' . ($k + 1)] = $categories[$k];
 				}
 			}
-	
-			// now trim off the last ">" from the category stack
-			$row['v_category_fullpath'] = substr($fullcategory,0,strlen($fullcategory)-3);
-	
-			// temprow has the old style low to high level categories.
-			$newlevel = 1;
-			// let's turn them into high to low level categories
-			for ($categorylevel= $max_categories; $categorylevel>0; $categorylevel--) {
-				if ($temprow['v_categories_name_' . $categorylevel] != ''){
-					$row['v_categories_name_' . $newlevel++] = $temprow['v_categories_name_' . $categorylevel];
-				} else {
-					$row['v_categories_name_' . $newlevel++] = '';
-				}
-			}
-			}
+
 			$row['v_manufacturers_name'] = '';
 			if (isset($filelayout['v_manufacturers_name'])){
 				$row['v_manufacturers_name'] = $this->getManufacturerName($row['v_manufacturers_id']);

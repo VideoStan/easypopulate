@@ -63,6 +63,43 @@ class EasyPopulateProcess
 	}
 
 	/**
+	 * Get product categories
+	 *
+	 * @param int $categoryId
+	 * @return array
+	 * @todo CHECKME: this method could use a rewrite, it is essentially the same as the original code
+	 */
+	protected function getCategories($categoryId)
+	{
+		$langId = ep_get_config('epdlanguage_id'); // @todo store this in EasyPopulateProcess
+		$categories = array();
+		for ($categorylevel=1; ; $categorylevel++) {
+			if (empty($categoryId)) break;
+			$query = "SELECT categories_name FROM ".TABLE_CATEGORIES_DESCRIPTION."
+			WHERE
+			categories_id = " . $categoryId . " AND
+			language_id = " . $langId;
+			$result = ep_query($query);
+			$row = mysql_fetch_array($result);
+			$categories[$categorylevel] = $row['categories_name'];
+
+			$query2 = "SELECT parent_id FROM ".TABLE_CATEGORIES."
+			WHERE categories_id = " . $categoryId;
+			$result2 = ep_query($query2);
+			$row2 =  mysql_fetch_array($result2);
+			$parentId = $row2['parent_id'];
+			if ($parentId != '') {
+				// there was a parent ID, lets set $categoryId to get the next level
+				$categoryId = $parentId;
+			} else {
+				// we have found the top level category for this item,
+				$categoryId = false;
+			}
+		}
+		return array_reverse($categories);
+	}
+
+	/**
 	 * Clean out newlines/carriage returns from products
 	 * and optionally apply a regular expression
 	 *
