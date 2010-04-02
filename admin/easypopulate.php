@@ -312,9 +312,33 @@ switch ($_GET['dross']) {
 	</style>
 </head>
 <body>
-<?php error_reporting($original_error_level); ?>
-<?php require(DIR_WS_INCLUDES . 'header.php'); ?>
-<?php error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3 ?>
+<?php
+error_reporting($original_error_level);
+require(DIR_WS_INCLUDES . 'header.php'); 
+error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
+// form defaults
+$max_file_size = min(ep_get_bytes(ini_get('upload_max_filesize')), ep_get_bytes(ini_get('post_max_size')));
+$price_modifier = 0;
+$image_path_prefix = '';
+$column_delimiter = ',';
+$column_enclosure = '"';
+$local_file = '';
+$tax_class_title = '';
+$feed_url = '';
+$metatags_keywords = '';
+$metatags_description = '';
+$metatags_title = '';
+if (defined('EASYPOPULATE_CONFIG_VERSION')) { // EasyPopulate is installed
+	ep_update_handlers();
+	$config = ep_get_config();
+	extract($config); // Brings all the configuration variables into the current symbol table
+	extract(EPFileUploadFactory::getConfig($import_handler), EXTR_OVERWRITE);
+	$chmod_check = is_dir($temp_path) && is_writable($temp_path);
+	if (!$chmod_check) {
+		ep_set_error('local_file', sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG));
+	}
+}
+?>
 <div id="ep_header">
 	<h2>Easy Populate <?php echo EASYPOPULATE_VERSION ?></h2>
 	<form id="installer" enctype="multipart/form-data" action="easypopulate.php" method="POST">
