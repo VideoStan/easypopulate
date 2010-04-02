@@ -20,34 +20,10 @@ if (!isset($_SESSION['easypopulate']['errors'])) {
 
 $output = array();
 
-if (defined('EASYPOPULATE_CONFIG_VERSION')) { // EasyPopulate is installed
-	$config = ep_get_config();
-	extract($config); // Brings all the configuration variables into the current symbol table
-
-	$chmod_check = is_dir($temp_path) && is_writable($temp_path);
-	if (!$chmod_check) {
-		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG), 'warning');
-	}
-	$max_file_size = min(ep_get_bytes(ini_get('upload_max_filesize')), ep_get_bytes(ini_get('post_max_size')));
-
-	$price_modifier = 0;
-	$image_path_prefix = '';
-	$column_delimiter = ',';
-	$column_enclosure = '"';
-	$local_file = '';
-	$tax_class_title = '';
-	$feed_url = '';
-	$metatags_keywords = '';
-	$metatags_description = '';
-	$metatags_title = '';
-	ep_update_handlers();
-	extract(EPFileUploadFactory::getConfig($import_handler), EXTR_OVERWRITE);
-}
-
 if (isset($_POST['installer'])) {
 	$f = $_POST['installer'] . '_easypopulate';
 	$f();
-	zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+	zen_redirect(zen_href_link('easypopulate.php'));
 	//$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_SUCCESS, 'success');
 }
 
@@ -81,7 +57,7 @@ if (isset($_GET['dltype'])) {
 	} else {
 		$export->saveFile();
 		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $export->fileName, ep_get_config('temp_path')), 'success');
-		zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+		zen_redirect(zen_href_link('easypopulate.php'));
 	}
 }
 
@@ -107,7 +83,7 @@ if (isset($_POST['import'])) {
 			$result_code = $_FILES['uploaded_file']['error'];
 			if ($result_code != UPLOAD_ERR_OK) {
 				ep_set_error('uploaded_file', ep_get_upload_error($result_code));
-				zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+				zen_redirect(zen_href_link('easypopulate.php'));
 			} else {
 				$config['local_file'] = ep_handle_uploaded_file($_FILES['uploaded_file']);
 			}
@@ -119,7 +95,7 @@ if (isset($_POST['import'])) {
 		if(!@copy($config['feed_url'], $config['local_file'])) {
 			$error = error_get_last();
 			ep_set_error('local_file', sprintf('Unable to save %s to %s because: %s', $config['feed_url'], $config['local_file'], $error['message']));
-			zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+			zen_redirect(zen_href_link('easypopulate.php'));
 		}
 	}
 
@@ -159,12 +135,12 @@ if (isset($_POST['import'])) {
 
 	if (!$fileInfo->isFile()) {
 		ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_NOT_EXIST, $fileInfo->getFileName()));
-		zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+		zen_redirect(zen_href_link('easypopulate.php'));
 	}
 
 	if (!$fileInfo->isReadable()) {
 		ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED, $fileInfo->getFileName()));
-		zen_redirect(zen_href_link(FILENAME_EASYPOPULATE));
+		zen_redirect(zen_href_link('easypopulate.php'));
 	}
 
 	$import = new EasyPopulateImport($config);
@@ -184,7 +160,7 @@ switch ($_GET['dross']) {
 	case !empty($GET['dross']): // we can choose a config option: check always, or only on clicking a button
 		$dross = EasyPopulateImport::getDross();
 		if (!empty($dross)) {
-			$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_DROSS_DETECTED, count($dross), zen_href_link(FILENAME_EASYPOPULATE, 'dross=delete')), 'caution');
+			$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_DROSS_DETECTED, count($dross), zen_href_link('easypopulate.php', 'dross=delete')), 'caution');
 		} else {
 			break;
 		}
