@@ -132,6 +132,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 			}
 	
 			$filelayout[] = 'v_specials_price';
+			$filelayout[] = 'v_specials_date_avail';
 			$filelayout[] = 'v_specials_expires_date';
 			$filelayout[] = 'v_products_price';
 	
