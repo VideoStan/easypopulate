@@ -316,6 +316,9 @@ class EasyPopulateImport extends EasyPopulateProcess
 			if (isset($products_sort_order)) {
 				$product['products_sort_order'] = $products_sort_order;
 			}
+			if (isset($products_qty_box_status)) {
+				$product['products_qty_box_status'] = $products_qty_box_status;
+			}
 			$product['products_quantity_order_min'] = $products_quantity_order_min;
 			$product['products_quantity_order_units'] = $products_quantity_order_units;
 			$product['products_quantity']	= $products_quantity;
