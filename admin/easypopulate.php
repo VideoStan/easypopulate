@@ -89,7 +89,7 @@ if (isset($_POST['import'])) {
 			}
 		}
 	}
-	$config['local_file'] = $temp_path . $config['local_file'];
+	$config['local_file'] = ep_get_config('temp_path') . $config['local_file'];
 	if (isset($_POST['remote_file']) && !empty($_POST['remote_file'])
 	&& !empty($config['local_file']) && isset($config['feed_url'])) {
 		if(!@copy($config['feed_url'], $config['local_file'])) {
