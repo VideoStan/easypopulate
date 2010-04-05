@@ -17,9 +17,10 @@ class EasyPopulateProcess
 
 	public function __construct(array $config = array())
 	{
+		$time_limit = ep_get_config('time_limit');
 		$this->config = $config;
-		@set_time_limit($config['time_limit']);
-		@ini_set('max_input_time', $config['time_limit']);	
+		@set_time_limit($time_limit);
+		@ini_set('max_input_time', $time_limit);	
 	}
 
 	/**

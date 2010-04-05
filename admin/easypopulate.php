@@ -44,7 +44,7 @@ if (isset($_POST['preset']) && !empty($_POST['preset'])) {
 if (isset($_GET['dltype'])) {
 	$dltype = !empty($_GET['dltype']) ? $_GET['dltype'] : 'full';
 
-	$export = new EasyPopulateExport($config);
+	$export = new EasyPopulateExport();
 	$export->setFormat($dltype);
 	$export->run();
 
