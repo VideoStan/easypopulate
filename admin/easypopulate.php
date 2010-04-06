@@ -9,6 +9,11 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  */
 require_once 'includes/application_top.php';
+$langdir = DIR_WS_CLASSES . 'EasyPopulate/lang/' . $_SESSION['language'] . '/';
+foreach (glob($langdir . '*php') as $langfile) {
+	include $langfile;
+}
+
 $original_error_level = error_reporting();
 error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
 if (!isset($_SESSION['easypopulate'])) {
