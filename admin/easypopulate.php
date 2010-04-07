@@ -205,6 +205,7 @@ switch ($_GET['dross']) {
 	<title><?php echo TITLE; ?> - Easy Populate</title>
 	<link rel="stylesheet" type="text/css" href="includes/stylesheet.css">
 	<link rel="stylesheet" type="text/css" href="includes/cssjsmenuhover.css" media="all" id="hoverJS">
+	<link rel="stylesheet" type="text/css" href="includes/classes/EasyPopulate/public/style.css" media="all" id="hoverJS">
 	<script language="javascript" type="text/javascript" src="includes/menu.js"></script>
 	<script language="javascript" type="text/javascript" src="includes/general.js"></script>
 	<script language="javascript" type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
@@ -266,55 +267,6 @@ switch ($_GET['dross']) {
 		});
 	});
 	</script>
-	<!--@todo: move this css to some other file -->
-	<style type="text/css">
-	#ep_header {
-		margin-top: 5px;
-		height: 25px;
-	}
-	#ep_header h2 {
-		display: inline;
-	}
-	#installer {
-		float: right;
-		margin-bottom: 0;
-	}
-
-	label {
-		font-weight: bold;
-		width: 23em;
-		float: left;
-	}
-
-	#uploaded_files {
-		display: none;
-	}
-
-	.results_table {
-		border-collapse: collapse;
-		border:1px solid #000;
-	}
-	.results_table th {
-		padding-right: 0.5em;
-		background-color: #D7D6CC;
-	}
-	.results_table tr.fail td.status {
-		color: #E68080;
-	}
-	.results_table tr.success td.status {
-		color: #599659;
-	}
-	td.status {
-		font-weight: bold;
-	}
-	.results_table tr.alt {
-		background-color: #E7E6E0;
-	}
-	.error {
-		color: red;
-		font-weight: bold;
-	}
-	</style>
 </head>
 <body>
 <?php
