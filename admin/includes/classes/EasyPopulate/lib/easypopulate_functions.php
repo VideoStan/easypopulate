@@ -202,7 +202,7 @@ function write_debug_log($string, $type = 'debug')
 	return;
 }
 
-function ep_query($query)
+function ep_query($query, $log = false)
 {
 	global $ep_stack_sql_error;
 	$result = mysql_query($query);
@@ -213,7 +213,7 @@ function ep_query($query)
 			$string = "MySQL error ".mysql_errno().": ".mysql_error()."\nWhen executing:\n$query\n";
 			write_debug_log($string, 'sql_errors');
 		}
-	} elseif (ep_get_config('log_queries')) {
+	} elseif (ep_get_config('log_queries') || $log) {
 		$string = "MySQL PASSED\nWhen executing:\n$query\n";
 		write_debug_log($string, 'queries');
 	}
