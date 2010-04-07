@@ -12,7 +12,7 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  * @todo document these functions
  */
-
+if (!defined('EASYPOPULATE_CONFIG_IMPORT_HANDLER')) define('EASYPOPULATE_CONFIG_IMPORT_HANDLER', 'Standard');
 define('EASYPOPULATE_VERSION', '3.9.5');
 /**
  * EasyPopulate extra configuration
@@ -289,11 +289,11 @@ function install_easypopulate()
 							'key' => 'EASYPOPULATE_CONFIG_TEMP_DIR',
 							'value' => 'tempEP/',
 							'description' => 'Name of directory for your uploads (default: tempEP/).');
-	$entries[] = array('title' => 'Default Upload File Format',
+	/*$entries[] = array('title' => 'Default Upload File Format',
 							'key' => 'EASYPOPULATE_CONFIG_IMPORT_HANDLER',
 							'value' => 'Standard',
 							'description' => 'Import File Handler (default: Standard).',
-							'set_function' => 'zen_cfg_select_option(EPFileUploadFactory::find(),');
+							'set_function' => 'zen_cfg_select_option(EPFileUploadFactory::find(),');*/
 	$entries[] = array('title' => 'Upload File Date Format',
 							'key' => 'EASYPOPULATE_CONFIG_FILE_DATE_FORMAT',
 							'value' => 'm-d-y',

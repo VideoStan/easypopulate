@@ -9,6 +9,7 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  */
 require_once 'includes/application_top.php';
+include DIR_WS_CLASSES . 'EasyPopulate/lib/easypopulate_functions.php';
 $langdir = DIR_WS_CLASSES . 'EasyPopulate/lang/' . $_SESSION['language'] . '/';
 foreach (glob($langdir . '*php') as $langfile) {
 	include $langfile;
