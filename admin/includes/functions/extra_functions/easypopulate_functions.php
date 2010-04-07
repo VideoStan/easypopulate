@@ -185,25 +185,6 @@ function ep_get_tax_class_titles()
 }
 
 /**
- * Print a table row of item values
- *
- * @param string $value
- * @
- */
-function print_el($value = '')
-{
-	return substr(strip_tags($value), 0, 10);
-}
-
-function ep_field_name_exists($tbl, $fld)
-{
-	if (zen_not_null(zen_field_type($tbl, $fld))) {
-		return true;
-	}
-	return false;
-}
-
-/**
  * Write debugging information to a log file
  *
  * @param string $string string to write to the log file
@@ -517,16 +498,4 @@ function ep_get_config($var = NULL)
 
 	return ep_get_config($var);
 }
-
-/**
-* The following functions are for testing purposes only
-*/
-// available zen functions of use..
-/*
-function zen_get_category_name($category_id, $language_id)
-function zen_get_category_description($category_id, $language_id)
-function zen_get_products_name($product_id, $language_id = 0)
-function zen_get_products_description($product_id, $language_id)
-function zen_get_products_model($products_id)
-*/
 ?>

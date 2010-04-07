@@ -277,7 +277,7 @@ error_reporting(E_ALL ^ E_DEPRECATED);
 						<td class="message"><?php echo $item['message'] ?></td>
 						<?php foreach ($item['data'] as $data) { ?>
 							<?php if (!is_array($data)) { ?>
-								<td><?php echo print_el($data); ?></td>
+								<td><?php echo substr(strip_tags($data), 0, 10); ?></td>
 							<?php } ?>
 						<?php } ?>
 					</tr>
@@ -303,7 +303,7 @@ error_reporting(E_ALL ^ E_DEPRECATED);
 						<td class="status"><?php echo $item['status'] ?></td>
 						<td class="message"><?php echo $item['message'] ?></td>
 						<?php foreach ($item['data'] as $data) { ?>
-							<td><?php echo print_el($data); ?></td>
+							<td><?php echo substr(strip_tags($data), 0, 10); ?></td>
 						<?php } ?>
 					</tr>
 				<?php } ?>
