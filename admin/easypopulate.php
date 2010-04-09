@@ -187,18 +187,10 @@ switch ($_GET['dross']) {
 		}
 		break;
 }
+
 /**
- * Changes planned for GUI
- * @todo <johnny> process data via xhr method
- * @todo <johnny> show results via xhr method
- * @todo <langer> 1 input field for local and server updating
- * @todo <langer> default to update directly from HDD, with option to upload to temp, or update from temp
- * @todo <langer> List temp files with delete, etc options
- * @todo <langer> Auto detecting of mods - display list of (only) installed mods, with check-box to include in download
- * @todo <langer> may consider an auto-splitting feature if it can be done.
- *     Will detect speed of server, safe_mode etc and determine what splitting level is required (can be over-ridden of course)
+ * GUI defaults
  */
-// form defaults
 $max_file_size = min(ep_get_bytes(ini_get('upload_max_filesize')), ep_get_bytes(ini_get('post_max_size')));
 $price_modifier = 0;
 $image_path_prefix = '';

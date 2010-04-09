@@ -122,11 +122,14 @@ Important:
 * Add dates to specials summary. Put summary data (prices) in same order as in downloads file
 * investigate gzip compression for uploads and downloads
 * optimisation of code to reduce sql calls?
+* process data via xhr method
+* show results via xhr method
+* auto detecting of mods - display list of (only) installed mods, with check-box to include in download
+* consider an auto-splitting feature if it can be done.
 
 Can wait:
 
 * Dual Price Mod support? Maybe I should just write a real-time discount by user-group mod..
-* if upload file not exist, error.
 * Revamp downloads layout for modular construction - makes little sense to have multiple configs
 * Add options to either hide/delete products removed from supplier's list instead of just deleting them
 * Feasibility of addition to smart-tags for creating unordered lists based on occurance of blank lines & bullets, asterisks etc.
