@@ -217,6 +217,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 				}
 			}
 
+			if (!isset($manufacturers_name)) $manufacturers_name = NULL; 
 			$manufacturers_id = $this->getManufacturerIdByName($manufacturers_name);
 			if (empty($manufacturers_id)) {
 				$data = array();
