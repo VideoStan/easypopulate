@@ -9,10 +9,10 @@
  *
  * @package easypopulate
  * @author langer
- * @copyright 2003
- * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Publice License (v2 only)
+ * @copyright 2003-2010
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  */
-if (file_exists(DIR_FS_ADMIN . 'easypopulate.php')) {
+if (file_exists(DIR_WS_CLASSES . 'EasyPopulate/easypopulate.php')) {
 	if (!defined('BOX_TOOLS_EASYPOPULATE')) {
 		define('BOX_TOOLS_EASYPOPULATE', 'Easy Populate');
 	}
