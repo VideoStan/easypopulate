@@ -60,6 +60,7 @@ class EPUploadEvertek extends EPUploadStandard
 		$filelayout[10] = 'products_weight';
 		$filelayout[12] = 'products_image';
 		$filelayout[13] = 'manufacturers_name';
+		$filelayout[15] = 'categories_name_1';
 		$filelayout = array_flip($filelayout);
 		return $filelayout;
 	}
