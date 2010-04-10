@@ -96,8 +96,6 @@ define('EASYPOPULATE_CONFIG_ADV_SMART_TAGS_LIST', serialize(
 	)
 ));
 
-require_once DIR_WS_CLASSES . 'EasyPopulate.php';
-
 function ep_handle_uploaded_file($file)
 {
 	$target = '';
