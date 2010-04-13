@@ -419,7 +419,7 @@ function ep_update_handlers()
 	global $db;
 
 	$query = "SELECT name FROM " . TABLE_EASYPOPULATE_FEEDS;
-	$result = ep_query($query);
+	$result = mysql_query($query);
 
 	$handlers_db = array();
 	while ($row = mysql_fetch_array($result)) {
