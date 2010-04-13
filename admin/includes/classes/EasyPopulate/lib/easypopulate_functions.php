@@ -212,7 +212,7 @@ function ep_query($query, $log = false)
 			write_debug_log($string, 'sql_errors');
 		}
 	} elseif (ep_get_config('log_queries') || $log) {
-		$string = "MySQL PASSED\nWhen executing:\n$query\n";
+		$string = $query ."\n";
 		write_debug_log($string, 'queries');
 	}
 	return $result;
