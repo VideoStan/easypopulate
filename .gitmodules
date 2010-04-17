@@ -1,0 +1,3 @@
+[submodule "admin/includes/classes/EasyPopulate/lib/fitzgerald"]
+	path = admin/includes/classes/EasyPopulate/lib/fitzgerald
+	url = git://github.com/jrobeson/fitzgerald.git
