@@ -8,16 +8,37 @@
  * @copyright 200?-2010
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  */
-require_once 'includes/application_top.php';
-require DIR_WS_CLASSES . 'EasyPopulate/lib/EasyPopulate.php'; 
+//require_once 'includes/application_top.php';
+/**
+ * Capture header and footer since they must be included in the global
+ * scope so all zencart variables are available to them
+ * 
+ * Rewrite the header/footer urls so they point to the right place
+ */
+$replace = array();
+$replace['/admin/easypopulate.php/'] = '';
+$replace['="images/'] = '="../images/';
+$replace['="includes/languages'] = '="../includes/languages';
+ob_start();
+require DIR_WS_INCLUDES . 'header.php';
+$header = ob_get_clean();
+ob_start();
+require DIR_WS_INCLUDES . 'footer.php';
+$footer = ob_get_clean();
+$header = str_replace(array_keys($replace), array_values($replace), $header);
+$footer = str_replace(array_keys($replace), array_values($replace), $footer);
+
+$original_error_level = error_reporting();
+error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
+
+require DIR_WS_CLASSES . 'EasyPopulate/lib/EasyPopulate.php';
 include DIR_WS_CLASSES . 'EasyPopulate/lib/easypopulate_functions.php';
+require DIR_WS_CLASSES . 'EasyPopulate/lib/fitzgerald/lib/fitzgerald.php';
 $langdir = DIR_WS_CLASSES . 'EasyPopulate/lang/' . $_SESSION['language'] . '/';
 foreach (glob($langdir . '*php') as $langfile) {
 	include $langfile;
 }
 
-$original_error_level = error_reporting();
-error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
 if (!isset($_SESSION['easypopulate'])) {
 	$_SESSION['easypopulate'] = array();
 }
@@ -25,153 +46,106 @@ if (!isset($_SESSION['easypopulate']['errors'])) {
 	$_SESSION['easypopulate']['errors'] = array();
 }
 
-$output = array();
-
-if (isset($_POST['installer'])) {
-	$f = $_POST['installer'] . '_easypopulate';
-	$f();
-	zen_redirect(zen_href_link('easypopulate.php'));
-	//$messageStack->add(EASYPOPULATE_MSGSTACK_INSTALL_SUCCESS, 'success');
-}
-
-if (isset($_GET['preset']) && !empty($_GET['preset'])) {
-	echo json_encode(EPFileUploadFactory::getConfig($_GET['preset']));
-	error_reporting($original_error_level);
-	exit();
-}
-
-if (isset($_POST['preset']) && !empty($_POST['preset'])) {
-	if (isset($_POST['config']) && is_array($_POST['config'])) {
-		EPFileUploadFactory::setConfig($_POST['preset'], $_POST['config']);
-	}
-	error_reporting($original_error_level);
-	exit();
-}
-
-if (isset($_GET['dltype'])) {
-	$dltype = !empty($_GET['dltype']) ? $_GET['dltype'] : 'full';
-
-	$export = new EasyPopulateExport();
-	$export->setFormat($dltype);
-	$export->run();
-
-	$ep_dlmethod = isset($_GET['download']) ? $_GET['download'] : 'stream';
-
-	if ($ep_dlmethod == 'stream') {
-		$export->streamFile();
-		error_reporting($original_error_level);
-		exit();
-	} else {
-		$export->saveFile();
-		$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $export->fileName, ep_get_config('temp_path')), 'success');
-		zen_redirect(zen_href_link('easypopulate.php'));
-	}
-}
-
-//*******************************
-// UPLOADING OF FILES STARTS HERE
-//*******************************
-if (isset($_POST['import'])) {
-	$config = array();
-	$config['import_handler'] = ep_get_config('import_handler');
-	if (isset($_POST['import_handler']) && !empty($_POST['import_handler'])) {
-		$config['import_handler'] = $_POST['import_handler'];
+class EasyPopulate extends Fitzgerald
+{
+	public $originalErrorLevel;
+	
+	public function __construct($options = array())
+	{
+		parent::__construct($options);
 	}
 
-	$saved_config = EPFileUploadFactory::getConfig($config['import_handler']);
-	$config = array_merge($saved_config, $config);
-
-	if (isset($_POST['local_file']) && !empty($_POST['local_file'])) {
-		$config['local_file'] = $_POST['local_file'];
+	protected function views()
+	{
+		$views = parent::views();
+		array_unshift($views, dirname(__FILE__) . '/');
+		return $views;
 	}
 
-	if (isset($_FILES['uploaded_file'])) {
-		if (!empty($_FILES['uploaded_file']['type'])) {
-			$result_code = $_FILES['uploaded_file']['error'];
-			if ($result_code != UPLOAD_ERR_OK) {
-				ep_set_error('uploaded_file', ep_get_upload_error($result_code));
-				zen_redirect(zen_href_link('easypopulate.php'));
-			} else {
-				$config['local_file'] = ep_handle_uploaded_file($_FILES['uploaded_file']);
+	public function get_index()
+	{
+		$tpl = array();
+
+		if (defined('EASYPOPULATE_CONFIG_VERSION')) {
+			$config = ep_get_config();
+			$chmod_check = is_dir($config['temp_path']) && is_writable($config['temp_path']);
+			if (!$chmod_check) {
+				ep_set_error('local_file', sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $config['temp_path'], DIR_FS_CATALOG));
 			}
+			ep_update_handlers();
+			$config = ep_get_config();
+
+		}
+		return $this->render('main');
+	}
+
+	public function post_installer()
+	{
+		if (!is_null($this->request->action)) {
+			$f = $this->request->action . '_easypopulate';
+			$f();
+			// @todo return true or false from the installer so we can print an error message
+			//$this->session->installSuccess = EASYPOPULATE_MSGSTACK_INSTALL_SUCCESS;
+		}
+		$this->redirect('/');
+	}
+	
+	public function get_preset($config)
+	{
+		echo json_encode(EPFileUploadFactory::getConfig($config));
+		error_reporting($this->originalErrorLevel);
+		exit();	
+	}
+
+	public function post_preset()
+	{
+		if (!is_null($this->request->preset) && !is_null($this->request->config)) {
+			EPFileUploadFactory::setConfig($this->request->preset, $this->request->config);
+		}
+		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
+		error_reporting($this->originalErrorLevel);
+		exit();
+	}
+
+	public function get_export_page()
+	{
+		return $this->render('export', ep_get_config());
+	}
+
+	public function get_export($format = 'full', $download = 'stream')
+	{
+		$export = new EasyPopulateExport();
+		$export->setFormat($format);
+		$export->run();
+
+		if ($download == 'stream') {
+			$export->streamFile();
+			if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
+			error_reporting($this->originalErrorLevel);
+			exit();
+		} else {
+			$export->saveFile();
+			//$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $export->fileName, ep_get_config('temp_path')), 'success');
+			if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
+			$this->redirect('/export');
 		}
 	}
-	$config['local_file'] = ep_get_config('temp_path') . $config['local_file'];
-	if (isset($_POST['remote_file']) && !empty($_POST['remote_file'])
-	&& !empty($config['local_file']) && isset($config['feed_url'])) {
-		if(!@copy($config['feed_url'], $config['local_file'])) {
-			$error = error_get_last();
-			ep_set_error('local_file', sprintf('Unable to save %s to %s because: %s', $config['feed_url'], $config['local_file'], $error['message']));
-			zen_redirect(zen_href_link('easypopulate.php'));
-		}
-	}
-
-	if (isset($_POST['column_delimiter']) && !empty($_POST['column_delimiter'])) {
-		$config['column_delimiter'] = $_POST['column_delimiter'];
-	}
-
-	if (isset($_POST['column_enclosure']) && !empty($_POST['column_enclosure'])) {
-		$config['column_enclosure'] = $_POST['column_enclosure'];
-	}
-
-	if (isset($_POST['price_modifier']) && !empty($_POST['price_modifier'])) {
-		$config['price_modifier'] = $_POST['price_modifier'];
-	}
-
-	if (isset($_POST['image_path_prefix']) && !empty($_POST['image_path_prefix'])) {
-		$config['image_path_prefix'] = $_POST['image_path_prefix'];
-	}
-
-	if (isset($_POST['tax_class_title']) && !empty($_POST['tax_class_title'])) {
-		$config['tax_class_title'] = $_POST['tax_class_title'];
-	}
-
-	if (isset($_POST['metatags_keywords']) && !empty($_POST['metatags_keywords'])) {
-		$config['metatags_keywords'] = $_POST['metatags_keywords'];
-	}
-
-	if (isset($_POST['metatags_description']) && !empty($_POST['metatags_description'])) {
-		$config['metatags_description'] = $_POST['metatags_description'];
-	}
-
-	if (isset($_POST['metatags_title']) && !empty($_POST['metatags_title'])) {
-		$config['metatags_title'] = $_POST['metatags_title'];
-	}
-
-	$fileInfo = new SplFileInfo($config['local_file']);
-
-	if (!$fileInfo->isFile()) {
-		ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_NOT_EXIST, $fileInfo->getFileName()));
-		zen_redirect(zen_href_link('easypopulate.php'));
-	}
-
-	if (!$fileInfo->isReadable()) {
-		ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED, $fileInfo->getFileName()));
-		zen_redirect(zen_href_link('easypopulate.php'));
-	}
-
-	$import = new EasyPopulateImport($config);
-	$output = $import->run($fileInfo);
-	$output['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $fileInfo->getFileName(), $fileInfo->getSize());
-}
-
-if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
-
-/**
-* this is a rudimentary date integrity check for references to any non-existant product_id entries
-* this check ought to be last, so it checks the tasks just performed as a quality check of EP...
-* @todo langer  data present in table products, but not in descriptions.. user will need product info, and decide to add description, or delete product
-*/
-if (!isset($_GET['dross'])) $_GET['dross'] = 'check';
-switch ($_GET['dross']) {
-	case !empty($GET['dross']): // we can choose a config option: check always, or only on clicking a button
+	
+	/**
+    * This is a rudimentary date integrity check for references to any non-existant product_id entries
+	 * this check ought to be last, so it checks the tasks just performed as a quality check of EP...
+	 * @todo langer  data present in table products, but not in descriptions.. user will need product info, and decide to add description, or delete product
+	 */
+	public function get_dross()
+	{
 		$dross = EasyPopulateImport::getDross();
 		if (!empty($dross)) {
-			$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_DROSS_DETECTED, count($dross), zen_href_link('easypopulate.php', 'dross=delete')), 'caution');
-		} else {
-			break;
+			//$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_DROSS_DETECTED, count($dross), zen_href_link('easypopulate.php', 'dross=delete')), 'caution');
 		}
-	case 'delete':
+	}
+	
+	public function post_dross()
+	{
 		EasyPopulateImport::purgeDross($dross);
 		// now check it is really gone...
 		$dross = EasyPopulateImport::getDross();
@@ -182,37 +156,160 @@ switch ($_GET['dross']) {
 			}
 			$string .= "It is recommended that you delete this corrupted data using phpMyAdmin.\n\n";
 			write_debug_log($string, 'dross');
-			$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_FAIL, 'caution');
+			//$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_FAIL, 'caution');
 		} else {
-			$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_SUCCESS, 'success');
+			//$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_SUCCESS, 'success');
 		}
-		break;
-}
+		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');	
+	}
 
-/**
- * GUI defaults
- */
-$max_file_size = min(ep_get_bytes(ini_get('upload_max_filesize')), ep_get_bytes(ini_get('post_max_size')));
-$price_modifier = 0;
-$image_path_prefix = '';
-$column_delimiter = ',';
-$column_enclosure = '"';
-$local_file = '';
-$tax_class_title = '';
-$feed_url = '';
-$metatags_keywords = '';
-$metatags_description = '';
-$metatags_title = '';
-if (defined('EASYPOPULATE_CONFIG_VERSION')) { // EasyPopulate is installed
-	ep_update_handlers();
-	$config = ep_get_config();
-	extract($config); // Brings all the configuration variables into the current symbol table
-	extract(EPFileUploadFactory::getConfig($import_handler), EXTR_OVERWRITE);
-	$chmod_check = is_dir($temp_path) && is_writable($temp_path);
-	if (!$chmod_check) {
-		ep_set_error('local_file', sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $temp_path, DIR_FS_CATALOG));
+	private function getImportTplVars()
+	{
+		$tpl = array();
+		$tpl['max_file_size'] = min(ep_get_bytes(ini_get('upload_max_filesize')), ep_get_bytes(ini_get('post_max_size')));
+		$tpl['price_modifier'] = 0;
+		$tpl['image_path_prefix'] = '';
+		$tpl['column_delimiter'] = ',';
+		$tpl['column_enclosure'] = '"';
+		$tpl['local_file'] = '';
+		$tpl['tax_class_title'] = '';
+		$tpl['feed_url'] = '';
+		$tpl['metatags_keywords'] = '';
+		$tpl['metatags_description'] = '';
+		$tpl['metatags_title'] = '';
+		$config = ep_get_config();
+		$tpl = array_merge($tpl, $config);
+		$tpl = array_merge($tpl, EPFileUploadFactory::getConfig($tpl['import_handler']));
+		return $tpl;
+	}
+
+	public function get_import()
+	{
+		$tpl = $this->getImportTplVars();
+		return $this->render('import', $tpl);
+	}
+
+	public function post_import()
+	{
+		$config = array();
+		$config['import_handler'] = ep_get_config('import_handler');
+		if (!is_null($this->request->import_handler)) {
+			$config['import_handler'] = $this->request->import_handler;
+		}
+	
+		$saved_config = EPFileUploadFactory::getConfig($config['import_handler']);
+		$config = array_merge($saved_config, $config);
+	
+		if (!is_null($this->request->local_file)) {
+			$config['local_file'] = $this->request->local_file;
+		}
+	
+		if (isset($_FILES['uploaded_file'])) {
+			if (!empty($_FILES['uploaded_file']['type'])) {
+				$result_code = $_FILES['uploaded_file']['error'];
+				if ($result_code != UPLOAD_ERR_OK) {
+					ep_set_error('uploaded_file', ep_get_upload_error($result_code));
+					$this->redirect('/import');
+				} else {
+					$config['local_file'] = ep_handle_uploaded_file($_FILES['uploaded_file']);
+				}
+			}
+		}
+		$config['local_file'] = ep_get_config('temp_path') . $config['local_file'];
+		if (!is_null($this->request->remote_file) && !empty($config['local_file']) && isset($config['feed_url'])) {
+			if(!@copy($config['feed_url'], $config['local_file'])) {
+				$error = error_get_last();
+				ep_set_error('local_file', sprintf('Unable to save %s to %s because: %s', $config['feed_url'], $config['local_file'], $error['message']));
+				$this->redirect('/import');
+			}
+		}
+	
+		if (!is_null($this->request->column_delimiter)) {
+			$config['column_delimiter'] = $this->request->column_delimiter;
+		}
+	
+		if (!is_null($this->request->column_enclosure)) {
+			$config['column_enclosure'] = $this->request->column_enclosure;
+		}
+
+		if (!is_null($this->request->price_modifier)) {
+			$config['price_modifier'] = $this->request->price_modifier;
+		}
+	
+		if (!is_null($this->request->image_path_prefix)) {
+			$config['image_path_prefix'] = $this->request->image_path_prefix;
+		}
+	
+		if (!is_null($this->request->tax_class_title)) {
+			$config['tax_class_title'] = $this->request->tax_class_title;
+		}
+	
+		if (!is_null($this->request->metatags_keywords)) {
+			$config['metatags_keywords'] = $this->request->metatags_keywords;
+		}
+	
+		if (!is_null($this->request->metatags_description)) {
+			$config['metatags_description'] = $this->request->metatags_description;
+		}
+	
+		if (!is_null($this->request->metatags_title)) {
+			$config['metatags_title'] = $this->request->metatags_title;
+		}
+	
+		$fileInfo = new SplFileInfo($config['local_file']);
+	
+		if (!$fileInfo->isFile()) {
+			ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_NOT_EXIST, $fileInfo->getFileName()));
+			$this->redirect('/import');
+		}
+	
+		if (!$fileInfo->isReadable()) {
+			ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED, $fileInfo->getFileName()));
+			$this->redirect('/import');
+		}
+	
+		$import = new EasyPopulateImport($config);
+		$tpl = $this->getImportTplVars();
+		$tpl['local_file'] = $this->request->local_file;
+		$tpl['output'] = $import->run($fileInfo);
+		$tpl['import'] = $import;
+		$tpl['output']['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $fileInfo->getFileName(), $fileInfo->getSize());
+		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
+		$tpl = array_merge($tpl, $config);
+		return $this->render('import', $tpl);
+	}
+	
+	public function handleError($number, $message, $file = '', $line = 0)
+	{
+		// a proper resource isn't always available to RecordCount() in queryFactoryResult
+		// @todo find a way just ignore that one
+		if ($message == 'mysql_num_rows() expects parameter 1 to be resource, boolean given') return;
+		return parent::handleError($number, $message, $file, $line);
 	}
 }
-include DIR_WS_CLASSES . 'EasyPopulate/views/layout.php';
-require(DIR_WS_INCLUDES . 'application_bottom.php');
+
+	$app->originalErrorLevel = $original_error_level;
+
+	$app = new EasyPopulate(array(
+	'errorLevel' => error_reporting(), 
+	'layout' => 'layout',
+	'header' =>  $header,
+	'footer' => $footer,
+	'sessions' => false, // We use zencart's sessions
+	'mountPoint' => '/admin/easypopulate.php'));
+
+	$app->get('/', 'get_index');
+	$app->post('/installer', 'post_installer');
+	$app->get('/preset/:config', 'get_preset');
+	$app->post('/preset', 'post_preset');
+	$app->get('/export', 'get_export_page');
+	$app->get('/export/:format/:download', 'get_export');
+
+	$app->get('/dross', 'get_dross');
+	$app->post('/dross', 'post_dross');
+	$app->get('/import', 'get_import');
+	$app->post('/import', 'post_import');
+
+	$app->run();
+	require(DIR_WS_INCLUDES . 'application_bottom.php');
 ?>
