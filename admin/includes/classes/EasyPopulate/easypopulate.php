@@ -34,10 +34,6 @@ error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in p
 require DIR_WS_CLASSES . 'EasyPopulate/lib/EasyPopulate.php';
 include DIR_WS_CLASSES . 'EasyPopulate/lib/easypopulate_functions.php';
 require DIR_WS_CLASSES . 'EasyPopulate/lib/fitzgerald/lib/fitzgerald.php';
-$langdir = DIR_WS_CLASSES . 'EasyPopulate/lang/' . $_SESSION['language'] . '/';
-foreach (glob($langdir . '*php') as $langfile) {
-	include $langfile;
-}
 
 if (!isset($_SESSION['easypopulate'])) {
 	$_SESSION['easypopulate'] = array();
@@ -53,6 +49,14 @@ class EasyPopulate extends Fitzgerald
 	public function __construct($options = array())
 	{
 		parent::__construct($options);
+		$language = 'english';
+		if (!is_null($this->session->language)) {
+			$language = $this->session->language;
+		}
+		$langDir = dirname( __FILE__) . '/lang/' . $language . '/';
+		foreach (glob($langDir . '*php') as $langFile) {
+			if (is_readable($langFile)) include $langFile;
+		}
 	}
 
 	protected function views()
