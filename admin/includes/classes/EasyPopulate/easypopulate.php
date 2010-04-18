@@ -288,8 +288,6 @@ class EasyPopulate extends Fitzgerald
 	}
 }
 
-	$app->originalErrorLevel = $original_error_level;
-
 	$app = new EasyPopulate(array(
 	'errorLevel' => error_reporting(), 
 	'layout' => 'layout',
@@ -297,6 +295,7 @@ class EasyPopulate extends Fitzgerald
 	'footer' => $footer,
 	'sessions' => false, // We use zencart's sessions
 	'mountPoint' => '/admin/easypopulate.php'));
+	$app->originalErrorLevel = $original_error_level;
 
 	$app->get('/', 'get_index');
 	$app->post('/installer', 'post_installer');
@@ -311,5 +310,9 @@ class EasyPopulate extends Fitzgerald
 	$app->post('/import', 'post_import');
 
 	$app->run();
+	
+	// Go back to zencart's error handling
+	error_reporting($original_error_level);
+	restore_error_handler();
 	require(DIR_WS_INCLUDES . 'application_bottom.php');
 ?>
