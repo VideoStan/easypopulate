@@ -1,3 +1,6 @@
 [submodule "admin/includes/classes/EasyPopulate/lib/fitzgerald"]
 	path = admin/includes/classes/EasyPopulate/lib/fitzgerald
 	url = git://github.com/jrobeson/fitzgerald.git
+[submodule "admin/includes/classes/EasyPopulate/public/form"]
+	path = admin/includes/classes/EasyPopulate/public/form
+	url = git://github.com/malsup/form.git
