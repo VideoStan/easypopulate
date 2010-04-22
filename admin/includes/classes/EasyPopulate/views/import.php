@@ -1,5 +1,14 @@
-<form id="import_form" enctype="multipart/form-data" action="/admin/easypopulate.php/import" method="POST">
+<form id="upload_form" enctype="multipart/form-data" action="/admin/easypopulate.php/upload" method="POST">
 	<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $max_file_size ?>">
+		<div>
+		<label for="uploaded_file">Upload EP File</label>
+		<input id="uploaded_file" name="uploaded_file" type="file" size="50">
+		<input type="submit" value="Upload">
+		<p class="message"><?php echo ep_get_error('uploaded_file'); ?></p>
+		</div>
+</form>
+
+<form id="import_form" enctype="multipart/form-data" action="/admin/easypopulate.php/import" method="POST">
 	<input type="hidden" name="import" value="1">
 	<fieldset>
 		<legend>Import delimited files</legend>
@@ -10,11 +19,6 @@
 			$handlers[] = array('id' => $v, 'text' => $v);
 		} ?>
 		<?php echo zen_draw_pull_down_menu('import_handler', $handlers, $import_handler, 'id="import_handler"'); ?>
-		</div>
-		<div>
-		<label for="uploaded_file">Upload EP File</label>
-		<input id="uploaded_file" name="uploaded_file" type="file" size="50">
-		<span class="error"><?php echo ep_get_error('uploaded_file'); ?></span>
 		</div>
 		<div>
 		<label for="local_file">Import from Temp Dir (<?php echo $tempdir; ?>)</label>

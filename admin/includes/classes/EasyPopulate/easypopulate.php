@@ -259,9 +259,9 @@ class EasyPopulate extends Fitzgerald
 		if (!is_null($this->request->metatags_title)) {
 			$config['metatags_title'] = $this->request->metatags_title;
 		}
-	
+
 		$fileInfo = new SplFileInfo($config['local_file']);
-	
+
 		if (!$fileInfo->isFile()) {
 			ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_NOT_EXIST, $fileInfo->getFileName()));
 			$this->redirect('/import');
@@ -277,17 +277,38 @@ class EasyPopulate extends Fitzgerald
 		$tpl['local_file'] = $this->request->local_file;
 		$tpl['output'] = $import->run($fileInfo);
 		$tpl['import'] = $import;
-		$tpl['output']['info'] = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $fileInfo->getFileName(), $fileInfo->getSize());
-		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
+
+		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $this->log(EASYPOPULATE_MSGSTACK_ERROR_SQL);
 		$tpl = array_merge($tpl, $config);
 		return $this->render('import', $tpl);
 	}
-	
+
+	public function post_upload()
+	{
+		if (!isset($_FILES['uploaded_file']) || empty($_FILES['uploaded_file']['type'])) {
+			throw new Exception('Failed to read uploaded file');
+		}
+		$file = $_FILES['uploaded_file'];
+		$error = constant('EASYPOPULATE_UPLOAD_ERROR_CODE_' . $file['error']);
+		if ($file['error'] != UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {
+			ep_set_error('uploaded_file', $error);
+			 $out = $error;
+		} else {
+			$fileName = ep_get_config('temp_path') . $file['name']; 
+			move_uploaded_file($file['tmp_name'], $fileName);
+			$fileInfo = new SplFileInfo($fileName);
+			$size = round(($fileInfo->getSize() / 1024)) . ' KB';
+			$out = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $error, $fileInfo->getFileName(), $size);
+			ep_set_error('uploaded_file', $error); // @todo not an error at all
+		}
+		if (is_null($this->request->ajax)) $this->redirect('/import');
+		return $out;
+	}
+
 	public function handleError($number, $message, $file = '', $line = 0)
 	{
 		// a proper resource isn't always available to RecordCount() in queryFactoryResult
 		// @todo find a way just ignore that one
-		if ($message == 'mysql_num_rows() expects parameter 1 to be resource, boolean given') return;
 		return parent::handleError($number, $message, $file, $line);
 	}
 }
@@ -312,9 +333,10 @@ class EasyPopulate extends Fitzgerald
 	$app->post('/dross', 'post_dross');
 	$app->get('/import', 'get_import');
 	$app->post('/import', 'post_import');
+	$app->post('/upload', 'post_upload');
 
 	$app->run();
-	
+
 	// Go back to zencart's error handling
 	error_reporting($original_error_level);
 	restore_error_handler();

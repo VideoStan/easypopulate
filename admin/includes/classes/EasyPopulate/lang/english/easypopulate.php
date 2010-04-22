@@ -12,7 +12,16 @@ define('EASYPOPULATE_DISPLAY_SPLIT_LOCATION','You can also download your split f
 
 define('EASYPOPULATE_DISPLAY_FILE_NOT_EXIST','File does not exist: %s');
 define('EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED','Could not open file: %s');
-define('EASYPOPULATE_DISPLAY_FILE_SPEC','File uploaded.<br /><b>File Name: %s</b><br />Size: %s');
+define('EASYPOPULATE_DISPLAY_FILE_SPEC','%s.<br /><b>File Name: %s</b><br />Size: %s');
+
+define('EASYPOPULATE_UPLOAD_ERROR_CODE_' . UPLOAD_ERR_OK, 'The file was successfully uploaded');
+define('EASYPOPULATE_UPLOAD_ERROR_CODE_' . UPLOAD_ERR_INI_SIZE, 'The uploaded file exceeds the upload_max_filesize directive in php.ini');
+define('EASYPOPULATE_UPLOAD_ERROR_CODE_' . UPLOAD_ERR_FORM_SIZE, 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form');
+define('EASYPOPULATE_UPLOAD_ERROR_CODE_' . UPLOAD_ERR_PARTIAL, 'The file was not completely uploaded');
+define('EASYPOPULATE_UPLOAD_ERROR_CODE_' . UPLOAD_ERR_NO_FILE, 'No file was uploaded');
+define('EASYPOPULATE_UPLOAD_ERROR_CODE_' . UPLOAD_ERR_NO_TMP_DIR, 'System (not EasyPopulate) temp directory was not found');
+define('EASYPOPULATE_UPLOAD_ERROR_CODE_' . UPLOAD_ERR_CANT_WRITE, 'Failed to write file to disk');
+define('EASYPOPULATE_UPLOAD_ERROR_CODE_' . UPLOAD_ERR_EXTENSION, 'File upload stopped by extension');
 
 // product results
 define('EASYPOPULATE_DISPLAY_HEADING', 'Products Summary');

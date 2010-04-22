@@ -96,43 +96,6 @@ define('EASYPOPULATE_CONFIG_ADV_SMART_TAGS_LIST', serialize(
 	)
 ));
 
-function ep_handle_uploaded_file($file)
-{
-	$target = '';
-	$temp_path = ep_get_config('temp_path');
-	if (is_array($file) && !empty($file)) {
-		if (is_uploaded_file($file['tmp_name'])) {
-			$target = $file['name'];
-			move_uploaded_file($file['tmp_name'], $temp_path . $target);
-		}
-	}
-	return $target;
-}
-
-function ep_get_upload_error($error_code = 0)
-{
-	switch ($error_code) {
-		case UPLOAD_ERR_OK:
-			return 'The file was successfully uploaded';
-		case UPLOAD_ERR_INI_SIZE:
-			return 'The uploaded file exceeds the upload_max_filesize directive in php.ini';
-		case UPLOAD_ERR_FORM_SIZE:
-				return 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form';
-		case UPLOAD_ERR_PARTIAL:
-				return 'The file was only partially uploaded';
-		case UPLOAD_ERR_NO_FILE:
-				return 'No file was uploaded';
-		case UPLOAD_ERR_NO_TMP_DIR:
-				return 'System (not EasyPopulate) temp directory was not found';
-		case UPLOAD_ERR_CANT_WRITE:
-				return 'Failed to write file to disk';
-		case UPLOAD_ERR_EXTENSION:
-				return 'File upload stopped by extension';
-		default:
-				return 'Unknown upload error';
-	}
-}
-
 function ep_set_error($field = '', $error = '')
 {
 	if (empty($field)) return;

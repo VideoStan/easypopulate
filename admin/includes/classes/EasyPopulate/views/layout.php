@@ -19,6 +19,7 @@
 	<script type="text/javascript" src="<?php echo $adminUrl; ?>includes/menu.js"></script>
 	<script type="text/javascript" src="<?php echo $adminUrl; ?>includes/general.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type="text/javascript" src="<?php echo $adminUrl; ?>includes/classes/EasyPopulate/public/form/jquery.form.js"></script> 
 
 	<script type="text/javascript">
 	/*! jQuery serializeObject - v0.2 - 1/20/2010 http://benalman.com/projects/jquery-misc-plugins/
@@ -40,12 +41,14 @@
 	$(document).ready(function() {
 		cssjsmenu('navbar');
 		$('#hoverJS').attr('disabled', 'disabled');
+		$("#tabs li a[href=" + window.location.pathname + "]").parent().addClass("current");
 
 		$("#installer :button").click(function() {
 			$("#installer input[name=action]").val($(this).attr('name'));
 			$("#installer").submit();
 		});
-
+	});
+	$(document).ready(function() {
 		$("#import_handler").change(function() {
 			$.getJSON("/admin/easypopulate.php/preset/" + $(this).val(), function(json) {
 				$("#remote_file").attr("disabled", "disabled");
@@ -76,7 +79,16 @@
 			$("#uploaded_files").toggle();
 		});
 
-		$("#tabs li a[href=" + window.location.pathname + "]").parent().addClass("current");
+		var options = {
+			target: "#uploaded_file ~ .message",
+			data: { ajax : true },
+			success: function(responseString) {
+				local_file = $("#uploaded_file").val().replace(/^.*[\/\\]/g, '');
+				$("#uploaded_file ~ .message").addClass('success');
+				$("#local_file").val(local_file);
+			}
+		}
+		$('#upload_form').ajaxForm(options);
 	});
 	</script>
 </head>
