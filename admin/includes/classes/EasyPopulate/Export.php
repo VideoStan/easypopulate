@@ -94,8 +94,8 @@ class EasyPopulateExport extends EasyPopulateProcess
 		if(count($custom_fields) > 0) {
 			foreach($custom_fields as $f) {
 				if (empty($f)) continue;
-				$filelayout[] = 'v_'.$f;
-				$custom_filelayout_sql .= ', p.'.$f.' as v_'.$f.' ';
+				$filelayout[] = $f;
+				$custom_filelayout_sql .= ', p.' . $f .' ';
 			}
 		}
 		// END custom fields
@@ -105,100 +105,102 @@ class EasyPopulateExport extends EasyPopulateProcess
 			// The file layout is dynamically made depending on the number of languages
 			$fileMeta = array();
 
-			$filelayout[] = 'v_products_model';
-			$filelayout[] = 'v_products_image';
-		 	$fileMeta[] = 'v_metatags_products_name_status';
-			$fileMeta[] = 'v_metatags_title_status';
-			$fileMeta[] = 'v_metatags_model_status';
-			$fileMeta[] = 'v_metatags_price_status';
-			$fileMeta[] = 'v_metatags_title_tagline_status';
+			$filelayout[] = 'products_model';
+			$filelayout[] = 'products_image';
 
+		 	$fileMeta[] = 'metatags_products_name_status';
+			$fileMeta[] = 'metatags_title_status';
+			$fileMeta[] = 'metatags_model_status';
+			$fileMeta[] = 'metatags_price_status';
+			$fileMeta[] = 'metatags_title_tagline_status';
 
 			foreach ($langcode as $key => $lang){
 				$l_id = $lang['id'];
 
-				$filelayout[] = 'v_products_name_' . $l_id;
-				$filelayout[] = 'v_products_description_' . $l_id;
+				$filelayout[] = 'products_name_' . $l_id;
+				$filelayout[] = 'products_description_' . $l_id;
 
 				if ($ep_supported_mods['psd']) {
-					$filelayout[] = 'v_products_short_desc_' . $l_id;
+					$filelayout[] = 'products_short_desc_' . $l_id;
 				}
-				$filelayout[] = 'v_products_url_' . $l_id;
-				$fileMeta[] = 'v_metatags_title_' . $l_id;
-				$fileMeta[] = 'v_metatags_keywords_' . $l_id;
-				$fileMeta[] = 'v_metatags_description_' . $l_id;
+
+				$filelayout[] = 'products_url_' . $l_id;
+
+				$fileMeta[] = 'metatags_title_' . $l_id;
+				$fileMeta[] = 'metatags_keywords_' . $l_id;
+				$fileMeta[] = 'metatags_description_' . $l_id;
 			}
 
-			$filelayout[] = 'v_specials_price';
-			$filelayout[] = 'v_specials_date_avail';
-			$filelayout[] = 'v_specials_expires_date';
-			$filelayout[] = 'v_products_price';
+			$filelayout[] = 'specials_price';
+			$filelayout[] = 'specials_date_avail';
+			$filelayout[] = 'specials_expires_date';
+			$filelayout[] = 'products_price';
 
 			if ($ep_supported_mods['uom']) {
-				$filelayout[] = 'v_products_price_as';
+				$filelayout[] = 'products_price_as';
 			}
 
 			if ($ep_supported_mods['upc']) {
-				$filelayout[] = 'v_products_upc';
+				$filelayout[] = 'products_upc';
 			}
 
-			$filelayout[] = 'v_products_weight';
-			$filelayout[] = 'v_product_is_call';
-			$filelayout[] = 'v_products_sort_order';
-			$filelayout[] = 'v_products_quantity_order_min';
-			$filelayout[] = 'v_products_quantity_order_units';
-			$filelayout[] = 'v_date_avail';
-			$filelayout[] = 'v_date_added';
-			$filelayout[] = 'v_products_quantity';
+			$filelayout[] = 'products_weight';
+			$filelayout[] = 'product_is_call';
+			$filelayout[] = 'products_sort_order';
+			$filelayout[] = 'products_quantity_order_min';
+			$filelayout[] = 'products_quantity_order_units';
+			$filelayout[] = 'date_avail';
+			$filelayout[] = 'date_added';
+			$filelayout[] = 'products_quantity';
 
 			if ($products_with_attributes) {
 				$attributes_layout = $this->getAttributesFileLayout();
 				$filelayout = array_merge($filelayout, $attributes_layout);
 			}
 
-			$filelayout[] = 'v_manufacturers_name';
+			$filelayout[] = 'manufacturers_name';
 
 			// build the categories name options based on the max categories configuration setting
 			for($i=1;$i<$max_categories+1;$i++){
-				$filelayout[] = 'v_categories_name_' . $i;
+				$filelayout[] = 'categories_name_' . $i;
 			}
 
-			$filelayout[] = 'v_tax_class_title';
-			$filelayout[] = 'v_status';
+			$filelayout[] = 'tax_class_title';
+			$filelayout[] = 'status';
 
 			$filelayout = array_merge($filelayout, $fileMeta);
 
 			$filelayout_sql = 'SELECT
-				p.products_id as v_products_id,
-				p.products_model as v_products_model,
-				p.products_image as v_products_image,
-				p.products_price as v_products_price,';
+				p.products_id,
+				p.products_model,
+				p.products_image,
+				p.products_price,';
 
 			if ($ep_supported_mods['uom'] == true) {
-				$filelayout_sql .=  'p.products_price_as as v_products_price_as,';
+				$filelayout_sql .=  'p.products_price_as,';
 			}
 			if ($ep_supported_mods['upc']) {
-				$filelayout_sql .=  'p.products_upc as v_products_upc,';
+				$filelayout_sql .=  'p.products_upc,';
 			}
 
-				$filelayout_sql .= 'p.products_weight as v_products_weight,
-				p.products_last_modified as v_last_modified,
-				p.product_is_call as v_product_is_call,
-				p.products_sort_order as v_products_sort_order,
-				p.products_quantity_order_min as v_products_quantity_order_min,
-				p.products_quantity_order_units	as v_products_quantity_order_units,
-				p.products_date_available as v_date_avail,
-				p.products_date_added as v_date_added,
-				p.products_tax_class_id as v_tax_class_id,
-				p.products_quantity as v_products_quantity,
-				p.manufacturers_id as v_manufacturers_id,
-				subc.categories_id as v_categories_id,
-				p.products_status as v_status,
-				p.metatags_title_status as v_metatags_title_status,
-				p.metatags_products_name_status as v_metatags_products_name_status,
-				p.metatags_model_status as v_metatags_model_status,
-				p.metatags_price_status as v_metatags_price_status,
-				p.metatags_title_tagline_status as v_metatags_title_tagline_status'.
+				$filelayout_sql .= 'p.products_weight,
+				p.products_last_modified,
+				p.product_is_call,
+				p.products_sort_order,
+				p.products_quantity_order_min,
+				p.products_quantity_order_units,
+				p.products_date_available AS date_avail,
+				p.products_date_added AS date_added,
+				p.products_tax_class_id AS tax_class_id,
+				p.products_quantity,
+				p.manufacturers_id,
+				subc.categories_id,
+				p.products_status as status,
+				p.metatags_title_status,
+				p.metatags_products_name_status,
+				p.metatags_model_status,
+				p.metatags_price_status,
+				p.metatags_title_tagline_status'.
 				$custom_filelayout_sql.
 				' FROM
 				' . TABLE_PRODUCTS . ' as p,
@@ -208,76 +210,76 @@ class EasyPopulateExport extends EasyPopulateProcess
 				p.products_id = ptoc.products_id AND
 				ptoc.categories_id = subc.categories_id' . $sql_filter;
 			break;
-	
+
 		case 'priceqty':
 
-			$filelayout[] = 'v_products_model';
-			$filelayout[] = 'v_specials_price';
-			$filelayout[] = 'v_specials_date_avail';
-			$filelayout[] = 'v_specials_expires_date';
-			$filelayout[] = 'v_products_price';
+			$filelayout[] = 'products_model';
+			$filelayout[] = 'specials_price';
+			$filelayout[] = 'specials_date_avail';
+			$filelayout[] = 'specials_expires_date';
+			$filelayout[] = 'products_price';
 			if ($ep_supported_mods['uom']) {
-				$filelayout[] = 'v_products_price_as';
+				$filelayout[] = 'products_price_as';
 			}
-			$filelayout[] = 'v_products_quantity';
+			$filelayout[] = 'products_quantity';
 
 			/*
-			$filelayout[] = 'v_customer_price_1';
-			$filelayout[] = 'v_customer_group_id_1';
-			$filelayout[] = 'v_customer_price_2';
-			$filelayout[] = 'v_customer_group_id_2';
-			$filelayout[] = 'v_customer_price_3';
-			$filelayout[] = 'v_customer_group_id_3';
-			$filelayout[] = 'v_customer_price_4';
-			$filelayout[] = 'v_customer_group_id_4';
-			$filelayout[] = 'v_last_modified';
-			$filelayout[] = 'v_status';
+			$filelayout[] = 'customer_price_1';
+			$filelayout[] = 'customer_group_id_1';
+			$filelayout[] = 'customer_price_2';
+			$filelayout[] = 'customer_group_id_2';
+			$filelayout[] = 'customer_price_3';
+			$filelayout[] = 'customer_group_id_3';
+			$filelayout[] = 'customer_price_4';
+			$filelayout[] = 'customer_group_id_4';
+			$filelayout[] = 'last_modified';
+			$filelayout[] = 'status';
 			//*/
 
 			$filelayout_sql = 'SELECT
-				p.products_id as v_products_id,
-				p.products_model as v_products_model,
-				p.products_price as v_products_price,';
+				p.products_id,
+				p.products_model,
+				p.products_price,';
 
 			if ($ep_supported_mods['uom']) {
-				$filelayout_sql .=  'p.products_price_as as v_products_price_as,';
+				$filelayout_sql .=  'p.products_price_as,';
 			}
 
-			$filelayout_sql .= 'p.products_tax_class_id as v_tax_class_id,
-				p.products_quantity as v_products_quantity
+			$filelayout_sql .= 'p.products_tax_class_id as tax_class_id,
+				p.products_quantity
 				FROM ' . TABLE_PRODUCTS . ' as p';
 			break;
 
 		case 'modqty':
-			$filelayout[] = 'v_products_model';
-			$filelayout[] = 'v_products_price';
-			$filelayout[] = 'v_products_quantity';
-			$filelayout[] = 'v_last_modified';
-			$filelayout[] = 'v_status';
+			$filelayout[] = 'products_model';
+			$filelayout[] = 'products_price';
+			$filelayout[] = 'products_quantity';
+			$filelayout[] = 'last_modified';
+			$filelayout[] = 'status';
 
 			/**
 			 * uncomment the customer_price and customer_group to support multi-price per product contrib
 			 * @todo modularize this
-			$filelayout[] = 'v_customer_price_1';
-			$filelayout[] = 'v_customer_group_id_1';
-			$filelayout[] = 'v_customer_price_2';
-			$filelayout[] = 'v_customer_group_id_2';
-			$filelayout[] = 'v_customer_price_3';
-			$filelayout[] = 'v_customer_group_id_3';
-			$filelayout[] = 'v_customer_price_4';
-			$filelayout[] = 'v_customer_group_id_4';
-			$filelayout[] = 'v_last_modified';
-			$filelayout[] = 'v_status';
+			$filelayout[] = 'customer_price_1';
+			$filelayout[] = 'customer_group_id_1';
+			$filelayout[] = 'customer_price_2';
+			$filelayout[] = 'customer_group_id_2';
+			$filelayout[] = 'customer_price_3';
+			$filelayout[] = 'customer_group_id_3';
+			$filelayout[] = 'customer_price_4';
+			$filelayout[] = 'customer_group_id_4';
+			$filelayout[] = 'last_modified';
+			$filelayout[] = 'status';
 			*/
 
 			$filelayout_sql = 'SELECT
-				p.products_id as v_products_id,
-				p.products_model as v_products_model,
-				p.products_price as v_products_price,
-				p.products_quantity as v_products_quantity,
-				p.products_last_modified as v_last_modified,
-				p.products_status as v_status,
-				p.products_tax_class_id  as v_tax_class_id
+				p.products_id,
+				p.products_model,
+				p.products_price,
+				p.products_quantity,
+				p.products_last_modified as last_modified,
+				p.products_status as status,
+				p.products_tax_class_id  as tax_class_id
 				FROM '
 				.TABLE_PRODUCTS.' as p';
 
@@ -287,52 +289,52 @@ class EasyPopulateExport extends EasyPopulateProcess
 		// 09-30-09 Need a configuration variable to set the MAX discounts level
 		//          then I will be able to generate $filelayout() dynamically
 		case 'pricebreaks':
-			$filelayout[] =	'v_products_model';
-			$filelayout[] =	'v_products_price';
+			$filelayout[] =	'products_model';
+			$filelayout[] =	'products_price';
 
 			if ($ep_supported_mods['uom']) {
-				$filelayout[] = 'v_products_price_as';
+				$filelayout[] = 'products_price_as';
 			}
 
-			$filelayout[] =	'v_products_discount_type';
-			$filelayout[] =	'v_products_discount_type_from';
+			$filelayout[] =	'products_discount_type';
+			$filelayout[] =	'products_discount_type_from';
 
 			for ($i=1;$i<$max_qty_discounts+1;$i++) {
-				$filelayout[] = 'v_discount_id_' . $i;
-				$filelayout[] = 'v_discount_qty_' . $i;
-				$filelayout[] = 'v_discount_price_' . $i;
+				$filelayout[] = 'discount_id_' . $i;
+				$filelayout[] = 'discount_qty_' . $i;
+				$filelayout[] = 'discount_price_' . $i;
 			}
 
 			$filelayout_sql = 'SELECT
-				p.products_id            as v_products_id,
-				p.products_model         as v_products_model,
-				p.products_price         as v_products_price,
-				p.products_tax_class_id  as v_tax_class_id';
+				p.products_id,
+				p.products_model,
+				p.products_price,
+				p.products_tax_class_id  as tax_class_id';
 
 			if ($ep_supported_mods['uom']) {
-				$filelayout_sql .=  'p.products_price_as as v_products_price_as,';
+				$filelayout_sql .=  'p.products_price_as,';
 			}
 
-			$filelayout_sql .= 'p.products_discount_type as v_products_discount_type,
-				p.products_discount_type_from as v_products_discount_type_from
+			$filelayout_sql .= 'p.products_discount_type,
+				p.products_discount_type_from
 				FROM '
 				.TABLE_PRODUCTS.' as p';
 		break;
 
 		case 'category':
 			// The file layout is dynamically made depending on the number of languages
-			$filelayout[] = 'v_products_model';
+			$filelayout[] = 'products_model';
 
 			// build the categories name section of the array based on the number of categories the user wants to have
 			for($i=1;$i<$max_categories+1;$i++){
-				$filelayout[] = 'v_categories_name_' . $i;
+				$filelayout[] = 'categories_name_' . $i;
 			}
 
 
 			$filelayout_sql = 'SELECT
-				p.products_id as v_products_id,
-				p.products_model as v_products_model,
-				subc.categories_id as v_categories_id
+				p.products_id,
+				p.products_model,
+				subc.categories_id
 				FROM '
 				.TABLE_PRODUCTS.'   as p,'
 				.TABLE_CATEGORIES.' as subc,'
@@ -348,43 +350,43 @@ class EasyPopulateExport extends EasyPopulateProcess
 
 			$filetemp = array();
 
-			$filetemp['product_url'] = 'v_froogle_products_url_1';
-			$filetemp['name'] = 'v_froogle_products_name_1';
-			$filetemp['description'] = 'v_froogle_products_description_1';
-			$filetemp['price'] = 'v_products_price';
-			$filetemp['image_url'] = 'v_products_fullpath_image';
-			$filetemp['category'] = 'v_category_fullpath';
-			$filetemp['offer_id'] = 'v_froogle_offer_id';
-			$filetemp['instock'] = 'v_froogle_instock';
-			$filetemp['shipping'] = 'v_froogle_shipping';
-			$filetemp['brand'] = 'v_manufacturers_name';
-			$filetemp['upc'] = 'v_froogle_upc';
-			//$filetemp['color'] = 'v_froogle_color';
-			//$filetemp['size'] = 'v_froogle_size';
-			//$filetemp['quantity'] = 'v_froogle_quantitylevel';
-			//$filetemp['product_id'] = 'v_froogle_product_id';
-			$filetemp['manufacturer_id'] = 'v_froogle_manufacturer_id';
-			//$filetemp['exp_date'] = 'v_froogle_exp_date';
-			$filetemp['product_type'] = 'v_froogle_product_type';
-			//$filetemp['delete'] = 'v_froogle_delete';
-			$filetemp['currency'] = 'v_froogle_currency';
+			$filetemp['product_url'] = 'froogle_products_url_1';
+			$filetemp['name'] = 'froogle_products_name_1';
+			$filetemp['description'] = 'froogle_products_description_1';
+			$filetemp['price'] = 'products_price';
+			$filetemp['image_url'] = 'products_fullpath_image';
+			$filetemp['category'] = 'category_fullpath';
+			$filetemp['offer_id'] = 'froogle_offer_id';
+			$filetemp['instock'] = 'froogle_instock';
+			$filetemp['shipping'] = 'froogle_shipping';
+			$filetemp['brand'] = 'manufacturers_name';
+			$filetemp['upc'] = 'froogle_upc';
+			//$filetemp['color'] = 'froogle_color';
+			//$filetemp['size'] = 'froogle_size';
+			//$filetemp['quantity'] = 'froogle_quantitylevel';
+			//$filetemp['product_id'] = 'froogle_product_id';
+			$filetemp['manufacturer_id'] = 'froogle_manufacturer_id';
+			//$filetemp['exp_date'] = 'froogle_exp_date';
+			$filetemp['product_type'] = 'froogle_product_type';
+			//$filetemp['delete'] = 'froogle_delete';
+			$filetemp['currency'] = 'froogle_currency';
 
 
 			$fileheaders = array_keys($filetemp);
 			$filelayout = array_values($filetemp);
 
 			$filelayout_sql = "SELECT
-				p.products_id as v_products_id,
-				p.products_model as v_products_model,
-				p.products_image as v_products_image,
-				p.products_price as v_products_price,
-				p.products_weight as v_products_weight,
-				p.products_date_added as v_date_added,
-				p.products_last_modified as v_last_modified,
-				p.products_tax_class_id as v_tax_class_id,
-				p.products_quantity as v_products_quantity,
-				p.manufacturers_id as v_manufacturers_id,
-				subc.categories_id as v_categories_id".
+				p.products_id,
+				p.products_model,
+				p.products_image,
+				p.products_price,
+				p.products_weight,
+				p.products_date_added AS date_added,
+				p.products_last_modified AS last_modified,
+				p.products_tax_class_id AS tax_class_id,
+				p.products_quantity,
+				p.manufacturers_id,
+				subc.categories_id".
 				$custom_filelayout_sql.
 				" FROM
 				".TABLE_PRODUCTS." as p,
@@ -399,13 +401,13 @@ class EasyPopulateExport extends EasyPopulateProcess
 
 		case 'attrib':
 
-			$filelayout[] = 'v_products_model';
+			$filelayout[] = 'products_model';
 			$attribute_layout = $this->getAttributesFileLayout();
 			$filelayout = array_merge($filelayout, $attributes_layout);
 
 			$filelayout_sql = "SELECT
-				p.products_id as v_products_id,
-				p.products_model as v_products_model
+				p.products_id,
+				p.products_model
 				FROM
 				".TABLE_PRODUCTS." as p
 				";
@@ -413,26 +415,26 @@ class EasyPopulateExport extends EasyPopulateProcess
 			break;
 
 		case 'attrib_basic':
-			$filelayout[] =	'v_products_attributes_id';
-			$filelayout[] =	'v_products_id';
-			$filelayout[] =	'v_products_model'; // product model from table PRODUCTS
-			$filelayout[] =	'v_options_id';
-			$filelayout[] =	'v_products_options_name'; // options name from table PRODUCTS_OPTIONS
-			$filelayout[] =	'v_products_options_type'; // 0-drop down, 1=text , 2=radio , 3=checkbox, 4=file, 5=read only
-			$filelayout[] =	'v_options_values_id';
-			$filelayout[] =	'v_products_options_values_name'; // options values name from table PRODUCTS_OPTIONS_VALUES
+			$filelayout[] =	'products_attributes_id';
+			$filelayout[] =	'products_id';
+			$filelayout[] =	'products_model'; // product model from table PRODUCTS
+			$filelayout[] =	'options_id';
+			$filelayout[] =	'products_options_name'; // options name from table PRODUCTS_OPTIONS
+			$filelayout[] =	'products_options_type'; // 0-drop down, 1=text , 2=radio , 3=checkbox, 4=file, 5=read only
+			$filelayout[] =	'options_values_id';
+			$filelayout[] =	'products_options_values_name'; // options values name from table PRODUCTS_OPTIONS_VALUES
 
 			$filelayout_sql = 'SELECT
-				a.products_attributes_id            as v_products_attributes_id,
-				a.products_id                       as v_products_id,
-				p.products_model				    as v_products_model,
-				a.options_id                        as v_options_id,
-				o.products_options_id               as v_products_options_id,
-				o.products_options_name             as v_products_options_name,
-				o.products_options_type             as v_products_options_type,
-				a.options_values_id                 as v_options_values_id,
-				v.products_options_values_id        as v_products_options_values_id,
-				v.products_options_values_name      as v_products_options_values_name
+				a.products_attributes_id,
+				a.products_id,
+				p.products_model,
+				a.options_id,
+				o.products_options_id,
+				o.products_options_name,
+				o.products_options_type,
+				a.options_values_id,
+				v.products_options_values_id,
+				v.products_options_values_name
 				FROM '
 				.TABLE_PRODUCTS_ATTRIBUTES.     ' as a,'
 				.TABLE_PRODUCTS.                ' as p,'
@@ -446,62 +448,62 @@ class EasyPopulateExport extends EasyPopulateProcess
 			break;
 
 		case 'options':
-			$filelayout[] =	'v_products_options_id';
-			$filelayout[] =	'v_language_id';
-			$filelayout[] =	'v_products_options_name';
-			$filelayout[] =	'v_products_options_sort_order';
-			$filelayout[] =	'v_products_options_type';
-			$filelayout[] =	'v_products_options_length';
-			$filelayout[] =	'v_products_options_comment';
-			$filelayout[] =	'v_products_options_size';
-			$filelayout[] =	'v_products_options_images_per_row';
-			$filelayout[] =	'v_products_options_images_style';
-			$filelayout[] =	'v_products_options_rows';
+			$filelayout[] =	'products_options_id';
+			$filelayout[] =	'language_id';
+			$filelayout[] =	'products_options_name';
+			$filelayout[] =	'products_options_sort_order';
+			$filelayout[] =	'products_options_type';
+			$filelayout[] =	'products_options_length';
+			$filelayout[] =	'products_options_comment';
+			$filelayout[] =	'products_options_size';
+			$filelayout[] =	'products_options_images_per_row';
+			$filelayout[] =	'products_options_images_style';
+			$filelayout[] =	'products_options_rows';
 
 			$filelayout_sql = 'SELECT
-				o.products_options_id             AS v_products_options_id,
-				o.language_id                     AS v_language_id,
-				o.products_options_name           AS v_products_options_name,
-				o.products_options_sort_order     AS v_products_options_sort_order,
-				o.products_options_type           AS v_products_options_type,
-				o.products_options_length         AS v_products_options_length,
-				o.products_options_comment        AS v_products_options_comment,
-				o.products_options_size           AS v_products_options_size,
-				o.products_options_images_per_row AS v_products_options_images_per_row,
-				o.products_options_images_style   AS v_products_options_images_style,
-				o.products_options_rows           AS v_products_options_rows '
+				o.products_options_id,
+				o.language_id,
+				o.products_options_name,
+				o.products_options_sort_order,
+				o.products_options_type,
+				o.products_options_length,
+				o.products_options_comment,
+				o.products_options_size,
+				o.products_options_images_per_row,
+				o.products_options_images_style,
+				o.products_options_rows'
 				.' FROM '
 				.TABLE_PRODUCTS_OPTIONS. ' AS o';
 			break;
 
 		case 'values':
-			$filelayout[] =	'v_products_options_values_id';
-			$filelayout[] =	'v_language_id';
-			$filelayout[] =	'v_products_options_values_name';
-			$filelayout[] =	'v_products_options_values_sort_order';
+			$filelayout[] =	'products_options_values_id';
+			$filelayout[] =	'language_id';
+			$filelayout[] =	'products_options_values_name';
+			$filelayout[] =	'products_options_values_sort_order';
 
 			$filelayout_sql = 'SELECT
-				v.products_options_values_id         AS v_products_options_values_id,
-				v.language_id                        AS v_language_id,
-				v.products_options_values_name       AS v_products_options_values_name,
-				v.products_options_values_sort_order AS v_products_options_values_sort_order '
+				v.products_options_values_id,
+				v.language_id,
+				v.products_options_values_name,
+				v.products_options_values_sort_order'
 				.' FROM '
 				.TABLE_PRODUCTS_OPTIONS_VALUES. ' AS v';
 			break;
 
 		case 'optionvalues':
-			$filelayout[] =	'v_products_options_values_to_products_options_id';
-			$filelayout[] =	'v_products_options_id';
-			$filelayout[] =	'v_products_options_name';
-			$filelayout[] =	'v_products_options_values_id';
-			$filelayout[] =	'v_products_options_values_name';
+			$filelayout[] =	'products_options_values_to_products_options_id';
+			$filelayout[] =	'products_options_id';
+			$filelayout[] =	'products_options_name';
+			$filelayout[] =	'products_options_values_id';
+			$filelayout[] =	'products_options_values_name';
 
 			$filelayout_sql = 'SELECT
-				otv.products_options_values_to_products_options_id AS v_products_options_values_to_products_options_id,
-				otv.products_options_id           AS v_products_options_id,
-				o.products_options_name           AS v_products_options_name,
-				otv.products_options_values_id    AS v_products_options_values_id,
-				v.products_options_values_name    AS v_products_options_values_name '
+				otv.products_options_values_to_products_options_id,
+				otv.products_options_id,
+				o.products_options_name,
+				otv.products_options_values_id,
+				v.products_options_values_name'
 				.' FROM '
 				.TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS. ' AS otv, '
 				.TABLE_PRODUCTS_OPTIONS.        ' AS o, '
@@ -556,8 +558,8 @@ class EasyPopulateExport extends EasyPopulateProcess
 			// build the long full froogle image path
 			// check for a large image else use medium else use small else no link
 			// thanks to Tim Kroeger - www.breakmyzencart.com
-			if (isset($row['v_products_image'])) {
-			$products_image = (($row['v_products_image'] == PRODUCTS_IMAGE_NO_IMAGE) ? '' : $row['v_products_image']);
+			if (isset($row['products_image'])) {
+			$products_image = (($row['products_image'] == PRODUCTS_IMAGE_NO_IMAGE) ? '' : $row['products_image']);
 			$products_image_extension = substr($products_image, strrpos($products_image, '.'));
 			$products_image_base = ereg_replace($products_image_extension . '$', '', $products_image);
 			$products_image_medium = $products_image_base . IMAGE_SUFFIX_MEDIUM . $products_image_extension;
@@ -571,111 +573,111 @@ class EasyPopulateExport extends EasyPopulateProcess
 			} else {
 				$image_url = DIR_WS_CATALOG_IMAGES . 'large/' . $products_image_large;
 			}
-	
-			$row['v_products_fullpath_image'] = $image_url;
+
+			$row['products_fullpath_image'] = $image_url;
 			}
 			// Other froogle defaults go here for now
-			$row['v_froogle_instock']     = 'Y';
-			$row['v_froogle_shipping']    = '';
-			$row['v_froogle_upc']       = '';
-	//		$row['v_froogle_color']     = '';
-	//		$row['v_froogle_size']      = '';
-	//		$row['v_froogle_quantitylevel']   = '';
-			$row['v_froogle_manufacturer_id'] = '';
-	//		$row['v_froogle_exp_date']    = '';
-			$row['v_froogle_product_type']    = 'OTHER';
-	//		$row['v_froogle_delete']    = '';
-			$row['v_froogle_currency']    = 'usd';
-			$row['v_froogle_offer_id']    = $row['v_products_model'];
-	//		$row['v_froogle_product_id']    = $row['v_products_model'];
-	
+			$row['froogle_instock']     = 'Y';
+			$row['froogle_shipping']    = '';
+			$row['froogle_upc']       = '';
+	//		$row['froogle_color']     = '';
+	//		$row['froogle_size']      = '';
+	//		$row['froogle_quantitylevel']   = '';
+			$row['froogle_manufacturer_id'] = '';
+	//		$row['froogle_exp_date']    = '';
+			$row['froogle_product_type']    = 'OTHER';
+	//		$row['froogle_delete']    = '';
+			$row['froogle_currency']    = 'usd';
+			$row['froogle_offer_id']    = $row['products_model'];
+	//		$row['froogle_product_id']    = $row['products_model'];
+
 			foreach ($langcode as $key => $lang) {
 				$lid = $lang['id'];
-	
+
 				// START product meta tags
 				$sqlMeta = 'SELECT * FROM '.TABLE_META_TAGS_PRODUCTS_DESCRIPTION.'
-								WHERE products_id = '.$row['v_products_id'].
+								WHERE products_id = '.$row['products_id'].
 								' AND language_id = '.$lid.' LIMIT 1 ';
 				$resultMeta = ep_query($sqlMeta);
 				$rowMeta = mysql_fetch_array($resultMeta);
-				$row['v_metatags_title_' . $lid] = $rowMeta['metatags_title'];
-				$row['v_metatags_keywords_' . $lid] = $rowMeta['metatags_keywords'];
-				$row['v_metatags_description_' . $lid] = $rowMeta['metatags_description'];
+				$row['metatags_title_' . $lid] = $rowMeta['metatags_title'];
+				$row['metatags_keywords_' . $lid] = $rowMeta['metatags_keywords'];
+				$row['metatags_description_' . $lid] = $rowMeta['metatags_description'];
 				//END product meta tags
-	
+
 				// for each language, get the description and set the vals
 				$sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_DESCRIPTION . ' WHERE
-						products_id = ' . $row['v_products_id'] . ' AND
+						products_id = ' . $row['products_id'] . ' AND
 						language_id = ' . $lid . ' LIMIT 1';
 				$result2 = ep_query($sql2);
 				$row2 =  mysql_fetch_array($result2);
-	
-				$row['v_products_name_' . $lid] = $row2['products_name'];
-				$row['v_products_description_' . $lid]  = $row2['products_description'];
+
+				$row['products_name_' . $lid] = $row2['products_name'];
+				$row['products_description_' . $lid]  = $row2['products_description'];
 				if ($ep_supported_mods['psd']) {
-					$row['v_products_short_desc_' . $lid]   = $row2['products_short_desc'];
+					$row['products_short_desc_' . $lid]   = $row2['products_short_desc'];
 				}
-				$row['v_products_url_' . $lid]    = $row2['products_url'];
-	
+				$row['products_url_' . $lid]    = $row2['products_url'];
+
 				// froogle advanced format needs the quotes around the name and desc
-				$row['v_froogle_products_name_' . $lid] = '"' . html_entity_decode(strip_tags(str_replace('"','""',$row2['products_name']))) . '"';
-				$row['v_froogle_products_description_' . $lid] = '"' . html_entity_decode(strip_tags(str_replace('"','""',$row2['products_description']))) . '"';
-				$row['v_froogle_products_url_' . $lid] = $row['v_products_url_' . $lid];
+				$row['froogle_products_name_' . $lid] = '"' . html_entity_decode(strip_tags(str_replace('"','""',$row2['products_name']))) . '"';
+				$row['froogle_products_description_' . $lid] = '"' . html_entity_decode(strip_tags(str_replace('"','""',$row2['products_description']))) . '"';
+				$row['froogle_products_url_' . $lid] = $row['products_url_' . $lid];
 			}
-	
+
 			// START specials
-			if (isset($filelayout['v_specials_price'])) {
-				$row['v_specials_price'] = '';
-				$row['v_specials_date_avail'] = '';
-				$row['v_specials_expires_date'] = '';
+			if (isset($filelayout['specials_price'])) {
+				$row['specials_price'] = '';
+				$row['specials_date_avail'] = '';
+				$row['specials_expires_date'] = '';
 				$specials_query = ep_query("SELECT
 							specials_new_products_price,
 							specials_date_available,
 							expires_date
 					FROM ".TABLE_SPECIALS."
-					WHERE products_id = " . $row['v_products_id']);
-	
+					WHERE products_id = " . $row['products_id']);
+
 				if (mysql_num_rows($specials_query)) {
 					$ep_specials = mysql_fetch_array($specials_query);
-					$row['v_specials_price'] = $ep_specials['specials_new_products_price'];
-					$row['v_specials_date_avail'] = $ep_specials['specials_date_available'];
-					$row['v_specials_expires_date'] = $ep_specials['expires_date'];
+					$row['specials_price'] = $ep_specials['specials_new_products_price'];
+					$row['specials_date_avail'] = $ep_specials['specials_date_available'];
+					$row['specials_expires_date'] = $ep_specials['expires_date'];
 				}
 			}
 			// END specials
 
-			if (isset($row['v_categories_id'])) {
-				$categories = $this->getCategories($row['v_categories_id']);
-				$categories = array_slice($categories, 0, $max_categories, true);		
+			if (isset($row['categories_id'])) {
+				$categories = $this->getCategories($row['categories_id']);
+				$categories = array_slice($categories, 0, $max_categories, true);
 				if ($ep_dltype == 'froogle') {
 					$fullcategory = ''; // @todo move to froogle output
 					foreach ($categories as $k => $v) {
 						$fullcategory .= $v . ' > ';
 					}
 					// now trim off the last ">" from the category stack
-					$row['v_category_fullpath'] = substr($fullcategory,0,strlen($fullcategory)-3);
+					$row['category_fullpath'] = substr($fullcategory,0,strlen($fullcategory)-3);
 				}
 				$categories = array_pad($categories, $max_categories, '');
 				foreach ($categories as $k => $v) {
-					$row['v_categories_name_' . ($k + 1)] = $categories[$k];
+					$row['categories_name_' . ($k + 1)] = $categories[$k];
 				}
 			}
 
-			$row['v_manufacturers_name'] = '';
-			if (isset($filelayout['v_manufacturers_name'])){
-				$row['v_manufacturers_name'] = $this->getManufacturerName($row['v_manufacturers_id']);
+			$row['manufacturers_name'] = '';
+			if (isset($filelayout['manufacturers_name'])){
+				$row['manufacturers_name'] = $this->getManufacturerName($row['manufacturers_id']);
 			}
 
 
 			// If you have other modules that need to be available, put them here
 
 			// VJ product attribs begin
-			if (isset($filelayout['v_attribute_options_id_1'])){
+			if (isset($filelayout['attribute_options_id_1'])){
 				$languages = zen_get_languages();
 
 				$attribute_options_count = 1;
 				foreach ($attribute_options_array as $attribute_options) {
-					$row['v_attribute_options_id_' . $attribute_options_count]  = $attribute_options['products_options_id'];
+					$row['attribute_options_id_' . $attribute_options_count]  = $attribute_options['products_options_id'];
 
 					for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
 						$lid = $languages[$i]['id'];
@@ -685,7 +687,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 
 						$attribute_options_languages = mysql_fetch_array($attribute_options_languages_values);
 
-						$row['v_attribute_options_name_' . $attribute_options_count . '_' . $lid] = $attribute_options_languages['products_options_name'];
+						$row['attribute_options_name_' . $attribute_options_count . '_' . $lid] = $attribute_options_languages['products_options_name'];
 					}
 
 					$attribute_values_query = "select products_options_values_id from " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " where products_options_id = '" . (int)$attribute_options['products_options_id'] . "' order by products_options_values_id";
@@ -693,14 +695,14 @@ class EasyPopulateExport extends EasyPopulateProcess
 
 					$attribute_values_count = 1;
 					while ($attribute_values = mysql_fetch_array($attribute_values_values)) {
-						$row['v_attribute_values_id_' . $attribute_options_count . '_' . $attribute_values_count]   = $attribute_values['products_options_values_id'];
-						$attribute_values_price_query = "select options_values_price, price_prefix from " . TABLE_PRODUCTS_ATTRIBUTES . " where products_id = '" . (int)$row['v_products_id'] . "' and options_id = '" . (int)$attribute_options['products_options_id'] . "' and options_values_id = '" . (int)$attribute_values['products_options_values_id'] . "'";
+						$row['attribute_values_id_' . $attribute_options_count . '_' . $attribute_values_count]   = $attribute_values['products_options_values_id'];
 
+						$attribute_values_price_query = "select options_values_price, price_prefix from " . TABLE_PRODUCTS_ATTRIBUTES . " where products_id = '" . (int)$row['products_id'] . "' and options_id = '" . (int)$attribute_options['products_options_id'] . "' and options_values_id = '" . (int)$attribute_values['products_options_values_id'] . "'";
 						$attribute_values_price_values = ep_query($attribute_values_price_query);
 
 						$attribute_values_price = mysql_fetch_array($attribute_values_price_values);
 
-						$row['v_attribute_values_price_' . $attribute_options_count . '_' . $attribute_values_count]  = $attribute_values_price['price_prefix'] . $attribute_values_price['options_values_price'];
+						$row['attribute_values_price_' . $attribute_options_count . '_' . $attribute_values_count]  = $attribute_values_price['price_prefix'] . $attribute_values_price['options_values_price'];
 
 						for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
 							$lid = $languages[$i]['id'];
@@ -710,7 +712,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 
 							$attribute_values_languages = mysql_fetch_array($attribute_values_languages_values);
 
-							$row['v_attribute_values_name_' . $attribute_options_count . '_' . $attribute_values_count . '_' . $lid] = $attribute_values_languages['products_options_values_name'];
+							$row['attribute_values_name_' . $attribute_options_count . '_' . $attribute_values_count . '_' . $lid] = $attribute_values_languages['products_options_values_name'];
 						}
 
 						$attribute_values_count++;
@@ -722,14 +724,14 @@ class EasyPopulateExport extends EasyPopulateProcess
 			// VJ product attribs end
 
 			// this is for the separate price per customer module
-			if (isset($filelayout['v_customer_price_1'])){
+			if (isset($filelayout['customer_price_1'])){
 				$sql2 = "SELECT
 						customers_group_price,
 						customers_group_id
 					FROM
 						".TABLE_PRODUCTS_GROUPS."
 					WHERE
-					products_id = " . $row['v_products_id'] . "
+					products_id = " . $row['products_id'] . "
 					ORDER BY
 					customers_group_id"
 					;
@@ -737,8 +739,8 @@ class EasyPopulateExport extends EasyPopulateProcess
 				$ll = 1;
 				$row2 =  mysql_fetch_array($result2);
 				while( $row2 ){
-					$row['v_customer_group_id_' . $ll]  = $row2['customers_group_id'];
-					$row['v_customer_price_' . $ll]   = $row2['customers_group_price'];
+					$row['customer_group_id_' . $ll]  = $row2['customers_group_id'];
+					$row['customer_price_' . $ll]   = $row2['customers_group_price'];
 					$row2 = mysql_fetch_array($result2);
 					$ll++;
 				}
@@ -751,7 +753,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 					FROM
 						".TABLE_SPECIALS."
 					WHERE
-					products_id = " . $row['v_products_id'] . " and
+					products_id = " . $row['products_id'] . " and
 					status = 1 and
 					expires_date < CURRENT_TIMESTAMP
 					ORDER BY
@@ -762,32 +764,32 @@ class EasyPopulateExport extends EasyPopulateProcess
 				$row2 =  mysql_fetch_array($result2);
 				if (!empty($row2)){
 					// reset the products price to our special price if there is one for this product
-					$row['v_products_price']  = $row2['specials_new_products_price'];
+					$row['products_price']  = $row2['specials_new_products_price'];
 				}
 			}
 
 			// Price/Qty/Discounts - chadd
 			 $discount_index = 1;
-			 while (isset($filelayout['v_discount_id_'.$discount_index])) {
-				if ($row['v_products_discount_type'] != '0') { // if v_products_discount_type == 0 then there are no quantity breaks
+			 while (isset($filelayout['discount_id_'.$discount_index])) {
+				if ($row['products_discount_type'] != '0') { // if products_discount_type == 0 then there are no quantity breaks
 					$sql2 = 'SELECT discount_id, discount_qty, discount_price FROM '.
 						TABLE_PRODUCTS_DISCOUNT_QUANTITY.' WHERE products_id = '.
-						$row['v_products_id'].' AND discount_id='.$discount_index;
+						$row['products_id'].' AND discount_id='.$discount_index;
 					$result2 = ep_query($sql2);
 					$row2    = mysql_fetch_array($result2);
-					$row['v_discount_id_'.$discount_index]    = $row2['discount_id'];
-					$row['v_discount_price_'.$discount_index] = $row2['discount_price'];
-					$row['v_discount_qty_'.$discount_index]   = $row2['discount_qty'];
+					$row['discount_id_'.$discount_index]    = $row2['discount_id'];
+					$row['discount_price_'.$discount_index] = $row2['discount_price'];
+					$row['discount_qty_'.$discount_index]   = $row2['discount_qty'];
 				}
 				$discount_index++;
 			 }
 
 			//We check the value of tax class and title instead of the id
 			//Then we add the tax to price if $price_with_tax is set to 1
-			if (isset($filelayout['v_products_price'])) {
-				$row_tax_multiplier     = $this->getTaxClassRate($row['v_tax_class_id']);
-				$row['v_tax_class_title']   = zen_get_tax_class_title($row['v_tax_class_id']);
-				$row['v_products_price']  = round($row['v_products_price'] + ($price_with_tax * $row['v_products_price'] * $row_tax_multiplier / 100),2);
+			if (isset($filelayout['products_price'])) {
+				$row_tax_multiplier     = $this->getTaxClassRate($row['tax_class_id']);
+				$row['tax_class_title']   = zen_get_tax_class_title($row['tax_class_id']);
+				$row['products_price']  = round($row['products_price'] + ($price_with_tax * $row['products_price'] * $row_tax_multiplier / 100),2);
 			}
 
 			$tempcsvrow = array();
@@ -859,15 +861,15 @@ class EasyPopulateExport extends EasyPopulateProcess
 
 		$attribute_options_count = 1;
 		foreach ($attribute_options_array as $attribute_options_values) {
-			$key1 = 'v_attribute_options_id_' . $attribute_options_count;
+			$key1 = 'attribute_options_id_' . $attribute_options_count;
 			$filelayout[] = $key1;
 
 			for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
 				$l_id = $languages[$i]['id'];
-				$key2 = 'v_attribute_options_name_' . $attribute_options_count . '_' . $l_id;
+				$key2 = 'attribute_options_name_' . $attribute_options_count . '_' . $l_id;
 				$filelayout[] = $key2;
 			}
-	
+
 			$attribute_values_query = "SELECT products_options_values_id
 			FROM " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . "
 			WHERE products_options_id = '" . (int)$attribute_options_values['products_options_id'] . "'
@@ -876,16 +878,16 @@ class EasyPopulateExport extends EasyPopulateProcess
 
 			$attribute_values_count = 1;
 			while ($attribute_values = mysql_fetch_array($attribute_values_values)) {
-				$key3 = 'v_attribute_values_id_' . $attribute_options_count . '_' . $attribute_values_count;
+				$key3 = 'attribute_values_id_' . $attribute_options_count . '_' . $attribute_values_count;
 				$filelayout[] = $key3;
 
-				$key4 = 'v_attribute_values_price_' . $attribute_options_count . '_' . $attribute_values_count;
+				$key4 = 'attribute_values_price_' . $attribute_options_count . '_' . $attribute_values_count;
 				$filelayout[] = $key4;
-	
+
 				for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
 					$l_id = $languages[$i]['id'];
 
-					$key5 = 'v_attribute_values_name_' . $attribute_options_count . '_' . $attribute_values_count . '_' . $l_id;
+					$key5 = 'attribute_values_name_' . $attribute_options_count . '_' . $attribute_values_count . '_' . $l_id;
 					$filelayout[] = $key5;
 				}
 
