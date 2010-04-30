@@ -12,7 +12,7 @@
 /**
  * Capture header and footer since they must be included in the global
  * scope so all zencart variables are available to them
- * 
+ *
  * Rewrite the header/footer urls so they point to the right place
  */
 $replace = array();
@@ -45,7 +45,7 @@ if (!isset($_SESSION['easypopulate']['errors'])) {
 class EasyPopulate extends Fitzgerald
 {
 	public $originalErrorLevel;
-	
+
 	public function __construct($options = array())
 	{
 		parent::__construct($options);
@@ -93,12 +93,12 @@ class EasyPopulate extends Fitzgerald
 		}
 		$this->redirect('/');
 	}
-	
+
 	public function get_preset($config)
 	{
 		echo json_encode(EPFileUploadFactory::getConfig($config));
 		error_reporting($this->originalErrorLevel);
-		exit();	
+		exit();
 	}
 
 	public function post_preset()
@@ -134,7 +134,7 @@ class EasyPopulate extends Fitzgerald
 			$this->redirect('/export');
 		}
 	}
-	
+
 	/**
     * This is a rudimentary date integrity check for references to any non-existant product_id entries
 	 * this check ought to be last, so it checks the tasks just performed as a quality check of EP...
@@ -147,7 +147,7 @@ class EasyPopulate extends Fitzgerald
 			//$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_DROSS_DETECTED, count($dross), zen_href_link('easypopulate.php', 'dross=delete')), 'caution');
 		}
 	}
-	
+
 	public function post_dross()
 	{
 		EasyPopulateImport::purgeDross($dross);
@@ -164,7 +164,7 @@ class EasyPopulate extends Fitzgerald
 		} else {
 			//$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_SUCCESS, 'success');
 		}
-		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');	
+		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
 	}
 
 	private function getImportTplVars()
@@ -200,10 +200,10 @@ class EasyPopulate extends Fitzgerald
 		if (!is_null($this->request->import_handler)) {
 			$config['import_handler'] = $this->request->import_handler;
 		}
-	
+
 		$saved_config = EPFileUploadFactory::getConfig($config['import_handler']);
 		$config = array_merge($saved_config, $config);
-	
+
 		if (!is_null($this->request->local_file)) {
 			$config['local_file'] = $this->request->local_file;
 		}
@@ -227,11 +227,11 @@ class EasyPopulate extends Fitzgerald
 				$this->redirect('/import');
 			}
 		}
-	
+
 		if (!is_null($this->request->column_delimiter)) {
 			$config['column_delimiter'] = $this->request->column_delimiter;
 		}
-	
+
 		if (!is_null($this->request->column_enclosure)) {
 			$config['column_enclosure'] = $this->request->column_enclosure;
 		}
@@ -239,23 +239,23 @@ class EasyPopulate extends Fitzgerald
 		if (!is_null($this->request->price_modifier)) {
 			$config['price_modifier'] = $this->request->price_modifier;
 		}
-	
+
 		if (!is_null($this->request->image_path_prefix)) {
 			$config['image_path_prefix'] = $this->request->image_path_prefix;
 		}
-	
+
 		if (!is_null($this->request->tax_class_title)) {
 			$config['tax_class_title'] = $this->request->tax_class_title;
 		}
-	
+
 		if (!is_null($this->request->metatags_keywords)) {
 			$config['metatags_keywords'] = $this->request->metatags_keywords;
 		}
-	
+
 		if (!is_null($this->request->metatags_description)) {
 			$config['metatags_description'] = $this->request->metatags_description;
 		}
-	
+
 		if (!is_null($this->request->metatags_title)) {
 			$config['metatags_title'] = $this->request->metatags_title;
 		}
@@ -266,12 +266,12 @@ class EasyPopulate extends Fitzgerald
 			ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_NOT_EXIST, $fileInfo->getFileName()));
 			$this->redirect('/import');
 		}
-	
+
 		if (!$fileInfo->isReadable()) {
 			ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED, $fileInfo->getFileName()));
 			$this->redirect('/import');
 		}
-	
+
 		$import = new EasyPopulateImport($config);
 		$tpl = $this->getImportTplVars();
 		$tpl['local_file'] = $this->request->local_file;
@@ -294,7 +294,7 @@ class EasyPopulate extends Fitzgerald
 			ep_set_error('uploaded_file', $error);
 			 $out = $error;
 		} else {
-			$fileName = ep_get_config('temp_path') . $file['name']; 
+			$fileName = ep_get_config('temp_path') . $file['name'];
 			move_uploaded_file($file['tmp_name'], $fileName);
 			$fileInfo = new SplFileInfo($fileName);
 			$size = round(($fileInfo->getSize() / 1024)) . ' KB';
@@ -314,12 +314,13 @@ class EasyPopulate extends Fitzgerald
 }
 
 	$app = new EasyPopulate(array(
-	'errorLevel' => error_reporting(), 
+	'errorLevel' => error_reporting(),
 	'layout' => 'layout',
 	'header' =>  $header,
 	'footer' => $footer,
 	'sessions' => false, // We use zencart's sessions
 	'mountPoint' => '/admin/easypopulate.php'));
+
 	$app->originalErrorLevel = $original_error_level;
 
 	$app->get('/', 'get_index');
