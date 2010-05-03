@@ -65,9 +65,6 @@ class EPUploadPremierProducts extends EPUploadStandard
 		$descriptions = array();
 		$descriptions['name'] = $item['item'];
 
-		$item['products_quantity_order_min'] = 1;
-		$item['products_quantity_order_units'] = 1;
-
 		$item['manufacturers_name'] = str_replace('?', '', $item['manufacturers_name']);
 
 		$item['products_image'] = $this->imagePathPrefix . $item['products_image'];

@@ -114,13 +114,6 @@ class EPUploadBNFUSA extends EPUploadStandard
 			$item['categories'][] = $cat;
 		}*/
 
-		if (empty($item['products_quantity_order_min']) || !isset($item['products_quantity_order_min'])) {
-			$item['products_quantity_order_min'] = 1;
-		}
-
-		if (empty($item['products_quantity_order_units']) || !isset($item['products_quantity_order_units'])) {
-			$item['products_quantity_order_units'] = 1;
-		}
 		$item['products_discount_type'] = 2;
 
 		$model = $item['products_model'];

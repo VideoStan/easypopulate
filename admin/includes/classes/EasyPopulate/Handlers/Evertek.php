@@ -79,9 +79,6 @@ class EPUploadEvertek extends EPUploadStandard
 		$descriptions = array();
 		$descriptions['name'] = $item['Product Description'];
 
-		$item['products_quantity_order_min'] = 1;
-		$item['products_quantity_order_units'] = 1;
-
 		$item['products_price'] = str_replace('$', '', $item['products_price']);
 		$item['discount_price_1'] = str_replace('$', '', $item['discount_price_1']);
 

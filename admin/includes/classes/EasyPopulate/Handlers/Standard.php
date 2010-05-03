@@ -195,12 +195,6 @@ class EPUploadStandard extends SplFileObject
 		} else {
 			$item['products_image'] = $this->imagePathPrefix . $item['products_image'];
 		}
-		if (empty($item['products_quantity_order_min']) || !isset($item['products_quantity_order_min'])) {
-			$item['products_quantity_order_min'] = 1;
-		}
-		if (empty($item['products_quantity_order_units']) || !isset($item['products_quantity_order_units'])) {
-			$item['products_quantity_order_units'] = 1;
-		}
 
 		return $item;
 	}

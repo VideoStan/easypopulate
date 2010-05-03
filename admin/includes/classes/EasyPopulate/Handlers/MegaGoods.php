@@ -63,9 +63,6 @@ class EPUploadMegaGoods extends EPUploadStandard
 
 		$item['metatags'] = array();
 
-		$item['products_quantity_order_min'] = 1;
-		$item['products_quantity_order_units'] = 1;
-
 		$item['products_status'] = 1;
 		if ($item['products_status'] == 'soldout') {
 			$item['products_status'] == 0;
