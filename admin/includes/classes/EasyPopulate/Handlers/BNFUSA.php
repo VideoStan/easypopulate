@@ -65,7 +65,8 @@ class EPUploadBNFUSA extends EPUploadStandard
 		$config['feed_url'] = 'http://www.bnfusa.com/utilities/cgen.lasso?an8=10151431&fmt=csv';
 		$config['local_file'] = 'BNFUSA.csv';
 		$config['images_url'] = 'http://statics.bnfusa.com/By_Part_Number.zip';
-		return $config;	
+		$config['images_file_path'] = 'By_Part_Number';
+		return $config;
 	}
 
 	public function mapFileLayout(array $filelayout)
