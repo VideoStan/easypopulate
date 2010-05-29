@@ -208,18 +208,7 @@ class EasyPopulate extends Fitzgerald
 		if (!is_null($this->request->local_file)) {
 			$config['local_file'] = $this->request->local_file;
 		}
-	
-		if (isset($_FILES['uploaded_file'])) {
-			if (!empty($_FILES['uploaded_file']['type'])) {
-				$result_code = $_FILES['uploaded_file']['error'];
-				if ($result_code != UPLOAD_ERR_OK) {
-					ep_set_error('uploaded_file', ep_get_upload_error($result_code));
-					$this->redirect('/import');
-				} else {
-					$config['local_file'] = ep_handle_uploaded_file($_FILES['uploaded_file']);
-				}
-			}
-		}
+
 		$config['local_file'] = ep_get_config('temp_path') . $config['local_file'];
 		if (!is_null($this->request->remote_file) && !empty($config['local_file']) && isset($config['feed_url'])) {
 			if(!@copy($config['feed_url'], $config['local_file'])) {
