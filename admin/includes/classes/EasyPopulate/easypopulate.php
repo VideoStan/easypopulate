@@ -337,9 +337,4 @@ class EasyPopulate extends Fitzgerald
 	$app->post('/upload', 'post_upload');
 
 	$app->run();
-
-	// Go back to zencart's error handling
-	error_reporting($original_error_level);
-	restore_error_handler();
-	require(DIR_WS_INCLUDES . 'application_bottom.php');
 ?>
