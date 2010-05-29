@@ -123,13 +123,14 @@ class EasyPopulate extends Fitzgerald
 		$export->run();
 
 		if ($download == 'stream') {
-			$export->streamFile();
-			if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
-			error_reporting($this->originalErrorLevel);
+			//if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
+			return $this->sendFile($export->fileName, 'text/csv', $export->tempFName);
 			exit();
 		} else {
-			$export->saveFile();
-			//$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $export->fileName, ep_get_config('temp_path')), 'success');
+			if (!rename($export->tempFName, ep_get_config('temp_path') . $export->fileName)) {
+				// @todo error
+			}
+			$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $export->fileName, ep_get_config('temp_path')), 'success');
 			if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
 			$this->redirect('/export');
 		}

@@ -13,10 +13,10 @@
 class EasyPopulateExport extends EasyPopulateProcess
 {
 	public $fileName = '';
+	public $tempFName = '';
 	private $type = 'full';
 	private $columnDelimiter = ',';
 	private $columnEnclosure = '"';
-	private $lines = array();
 
 	public function setFormat($type = 'full')
 	{
@@ -547,10 +547,17 @@ class EasyPopulateExport extends EasyPopulateProcess
 			// if no mapping was specified; use the internal field names for header names
 			$filelayout_header = $filelayout;
 		}
-	
-		$filestring = array();
-		$this->lines[] = array_keys($filelayout_header);
-	
+
+		//@todo ? $tempFName = tempnam(ep_get_config('temp_path'), 'eptemp-');
+		$tempFName = tempnam('/tmp', '');
+		$tempFile = new EasyPopulateCsvFileObject($tempFName , 'w+');
+		$tempFile->setCsvControl($this->columnDelimiter, stripslashes($this->columnEnclosure));
+
+		$header = array();
+		foreach ($filelayout_header as $key => $value) {
+			$header[] = 'v_' . $key; // @todo maybe set the key prefix in EasyPopulateCsvFileObject ?
+		}
+		$tempFile->setFileLayout($header, true);
 		$num_of_langs = count($langcode);
 
 		while ($row = mysql_fetch_array($result, MYSQL_ASSOC)){
@@ -793,60 +800,20 @@ class EasyPopulateExport extends EasyPopulateProcess
 			}
 
 			$tempcsvrow = array();
-			foreach( $filelayout as $key => $value ){
+			foreach ($filelayout as $key => $value) {
 				// only the specified keys are used
 				$tempcsvrow[] = $row[$key];
 			}
-			$this->lines[] = $tempcsvrow;
-	
+			switch ($ep_dltype) {
+				case 'froogle':
+					$tempcsvrow = array_map(array($this, 'killBreaks'), $tempcsvrow);
+					break;
+				}
+			$tempFile->write($tempcsvrow);
 		}
-	
-		switch ($ep_dltype) {
-			case 'froogle':
-				$filestring = array_map(array($this, 'killBreaks'), $this->lines);
-			break;
-		}
-		return true;
-	}
-	
-	/**
-	 * Stream the file
-	 *
-	 * @todo make Content-Type configurable
-	 */
-	public function streamFile()
-	{
-		global $request_type;
-		header('Content-type: text/csv');
-		//header("Content-type: application/vnd.ms-excel");
-		header('Content-disposition: attachment; filename=' . $this->fileName);
-		// Changed if using SSL, helps prevent program delay/timeout (add to backup.php also)
-		if ($request_type == 'NONSSL'){
-			header('Pragma: no-cache');
-		} else {
-			header('Pragma: ');
-		}
-		header('Expires: 0');
-		$fp = $this->write('php://temp');
-		rewind($fp);
-		echo stream_get_contents($fp);
-		fclose($fp);
-	}
-	
-	public function saveFile()
-	{
-		$tmpfpath = ep_get_config('temp_path') . $this->fileName;
-		$fp = $this->write($tmpfpath);
-		fclose($fp);
-	}
 
-	private function write($fileName)
-	{
-		$fp = fopen($fileName, 'w+');
-		foreach ($this->lines as $line) {
-			fputcsv($fp, $line, $this->columnDelimiter, $this->columnEnclosure);
-		}
-		return $fp;
+		$this->tempFName = $tempFName;
+		return true;
 	}
 
 	/**
