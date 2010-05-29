@@ -38,7 +38,7 @@ class EPUploadMegaGoods extends EPUploadStandard
 		$config['column_delimiter'] = 'tab';
 		$config['feed_url'] = 'https://www.megagoods.com/export.php?show=format_tab';
 		$config['local_file'] = 'MegaGoods.txt';
-		$config['images_url'] = 'https://www.megagoods.com/pimages/regular.zip';
+		$config['images_url'] = 'http://www.megagoods.com/pimages/regular.zip';
 		$config['images_file_path'] = ''; 
 		return $config;
 	}
