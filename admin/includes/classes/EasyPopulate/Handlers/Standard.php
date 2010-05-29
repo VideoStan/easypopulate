@@ -18,10 +18,9 @@
  *       If so, we can replace the subclass the current method to call fgetcsv
  *       and implement setCsvControl
  */
-class EPUploadStandard extends SplFileObject
+class EPUploadStandard extends EasyPopulateCsvFileObject
 {
 	public $name = 'Standard';
-	public $filelayout = array();
 	public $itemCount = 0;
 	public $transforms = array();
 	public $imagePathPrefix = '';
@@ -29,9 +28,8 @@ class EPUploadStandard extends SplFileObject
 	function __construct($file)
 	{
 		$this->transforms = array();
-		@ini_set('auto_detect_line_endings',(int)ep_get_config('detect_line_endings'));
+		$this->autoDetectLineEndings(ep_get_config('detect_line_endings'));
 		parent::__construct($file);
-		$this->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY | SplFileObject::DROP_NEW_LINE);
 	}
 
 	public static function defaultConfig()
@@ -46,20 +44,6 @@ class EPUploadStandard extends SplFileObject
 		$config['metatags_description'] = '';
 		$config['metatags_title'] = '';
 		return $config;
-	}
-
-	/**
-	 *
-	 * @todo rework how the caller handles filelayout
-	 */
-	function getFileLayout()
-	{
-		$pos = $this->key();
-		$this->seek(0);
-		$filelayout = $this->current();
-		$this->seek($pos);
-		$this->filelayout = $this->mapFileLayout($filelayout);
-		return $this->filelayout;
 	}
 
 	/**
@@ -89,33 +73,6 @@ class EPUploadStandard extends SplFileObject
 	{
 		$line = $this->current();
 		return $line[$column];
-	}
-
-	/**
-	 * Rewind to the first data row
-	 *
-	 * @return void
-	 */
-	function rewind()
-	{
-		parent::rewind();
-		$this->next();
-	}
-
-	/**
-	 * Get the current line array indexed by filelayout column names
-	 *
-	 * The keys are provided by the file handler and the data is padded to match
-	 * the size of the filelayout, so we get defined but empty values
-	 *
-	 * @return array
-	 * @todo should the values be an empty string or NULL?
-	 */
-	function current()
-	{
-		if (empty($this->filelayout)) return parent::current();
-		$row = array_pad(parent::current(), count($this->filelayout), '');
-		return array_combine(array_keys($this->filelayout), array_values($row));
 	}
 
 	/**
