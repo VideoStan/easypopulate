@@ -321,15 +321,14 @@ class EasyPopulateImport extends EasyPopulateProcess
 				$product['products_qty_box_status'] = $products_qty_box_status;
 			}
 			$product['products_quantity_order_min'] = 1;
-			if (empty($products_quantity_order_min) || !isset($products_quantity_order_min)) {
+			if (isset($products_quantity_order_min)) {
 				$product['products_quantity_order_min'] = $products_quantity_order_min;
 			}
 			$item['products_quantity_order_units'] = 1;
-			if (empty($products_quantity_order_units) || !isset($products_quantity_order_units)) {
-				$product['products_quantity_order_units'] = 1;
+			if (isset($products_quantity_order_units)) {
+				$product['products_quantity_order_units'] = $products_quantity_order_units;
 			}
-			$product['products_quantity_order_min'] = $products_quantity_order_min;
-			$product['products_quantity_order_units'] = $products_quantity_order_units;
+
 			$product['products_quantity']	= $products_quantity;
 			$product['master_categories_id'] = $categories_id;
 			$product['manufacturers_id'] = $manufacturers_id;
@@ -353,7 +352,7 @@ class EasyPopulateImport extends EasyPopulateProcess
 				$product['products_price_as'] = $products_price_as;
 			}
 			if ($ep_supported_mods['upc']) {
-					$product['products_upc'] = $products_upc;
+				$product['products_upc'] = $products_upc;
 			}
 
 			if ($row = mysql_fetch_array($result)) { //UPDATING PRODUCT
