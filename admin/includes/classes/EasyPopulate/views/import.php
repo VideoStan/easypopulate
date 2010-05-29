@@ -30,8 +30,14 @@
 			<?php $enabled = !empty($config['feed_url']) ? '' : 'disabled="disabled"'; ?>
 			<?php echo zen_draw_checkbox_field('remote_file', '', (bool)$feed_url, '', 'id="remote_file" ' . $enabled) ?>
 			<span class="error"><?php echo ep_get_error('remote_file'); ?></span>
-
 		</div>
+		<?php if (function_exists('get_sites')) { ?>
+			<div>
+			<label for="site">Site</label>
+			<?php echo zen_draw_pull_down_menu('site', get_sites(), $site, 'class="config" id="site"'); ?>
+			</div>
+		<?php } ?>
+
 		<div>
 		<label for="column_delimiter">Column Delimiter</label>
 		<?php $delimiters = array();

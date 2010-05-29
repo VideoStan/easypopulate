@@ -182,6 +182,8 @@ class EasyPopulate extends Fitzgerald
 		$tpl['metatags_keywords'] = '';
 		$tpl['metatags_description'] = '';
 		$tpl['metatags_title'] = '';
+		$tpl['site'] = '';
+
 		$config = ep_get_config();
 		$tpl = array_merge($tpl, $config);
 		$tpl = array_merge($tpl, EPFileUploadFactory::getConfig($tpl['import_handler']));
@@ -216,6 +218,10 @@ class EasyPopulate extends Fitzgerald
 				ep_set_error('local_file', sprintf('Unable to save %s to %s because: %s', $config['feed_url'], $config['local_file'], $error['message']));
 				$this->redirect('/import');
 			}
+		}
+
+		if (!is_null($this->request->site)) {
+			$config['site'] = $this->request->site;
 		}
 
 		if (!is_null($this->request->column_delimiter)) {

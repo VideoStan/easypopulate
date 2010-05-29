@@ -192,11 +192,9 @@ class EasyPopulateImport extends EasyPopulateProcess
 				$products_price = round( $products_price / (1 + ( $row_tax_multiplier * $price_with_tax/100) ), 4);
 			}
 
-			// @todo this does not appear to support more than 7 categories??
 			unset ($categories_name); // default to not set.
 
 			if (isset($filelayout['categories_name_1'])) { // does category 1 column exist in our file..
-
 				$category_strlen_long = false;
 				$newlevel = 1;
 				// @todo decouple import from max_categories altogether
@@ -229,26 +227,44 @@ class EasyPopulateImport extends EasyPopulateProcess
 				$manufacturers_id = mysql_insert_id();
 			}
 
+			$des_extra = '';
+			if (!empty($site) && function_exists('get_sites')) {
+				$des_extra = ', des.sites';
+			}
+
 			// if the categories names are set then try to update them
 			if (isset($categories_name_1)) {
 				// start from the highest possible category and work our way down from the parent
 				$categories_id = 0;
 				$theparent_id = 0;
-				// @todo decouple import from max categories altogetherr
+
+				// @todo decouple import from max categories altogether
 				for ($categorylevel = 10; $categorylevel>0; $categorylevel--) {
 					if (isset($categories_name[$categorylevel])){
 						$thiscategoryname = $categories_name[$categorylevel];
 						// we found a category name in this field
 
 						// now the subcategory
-						$sql = "SELECT cat.categories_id AS catID FROM ".TABLE_CATEGORIES." AS cat, ".TABLE_CATEGORIES_DESCRIPTION." AS des WHERE
+						$sql = "SELECT cat.categories_id AS catID $des_extra
+								FROM ".TABLE_CATEGORIES." AS cat, ".TABLE_CATEGORIES_DESCRIPTION." AS des WHERE
 								cat.categories_id = des.categories_id AND
 								des.language_id = $epdlanguage_id AND
 								cat.parent_id = " . $theparent_id . " AND
 								des.categories_name = '" . zen_db_input($thiscategoryname) . "' LIMIT 1";
 						$result = ep_query($sql);
-						if ( $row = mysql_fetch_array($result) ){ // langer - null result here where len of $categories_name[] exceeds maximum in database
+
+						if ($row = mysql_fetch_array($result)) { 
 							$thiscategoryid = $row['catID'];
+
+							if (isset($site) && !empty($site)) {
+								$sites = explode(',', $row['sites']);
+								if (!in_array($site, $sites)) {
+									$cddata['sites'] = $row['sites'] . ',' . $site;
+									$where = "categories_id = $thiscategoryid";
+									$query = ep_db_modify(TABLE_CATEGORIES_DESCRIPTION, $cddata, 'UPDATE', $where);
+									$sresult = ep_query($query);	
+								}
+							}
 						} else {
 							$data = array();
 							// to add, we need to put stuff in categories and categories_description
@@ -265,6 +281,11 @@ class EasyPopulateImport extends EasyPopulateProcess
 							$data['categories_id'] = $thiscategoryid;
 							$data['language_id'] = $epdlanguage_id;
 							$data['categories_name'] = $thiscategoryname;
+
+							if (isset($site) && !empty($site)) {
+								$data['sites'] = $site;
+							}
+
 							$query = ep_db_modify(TABLE_CATEGORIES_DESCRIPTION, $data, 'INSERT');
 							$result = ep_query($query);
 						}
