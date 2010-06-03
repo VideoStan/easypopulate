@@ -9,26 +9,7 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  */
 //require_once 'includes/application_top.php';
-/**
- * Capture header and footer since they must be included in the global
- * scope so all zencart variables are available to them
- *
- * Rewrite the header/footer urls so they point to the right place
- */
-$replace = array();
-$replace['/admin/easypopulate.php/'] = '';
-$replace['="images/'] = '="../images/';
-$replace['="includes/languages'] = '="../includes/languages';
-ob_start();
-require DIR_WS_INCLUDES . 'header.php';
-$header = ob_get_clean();
-ob_start();
-require DIR_WS_INCLUDES . 'footer.php';
-$footer = ob_get_clean();
-$header = str_replace(array_keys($replace), array_values($replace), $header);
-$footer = str_replace(array_keys($replace), array_values($replace), $footer);
 
-$original_error_level = error_reporting();
 error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
 
 require DIR_WS_CLASSES . 'EasyPopulate/lib/EasyPopulate.php';
@@ -44,8 +25,6 @@ if (!isset($_SESSION['easypopulate']['errors'])) {
 
 class EasyPopulate extends Fitzgerald
 {
-	public $originalErrorLevel;
-
 	public function __construct($options = array())
 	{
 		parent::__construct($options);
@@ -97,7 +76,6 @@ class EasyPopulate extends Fitzgerald
 	public function get_preset($config)
 	{
 		echo json_encode(EPFileUploadFactory::getConfig($config));
-		error_reporting($this->originalErrorLevel);
 		exit();
 	}
 
@@ -107,7 +85,6 @@ class EasyPopulate extends Fitzgerald
 			EPFileUploadFactory::setConfig($this->request->preset, $this->request->config);
 		}
 		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
-		error_reporting($this->originalErrorLevel);
 		exit();
 	}
 
@@ -307,17 +284,32 @@ class EasyPopulate extends Fitzgerald
 		// @todo find a way just ignore that one
 		return parent::handleError($number, $message, $file, $line);
 	}
+	
+	/**
+	 * Rewrite the zencart header urls so they point to the right place
+	 */
+	public static function header()
+	{
+		global $db, $messageStack, $PHP_SELF;
+		$new_version = TEXT_VERSION_CHECK_CURRENT;
+		$replace = array();
+		$replace['/admin/easypopulate.php/'] = '';
+		$replace['="images/'] = '="../images/';
+		$replace['="includes/languages'] = '="../includes/languages';
+
+		ob_start();
+		require DIR_WS_INCLUDES . 'header.php';
+		$header = ob_get_clean();
+		$header = str_replace(array_keys($replace), array_values($replace), $header);
+		return $header;
+	}
 }
 
 	$app = new EasyPopulate(array(
 	'errorLevel' => error_reporting(),
 	'layout' => 'layout',
-	'header' =>  $header,
-	'footer' => $footer,
 	'sessions' => false, // We use zencart's sessions
 	'mountPoint' => '/admin/easypopulate.php'));
-
-	$app->originalErrorLevel = $original_error_level;
 
 	$app->get('/', 'get_index');
 	$app->post('/installer', 'post_installer');

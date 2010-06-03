@@ -93,7 +93,7 @@
 	</script>
 </head>
 <body>
-<?php echo $options->header; ?>
+<?php echo EasyPopulate::header(); ?>
 <div id="ep_header">
 	<h2>Easy Populate <?php echo EASYPOPULATE_VERSION ?></h2>
 	<form id="installer" action="/admin/easypopulate.php/installer" method="POST">
@@ -121,6 +121,5 @@
 <?php } ?>
 </div>
 <?php $_SESSION['easypopulate']['errors'] = array(); ?>
-<?php echo $options->footer; ?>
 </body>
 </html>
