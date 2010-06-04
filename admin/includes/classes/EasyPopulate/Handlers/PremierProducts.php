@@ -9,26 +9,27 @@
  */
 
 /**
- * Premier Products Upload csv conversion class
+ * Premier Products csv conversion class
  *
  * @todo provide a sample entry
  *
  * All Available Fields:
-	itemid
-	category
-	subcategory
-	brand
-	item
-	modelnumber
-	thumb
-	pic
-	price
-	instock
-	description
-	weight
-	retailprice
-	UPC
-	Shipping Dimensions
+   0  BRAND
+   1  CATNAME
+   2  DESCRIPTION
+   3  DIMENSIONS
+   4  INSTOCK
+   5  ITEM
+   6  ITEMID
+   7  MODELNUM
+   8  PIC
+   9  PRICE
+   10 RETAILPRICE
+   11 SPECIAL
+   12 TAGLINE
+   13 TPIC
+   14 UPC
+   15 WEIGHT
  */
 class EPUploadPremierProducts extends EPUploadStandard
 {
@@ -37,24 +38,22 @@ class EPUploadPremierProducts extends EPUploadStandard
 	public static function defaultConfig()
 	{
 		$config = parent::defaultConfig();
-		$config['feed_url'] = 'http://www.hotbuy4u.com/productindexdl.cfm';
-		$config['local_file'] = 'PremierProducts.txt';
+		$config['feed_url'] = 'http://hotbuy4u.com/products.csv';
+		$config['local_file'] = 'PremierProducts.csv';
 		$config['images_url'] = 'http://www.hotbuy4u.com/picsdl.cfm';
 		$config['images_file_path'] = 'inetpub/wwwroot/products/pics';
-		$config['column_delimiter'] = '^';
 		return $config;
 	}
 
 	public function mapFileLayout(array $filelayout)
 	{
+		$filelayout[0] = 'manufacturers_name';
 		$filelayout[1] = 'categories_name_1';
-		$filelayout[2] = 'categories_name_2';
-		$filelayout[3] = 'manufacturers_name';
-		$filelayout[5] = 'products_model';
-		$filelayout[7] = 'products_image';
-		$filelayout[8] = 'products_price';
-		$filelayout[9] = 'products_quantity';
-		$filelayout[11] = 'products_weight';
+		$filelayout[4] = 'products_quantity';
+		$filelayout[7] = 'products_model';
+		$filelayout[8] = 'products_image';
+		$filelayout[9] = 'products_price';
+		$filelayout[15] = 'products_weight';
 		$filelayout = array_flip($filelayout);
 		return $filelayout;
 	}
@@ -63,7 +62,7 @@ class EPUploadPremierProducts extends EPUploadStandard
 	{
 		$item['metatags'] = array();
 		$descriptions = array();
-		$descriptions['name'] = $item['item'];
+		$descriptions['name'] = $item['ITEM'];
 
 		$item['manufacturers_name'] = str_replace('?', '', $item['manufacturers_name']);
 
@@ -72,11 +71,12 @@ class EPUploadPremierProducts extends EPUploadStandard
 			$item['products_image'] = 'no_picture.gif';
 		}
 
+		$descriptions['description'] =  $item['TAGLINE'] . '<br>' .
+		'<em><strong>Retail Price: $' . $item['RETAILPRICE'] .'</strong></em><br>' .
+		$item['DESCRIPTION'];
 		if (strpos($item['products_model'], '(R)') !== false) {
-			$item['description'] .= '<br> Reconditioned';
+			$descriptions['description'] .= '<br> Reconditioned';
 		}
-		$descriptions['description'] =  '<br><em><strong>Retail Price: $' . $item['retailprice'] .
-			'</strong></em><br>' . $item['description'];
 
 		$item['descriptions'][1] = $descriptions;
 
