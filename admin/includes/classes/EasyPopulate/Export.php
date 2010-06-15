@@ -309,7 +309,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 				p.products_id,
 				p.products_model,
 				p.products_price,
-				p.products_tax_class_id  as tax_class_id';
+				p.products_tax_class_id  as tax_class_id,';
 
 			if ($ep_supported_mods['uom']) {
 				$filelayout_sql .=  'p.products_price_as,';
