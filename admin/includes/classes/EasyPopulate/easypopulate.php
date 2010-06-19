@@ -73,9 +73,17 @@ class EasyPopulate extends Fitzgerald
 		$this->redirect('/');
 	}
 
-	public function get_preset($config)
+	/**
+	 * Get a single provider preset
+	 *
+	 * @param string $name
+	 * @return string template output
+	 * @todo send a 404 if list is empty
+	 */
+	public function get_preset($name = NULL)
 	{
-		echo json_encode(EPFileUploadFactory::getConfig($config));
+		$configs = EPFileUploadFactory::getConfig($name);
+		echo json_encode($configs);
 		exit();
 	}
 
@@ -313,7 +321,7 @@ class EasyPopulate extends Fitzgerald
 
 	$app->get('/', 'get_index');
 	$app->post('/installer', 'post_installer');
-	$app->get('/preset/:config', 'get_preset');
+	$app->get('/preset/:config', 'get_preset', array('config' => '.*'));
 	$app->post('/preset', 'post_preset');
 	$app->get('/export', 'get_export_page');
 	$app->get('/export/:format/:download', 'get_export');

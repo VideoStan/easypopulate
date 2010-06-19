@@ -58,20 +58,23 @@ class EPFileUploadFactory
 	 * @param string $name
 	 * @return array array of config values
 	 */
-	public static function getConfig($name)
+	public static function getConfig($name = NULL)
 	{
 		global $db;
-		$query = "SELECT config FROM  " . TABLE_EASYPOPULATE_FEEDS . "
-					WHERE name = '" . zen_db_input($name) . "'";
+		$query = "SELECT name, config FROM  " . TABLE_EASYPOPULATE_FEEDS;
+
+		if (!empty($name)) $query .= " WHERE name = '" . zen_db_input($name) . "'";
 		$result = $db->Execute($query);
-		$defaultConfig = call_user_func_array(array(EPFileUploadFactory::get($name), 'defaultConfig'), array());
-		$config = array();
+
+		$configs = array();
 		while (!$result->EOF) {
+			$method = array(EPFileUploadFactory::get($result->fields['name']), 'defaultConfig');
+			$defaultConfig = call_user_func_array($method, array());
 			$config = json_decode($result->fields['config'], true);
+			$configs[] = array_merge($defaultConfig, $config);
 			$result->MoveNext();
 		}
-		$config = array_merge($defaultConfig, $config);
-		return $config;
+		return $configs;
 	}
 
 	/**
