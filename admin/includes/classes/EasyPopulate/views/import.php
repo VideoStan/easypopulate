@@ -132,7 +132,7 @@
 		</tr>
 		</thead>
 		<?php foreach ($output['items'] as $item) { ?>
-			<tr class="<?php echo $item['class'] ?>">
+			<tr class="<?php echo 'success'; // @todo bring back the class $item['class'] ?>">
 				<td class="status"><?php echo $item['status'] ?></td>
 				<td class="message"><?php echo $item['message'] ?></td>
 				<?php foreach ($item['data'] as $data) { ?>
@@ -159,7 +159,7 @@
 		</tr>
 		</thead>
 		<?php foreach ($output['specials'] as $item) { ?>
-			<tr class="<?php echo $item['class'] ?>">
+			<tr class="<?php echo 'success'; // todo: bring back the class $item['class'] ?>">
 				<td class="status"><?php echo $item['status'] ?></td>
 				<td class="message"><?php echo $item['message'] ?></td>
 				<?php foreach ($item['data'] as $data) { ?>

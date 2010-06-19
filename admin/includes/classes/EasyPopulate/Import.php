@@ -56,13 +56,11 @@ class EasyPopulateImport extends EasyPopulateProcess
 			$items = $file->handleRow($items);
 
 			if (!isset($items['products_model']) && !zen_not_null($items['products_model'])) {
-				$output_class = 'fail nomodel';
 				$output_message = EASYPOPULATE_DISPLAY_RESULT_NO_MODEL;
 				continue;
 			}
 
 			if (strlen($items['products_model']) > $modelsize) {
-				$output_class = 'fail';
 				$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
 				$output_message = EASYPOPULATE_DISPLAY_RESULT_MODEL_NAME_LONG;
 				continue;
@@ -83,7 +81,6 @@ class EasyPopulateImport extends EasyPopulateProcess
 
 			$product_is_new = true;
 			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
-				$output_class = 'success';
 				$output_data = array();
 				$product_is_new = false;
 				/*
@@ -94,7 +91,6 @@ class EasyPopulateImport extends EasyPopulateProcess
 				// let's check and delete it if requested
 				if (isset($items['products_status']) && $items['products_status'] == 9) {
 					$output_status = EASYPOPULATE_DISPLAY_RESULT_DELETED;
-					$output_class = 'success deleted';
 					$this->removeProductByModel($items['products_model']);
 					continue 2;
 				}
@@ -148,7 +144,6 @@ class EasyPopulateImport extends EasyPopulateProcess
 			if ($product_is_new == true) {
 				if (!zen_not_null(trim($items['categories_name_1']))) {
 					// let's skip this new product without a master category..
-					$output_class = 'fail';
 					$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
 					$output_message = sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NOT_FOUND, ' new');
 					continue;
@@ -158,7 +153,6 @@ class EasyPopulateImport extends EasyPopulateProcess
 					// let's skip this existing product without a master category but has the column heading
 					// or should we just update it to result of $row (it's current category..)??
 					// @todo <johnny> If product exists and doesn't have a master category, use the current one
-					$output_class = 'fail';
 					$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
 					$output_message  = sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NOT_FOUND, '');
 					continue;
@@ -208,7 +202,6 @@ class EasyPopulateImport extends EasyPopulateProcess
 				}
 
 				if ($category_strlen_long) {
-					$output_class = 'fail';
 					$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
 					$output_message = sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NAME_LONG, $category_strlen_max);
 					continue;
@@ -382,10 +375,8 @@ class EasyPopulateImport extends EasyPopulateProcess
 				$query = ep_db_modify(TABLE_PRODUCTS, $product, 'UPDATE', "products_id = $products_id");
 
 				if ( ep_query($query) ) {
-					$output_class = 'updated success';
 					$output_status = EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT;
 				} else {
-					$output_class = 'updated fail';
 					$output_status =  EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT_FAIL;
 					$output_message = EASYPOPULATE_DISPLAY_RESULT_SQL_ERROR;
 				}
@@ -393,10 +384,8 @@ class EasyPopulateImport extends EasyPopulateProcess
 				$query = ep_db_modify(TABLE_PRODUCTS, $product, 'INSERT');
 				if ( ep_query($query) ) {
 					$products_id = mysql_insert_id();
-					$output_class = 'new success';
 					$output_status = EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT;
 				} else {
-					$output_class = 'new fail';
 					$output_status = EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT_FAIL;
 					$output_message = EASYPOPULATE_DISPLAY_RESULT_SQL_ERROR;
 					continue; // @todo CHECKME langer - any new categories however have been created by now..Adding into product table needs to be 1st action?
@@ -641,7 +630,6 @@ class EasyPopulateImport extends EasyPopulateProcess
 				$specials_message = '';
 				$specials_status = '';
 				if ($specials_price >= $products_price) {
-					$specials_class = 'fail';
 					$specials_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
 					$specials_message = EASYPOPULATE_SPECIALS_PRICE_FAIL;
 					//available function: zen_set_specials_status($specials_id, $status)
@@ -666,7 +654,6 @@ class EasyPopulateImport extends EasyPopulateProcess
 
 				if (mysql_num_rows($special) == 0) {
 					if ($specials_price == '0') {
-						$specials_class = 'fail notfound';
 						$specials_status = EASYPOPULATE_DISPLAY_RESULT_DELETE_NOT_FOUND;
 						$specials_message = EASYPOPULATE_SPECIALS_DELETE_FAIL;
 						continue;
@@ -675,29 +662,26 @@ class EasyPopulateImport extends EasyPopulateProcess
 					$query = ep_db_modify(TABLE_SPECIALS, $data, 'INSERT');
 
 					$result = ep_query($query);
-					$specials_class = 'new success';
 					$specials_status = EASYPOPULATE_DISPLAY_RESULT_NEW_PRODUCT;
 				} else {
 					// existing product
 					if ($specials_price == '0') {
 						$db->Execute("delete from " . TABLE_SPECIALS . "
 									 where products_id = '" . (int)$products_id . "'");
-						$specials_class = 'delete success';
 						$specials_status = EASYPOPULATE_DISPLAY_RESULT_DELETED;
 						continue;
 					}
 					$query = ep_db_modify(TABLE_SPECIALS, $data, 'UPDATE', "products_id = $products_id");
 					$result = ep_query($query);
-					$specials_class = 'updated success';
 					$specials_status = EASYPOPULATE_DISPLAY_RESULT_UPDATE_PRODUCT;
 				}
 
 				$specials_data = array($products_model, $descriptions[$epdlanguage_id]['name'], $products_price , $specials_price);
-				$output['specials'][] = array('status' => $specials_status, 'class' => $specials_class, 'message' => $specials_message, 'data' => $specials_data);
+				$output['specials'][] = array('status' => $specials_status, 'message' => $specials_message, 'data' => $specials_data);
 			}
 			// end specials for this product
 			$output_data = array_values($items);
-			$output['items'][] = array('status' => $output_status, 'class' => $output_class, 'message' => $output_message, 'data' => $output_data);
+			$output['items'][] = array('status' => $output_status, 'message' => $output_message, 'data' => $output_data);
 			// end of row insertion code
 
 
