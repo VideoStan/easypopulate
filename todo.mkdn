@@ -1,0 +1,25 @@
+TODO
+-----
+Important:
+
+* See @todo statements in the code
+* renovate html & finalise language support
+* add help links for each error generated
+* Choose between create linked product on new category (default behaviour) or move to new category
+* Add dates to specials summary. Put summary data (prices) in same order as in downloads file
+* investigate gzip compression for uploads and downloads
+* optimisation of code to reduce sql calls?
+* show results via xhr method
+* auto detecting of mods - display list of (only) installed mods, with check-box to include in download
+* consider an auto-splitting feature if it can be done.
+
+Can wait:
+
+* Dual Price Mod support? Maybe I should just write a real-time discount by user-group mod..
+* Revamp downloads layout for modular construction - makes little sense to have multiple configs
+* Add options to either hide/delete products removed from supplier's list instead of just deleting them
+* Feasibility of addition to smart-tags for creating unordered lists based on occurance of blank lines & bullets, asterisks etc.
+* Listing of files in /temp/ with options to delete, refresh list.
+* add button and function for complete SQL backup. Add config option to automatically backup to file all products prior to any uploads?
+* Add buttons/display to manage backup SQL files (delete, restore etc..) displaying date etc.
+* Additional tools for locating directories/manufacturers etc without any products, giving user option to delete.
