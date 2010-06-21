@@ -38,8 +38,8 @@ class EasyPopulateExport extends EasyPopulateProcess
 		// @todo scan array in future to reveal if any mods for inclusion in downloads
 		$ep_supported_mods = array();
 		$ep_supported_mods['psd'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_short_desc');
-		$ep_supported_mods['uom'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_as'); // uom = unit of measure
-		$ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
+		$ep_supported_mods['uom'] = true; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_uom'); // uom = unit of measure
+		$ep_supported_mods['upc'] = true; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
 		/**
 		 * END check for existance of various mods
 		 */
@@ -137,7 +137,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 			$filelayout[] = 'products_price';
 
 			if ($ep_supported_mods['uom']) {
-				$filelayout[] = 'products_price_as';
+				$filelayout[] = 'products_price_uom';
 			}
 
 			if ($ep_supported_mods['upc']) {
@@ -177,7 +177,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 				p.products_price,';
 
 			if ($ep_supported_mods['uom'] == true) {
-				$filelayout_sql .=  'p.products_price_as,';
+				$filelayout_sql .=  'p.products_price_uom,';
 			}
 			if ($ep_supported_mods['upc']) {
 				$filelayout_sql .=  'p.products_upc,';
@@ -219,7 +219,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 			$filelayout[] = 'specials_expires_date';
 			$filelayout[] = 'products_price';
 			if ($ep_supported_mods['uom']) {
-				$filelayout[] = 'products_price_as';
+				$filelayout[] = 'products_price_uom';
 			}
 			$filelayout[] = 'products_quantity';
 
@@ -242,7 +242,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 				p.products_price,';
 
 			if ($ep_supported_mods['uom']) {
-				$filelayout_sql .=  'p.products_price_as,';
+				$filelayout_sql .=  'p.products_price_uom,';
 			}
 
 			$filelayout_sql .= 'p.products_tax_class_id as tax_class_id,
@@ -293,7 +293,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 			$filelayout[] =	'products_price';
 
 			if ($ep_supported_mods['uom']) {
-				$filelayout[] = 'products_price_as';
+				$filelayout[] = 'products_price_uom';
 			}
 
 			$filelayout[] =	'products_discount_type';
@@ -312,7 +312,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 				p.products_tax_class_id  as tax_class_id,';
 
 			if ($ep_supported_mods['uom']) {
-				$filelayout_sql .=  'p.products_price_as,';
+				$filelayout_sql .=  'p.products_price_uom,';
 			}
 
 			$filelayout_sql .= 'p.products_discount_type,
