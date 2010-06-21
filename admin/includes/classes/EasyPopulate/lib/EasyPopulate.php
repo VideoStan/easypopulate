@@ -70,8 +70,9 @@ class EPFileUploadFactory
 		while (!$result->EOF) {
 			$method = array(EPFileUploadFactory::get($result->fields['name']), 'defaultConfig');
 			$defaultConfig = call_user_func_array($method, array());
+			$defaultConfig['name'] = $result->fields['name'];
 			$config = json_decode($result->fields['config'], true);
-			$configs[] = array_merge($defaultConfig, $config);
+			$configs[] = array_merge($defaultConfig, (array)$config);
 			$result->MoveNext();
 		}
 		return $configs;
