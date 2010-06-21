@@ -134,6 +134,7 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 					if (in_array($column[1], array('name', 'description', 'url', 'short'))) {
 						if ($column[1] == 'short') $column[1] = 'short_desc';
 						$descriptions[$column[2]][$column[1]] = $value;
+						break;
 					} // fall through for the rest
 				default:
 					$item[$key] = $value;
