@@ -7,6 +7,7 @@
  * @author too many to list, see history.txt
  * @copyright 200?-2010
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
+ * @todo validate all parameters
  */
 //require_once 'includes/application_top.php';
 
@@ -183,18 +184,22 @@ class EasyPopulate extends Fitzgerald
 
 	public function post_import()
 	{
+		$import_handler = $this->request->import_handler;
+		if (is_null($import_handler) || !is_string($import_handler)) {
+			ep_set_error('import_handler', 'Please set an import handler');
+			$this->redirect('/import');
+			exit();
+		}
+
 		$config = array();
-		$config['import_handler'] = ep_get_config('import_handler');
-		if (!is_null($this->request->import_handler)) {
-			$config['import_handler'] = $this->request->import_handler;
+		// @todo put config entries in $this->request->config again?
+		foreach ($this->request as $k => $v) {
+			if (is_null($v)) continue;
+			$config[$k] = $v;
 		}
 
 		$saved_config = EPFileUploadFactory::getConfig($config['import_handler']);
 		$config = array_merge($saved_config, $config);
-
-		if (!is_null($this->request->local_file)) {
-			$config['local_file'] = $this->request->local_file;
-		}
 
 		$config['local_file'] = ep_get_config('temp_path') . $config['local_file'];
 		if (!is_null($this->request->remote_file) && !empty($config['local_file']) && isset($config['feed_url'])) {
@@ -203,42 +208,6 @@ class EasyPopulate extends Fitzgerald
 				ep_set_error('local_file', sprintf('Unable to save %s to %s because: %s', $config['feed_url'], $config['local_file'], $error['message']));
 				$this->redirect('/import');
 			}
-		}
-
-		if (!is_null($this->request->site)) {
-			$config['site'] = $this->request->site;
-		}
-
-		if (!is_null($this->request->column_delimiter)) {
-			$config['column_delimiter'] = $this->request->column_delimiter;
-		}
-
-		if (!is_null($this->request->column_enclosure)) {
-			$config['column_enclosure'] = $this->request->column_enclosure;
-		}
-
-		if (!is_null($this->request->price_modifier)) {
-			$config['price_modifier'] = $this->request->price_modifier;
-		}
-
-		if (!is_null($this->request->image_path_prefix)) {
-			$config['image_path_prefix'] = $this->request->image_path_prefix;
-		}
-
-		if (!is_null($this->request->tax_class_title)) {
-			$config['tax_class_title'] = $this->request->tax_class_title;
-		}
-
-		if (!is_null($this->request->metatags_keywords)) {
-			$config['metatags_keywords'] = $this->request->metatags_keywords;
-		}
-
-		if (!is_null($this->request->metatags_description)) {
-			$config['metatags_description'] = $this->request->metatags_description;
-		}
-
-		if (!is_null($this->request->metatags_title)) {
-			$config['metatags_title'] = $this->request->metatags_title;
 		}
 
 		$fileInfo = new SplFileInfo($config['local_file']);
