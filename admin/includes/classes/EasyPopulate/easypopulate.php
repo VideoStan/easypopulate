@@ -201,7 +201,17 @@ class EasyPopulate extends Fitzgerald
 
 		$import = new EasyPopulateImport($config);
 		$result = $import->run($fileInfo);
+
 		$resultFileName = $result->getBasename();
+		if ((bool)$this->request->feed_send_email) {
+			$message = "Feed $import_handler has been updated. Please see 
+			" . HTTP_CATALOG_SERVER . '/' . ep_get_config('temp_path') . $resultFileName . " for details";
+			$original_error_level = error_reporting();
+			error_reporting(0);
+			zen_mail(EMAIL_FROM, STORE_OWNER_EMAIL_ADDRESS, 'EasyPopulate Update', $message, EMAIL_FROM, STORE_OWNER_EMAIL_ADDRESS, $message);
+			error_reporting($original_error_level);
+
+		}
 		//if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $this->log(EASYPOPULATE_MSGSTACK_ERROR_SQL);
 		print $result->getFileName();
 		exit();
