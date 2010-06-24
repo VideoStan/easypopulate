@@ -15,7 +15,7 @@
 	<!-- <base href=<?php echo DIR_WS_ADMIN; ?>"> -->
 	<link rel="stylesheet" type="text/css" href="<?php echo $adminUrl; ?>includes/stylesheet.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo $adminUrl; ?>includes/cssjsmenuhover.css" media="all" id="hoverJS">
-	<link rel="stylesheet" type="text/css" href="<?php echo $adminUrl; ?>includes/classes/EasyPopulate/public/style.css" media="all" id="hoverJS">
+	<link rel="stylesheet" type="text/css" href="<?php echo $adminUrl; ?>includes/classes/EasyPopulate/public/style.css" media="all">
 	<script type="text/javascript" src="<?php echo $adminUrl; ?>includes/menu.js"></script>
 	<script type="text/javascript" src="<?php echo $adminUrl; ?>includes/general.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
