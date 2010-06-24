@@ -43,12 +43,20 @@
 	$(document).ready(function() {
 		$("#import_handler").change(function() {
 			$.getJSON("/admin/easypopulate.php/preset/" + $(this).val(), function(json) {
-				$("#remote_file").attr("disabled", "disabled");
+				$("#feed_fetch").attr("disabled", "disabled");
+				$("#images_fetch").attr("disabled", "disabled");
 				$.each(json, function(k, v){
-					$("#" + k).val(unescape(v));
+					isCheckBox = $("#" + k).is("input:checkbox");
+					if (isCheckBox) {
+						$("#" + k).attr("checked", v);
+					} else {
+						$("#" + k).val(unescape(v));
+					}
 				});
-				if (json["feed_url"] != null) {
-					$("#remote_file").removeAttr("disabled");
+
+				if (json.name != 'Standard') {
+					$("#feed_fetch").removeAttr("disabled");
+					$("#images_fetch").removeAttr("disabled");
 				}
 			});
 		});
