@@ -85,6 +85,27 @@
 			}
 		}
 		$('#upload_form').ajaxForm(options);
+
+		var options = {
+			target: "#import_form .message",
+			beforeSubmit: function(formData, jqForm, options) {
+				$("#import_form .message").html('<strong>Importing...</strong>');
+			},
+			success: function(responseString) {
+				/* @todo do this better, use a throbbler? */
+				$("#import_form .message").html('');
+				$("#import_form .message").removeClass('error');
+				$("#import_form .message").addClass('success');
+				$("#import_form .message").html('Success: ' + responseString);
+			},
+			error: function (xhr, status) {
+				$("#import_form .message").html('');
+				$("#import_form .message").removeClass();
+				$("#import_form .message").addClass('error');
+				$("#import_form .message").html(xhr.responseText);	
+			}
+		}
+		$("#import_form").ajaxForm(options);
 	});
 	</script>
 </head>
