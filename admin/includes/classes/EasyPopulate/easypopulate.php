@@ -151,31 +151,16 @@ class EasyPopulate extends Fitzgerald
 		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
 	}
 
-	private function getImportTplVars()
+	public function get_import()
 	{
 		$tpl = array();
+		$tpl['output'] = array();
 		$tpl['max_file_size'] = min(ep_get_bytes(ini_get('upload_max_filesize')), ep_get_bytes(ini_get('post_max_size')));
-		$tpl['price_modifier'] = 0;
-		$tpl['image_path_prefix'] = '';
-		$tpl['column_delimiter'] = ',';
-		$tpl['column_enclosure'] = '"';
 		$tpl['local_file'] = '';
-		$tpl['tax_class_title'] = '';
-		$tpl['feed_url'] = '';
-		$tpl['metatags_keywords'] = '';
-		$tpl['metatags_description'] = '';
-		$tpl['metatags_title'] = '';
-		$tpl['site'] = '';
 
 		$config = ep_get_config();
 		$tpl = array_merge($tpl, $config);
-		$tpl = array_merge($tpl, EPFileUploadFactory::getConfig($tpl['import_handler']));
-		return $tpl;
-	}
-
-	public function get_import()
-	{
-		$tpl = $this->getImportTplVars();
+		$tpl = array_merge($tpl, EPFileUploadFactory::getConfig($config['import_handler']));
 		return $this->render('import', $tpl);
 	}
 
