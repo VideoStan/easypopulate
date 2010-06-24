@@ -76,11 +76,11 @@
 		$(".results_table tr:nth-child(even)").addClass("alt");
 
 		var options = {
-			target: "#uploaded_file ~ .message",
+			target: "#upload_form .message",
 			data: { ajax : true },
 			success: function(responseString) {
 				local_file = $("#uploaded_file").val().replace(/^.*[\/\\]/g, '');
-				$("#uploaded_file ~ .message").addClass('success');
+				$("#upload_form .message").addClass('success');
 				$("#local_file").val(local_file);
 			}
 		}
