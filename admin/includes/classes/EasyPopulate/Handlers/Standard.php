@@ -43,6 +43,12 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 		$config['metatags_keywords'] = '';
 		$config['metatags_description'] = '';
 		$config['metatags_title'] = '';
+		$config['feed_fetch'] = false;
+		$config['images_fetch'] = false;
+		$config['feed_send_email'] = false;
+		if (function_exists('get_sites')) {
+			$config['site'] = '';
+		}
 		return $config;
 	}
 
