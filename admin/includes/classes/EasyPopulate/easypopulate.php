@@ -272,7 +272,7 @@ class EasyPopulate extends Fitzgerald
 
 	$app->get('/', 'get_index');
 	$app->post('/installer', 'post_installer');
-	$app->get('/preset/:config', 'get_preset', array('config' => '.*'));
+	$app->get('/preset/:name', 'get_preset', array('name' => '.*'));
 	$app->post('/preset', 'post_preset');
 	$app->get('/export', 'get_export_page');
 	$app->get('/export/:format/:download', 'get_export');
