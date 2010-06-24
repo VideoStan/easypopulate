@@ -4,12 +4,13 @@
 		<label for="uploaded_file">Upload EP File</label>
 		<input id="uploaded_file" name="uploaded_file" type="file" size="50">
 		<input type="submit" value="Upload">
-		<p class="message"><?php echo ep_get_error('uploaded_file'); ?></p>
+		<p class="message"></p>
 		</div>
 </form>
 
 <form id="import_form" enctype="multipart/form-data" action="/admin/easypopulate.php/import" method="POST">
 	<input type="hidden" name="import" value="1">
+	<p class="message"></p>
 	<fieldset>
 		<legend>Import delimited files</legend>
 		<div>
@@ -23,7 +24,7 @@
 		<div>
 		<label for="local_file">Import from Temp Dir (<?php echo $tempdir; ?>)</label>
 		<input type="text" class="config" id="local_file" name="local_file" size="50" value="<?php echo $local_file; ?>">
-		<span class="error"><?php echo ep_get_error('local_file'); ?></span>
+		<span class="error"></span>
 		</div>
 		<div>
 			<label for="remote_file">Update from Supplier List URL</label>

@@ -120,6 +120,5 @@
 	<?php echo $content; ?>
 <?php } ?>
 </div>
-<?php $_SESSION['easypopulate']['errors'] = array(); ?>
 </body>
 </html>

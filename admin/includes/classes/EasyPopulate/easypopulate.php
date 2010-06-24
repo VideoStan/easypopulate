@@ -10,7 +10,6 @@
  * @todo validate all parameters
  */
 //require_once 'includes/application_top.php';
-
 error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
 
 require DIR_WS_CLASSES . 'EasyPopulate/lib/EasyPopulate.php';
@@ -19,9 +18,6 @@ require DIR_WS_CLASSES . 'EasyPopulate/lib/fitzgerald/lib/fitzgerald.php';
 
 if (!isset($_SESSION['easypopulate'])) {
 	$_SESSION['easypopulate'] = array();
-}
-if (!isset($_SESSION['easypopulate']['errors'])) {
-	$_SESSION['easypopulate']['errors'] = array();
 }
 
 class EasyPopulate extends Fitzgerald
@@ -54,7 +50,8 @@ class EasyPopulate extends Fitzgerald
 			$config = ep_get_config();
 			$chmod_check = is_dir($config['temp_path']) && is_writable($config['temp_path']);
 			if (!$chmod_check) {
-				ep_set_error('local_file', sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $config['temp_path'], DIR_FS_CATALOG));
+				// @todo print this error somewhere
+				print(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $config['temp_path'], DIR_FS_CATALOG));
 			}
 			ep_update_handlers();
 			$config = ep_get_config();
@@ -186,9 +183,7 @@ class EasyPopulate extends Fitzgerald
 	{
 		$import_handler = $this->request->import_handler;
 		if (is_null($import_handler) || !is_string($import_handler)) {
-			ep_set_error('import_handler', 'Please set an import handler');
-			$this->redirect('/import');
-			exit();
+			$this->error('Please select an import handler');
 		}
 
 		$config = array();
@@ -205,21 +200,18 @@ class EasyPopulate extends Fitzgerald
 		if (!is_null($this->request->remote_file) && !empty($config['local_file']) && isset($config['feed_url'])) {
 			if(!@copy($config['feed_url'], $config['local_file'])) {
 				$error = error_get_last();
-				ep_set_error('local_file', sprintf('Unable to save %s to %s because: %s', $config['feed_url'], $config['local_file'], $error['message']));
-				$this->redirect('/import');
+				$this->error(sprintf('Unable to save %s to %s because: %s', $config['feed_url'], $config['local_file'], $error['message']));
 			}
 		}
 
 		$fileInfo = new SplFileInfo($config['local_file']);
 
 		if (!$fileInfo->isFile()) {
-			ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_NOT_EXIST, $fileInfo->getFileName()));
-			$this->redirect('/import');
+			$this->error(sprintf(EASYPOPULATE_DISPLAY_FILE_NOT_EXIST, $fileInfo->getFileName()));
 		}
 
 		if (!$fileInfo->isReadable()) {
-			ep_set_error('local_file', sprintf(EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED, $fileInfo->getFileName()));
-			$this->redirect('/import');
+			$this->error(sprintf(EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED, $fileInfo->getFileName()));
 		}
 
 		$import = new EasyPopulateImport($config);
@@ -236,23 +228,21 @@ class EasyPopulate extends Fitzgerald
 	public function post_upload()
 	{
 		if (!isset($_FILES['uploaded_file']) || empty($_FILES['uploaded_file']['type'])) {
-			throw new Exception('Failed to read uploaded file');
+			$this->error('Failed to read uploaded file');
 		}
 		$file = $_FILES['uploaded_file'];
 		$error = constant('EASYPOPULATE_UPLOAD_ERROR_CODE_' . $file['error']);
 		if ($file['error'] != UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {
-			ep_set_error('uploaded_file', $error);
-			 $out = $error;
+			$this->error($error);
 		} else {
 			$fileName = ep_get_config('temp_path') . $file['name'];
 			move_uploaded_file($file['tmp_name'], $fileName);
 			$fileInfo = new SplFileInfo($fileName);
 			$size = round(($fileInfo->getSize() / 1024)) . ' KB';
 			$out = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $error, $fileInfo->getFileName(), $size);
-			ep_set_error('uploaded_file', $error); // @todo not an error at all
+			print $out; 
+			exit(0);
 		}
-		if (is_null($this->request->ajax)) $this->redirect('/import');
-		return $out;
 	}
 
 	public function handleError($number, $message, $file = '', $line = 0)
