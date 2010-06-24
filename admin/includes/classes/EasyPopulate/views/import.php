@@ -27,10 +27,16 @@
 		<span class="error"></span>
 		</div>
 		<div>
-			<label for="remote_file">Update from Supplier List URL</label>
-			<?php $enabled = !empty($config['feed_url']) ? '' : 'disabled="disabled"'; ?>
-			<?php echo zen_draw_checkbox_field('remote_file', '', (bool)$feed_url, '', 'id="remote_file" ' . $enabled) ?>
-			<span class="error"><?php echo ep_get_error('remote_file'); ?></span>
+			<label for="feed_fetch">Update from Supplier List URL</label>
+			<?php $enabled = $feed_fetch ? '' : 'disabled="disabled"'; ?>
+			<?php echo zen_draw_checkbox_field('feed_fetch', '', (bool)$feed_fetch, '', 'class="config" id="feed_fetch" ' . $enabled) ?>
+			<span class="error"></span>
+		</div>
+		<div>
+			<label for="images_fetch">Enable Supplier Images Update</label>
+			<?php $enabled = $images_fetch ? '' : 'disabled="disabled"'; ?>
+			<?php echo zen_draw_checkbox_field('images_fetch', '', (bool)$images_fetch, '', 'class="config" id="images_fetch" ' . $enabled) ?>
+			<span class="error"></span>
 		</div>
 		<?php if (function_exists('get_sites')) { ?>
 			<div>
@@ -80,6 +86,11 @@
 			<label for="image_path_prefix">Image Path Prefix</label>
 			<input type="text" class="config" id="image_path_prefix" name="image_path_prefix" size="30" value="<?php echo $image_path_prefix; ?>">
 			</div>
+			<div>
+			<label for="feed_send_email">Send email notification of results</label>
+			<?php echo zen_draw_checkbox_field('feed_send_email', '', (bool)$feed_send_email, '', 'id="images_fetch" class="config" ') ?>
+			<span class="error"></span>
+		   </div>
 		</div>
 		<input type="submit" name="import" value="Import">
 		<input type="button" name="setconfig" value="Save Handler Configuration">

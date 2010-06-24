@@ -182,7 +182,7 @@ class EasyPopulate extends Fitzgerald
 		$config = array_merge($saved_config, $config);
 
 		$config['local_file'] = ep_get_config('temp_path') . $config['local_file'];
-		if (!is_null($this->request->remote_file) && !empty($config['local_file']) && isset($config['feed_url'])) {
+		if (!is_null($this->request->feed_fetch) && !empty($config['local_file']) && isset($config['feed_url'])) {
 			if(!@copy($config['feed_url'], $config['local_file'])) {
 				$error = error_get_last();
 				$this->error(sprintf('Unable to save %s to %s because: %s', $config['feed_url'], $config['local_file'], $error['message']));
