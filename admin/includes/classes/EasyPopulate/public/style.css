@@ -54,10 +54,6 @@ label {
 	background: grey;
 }
 
-#uploaded_files {
-	display: none;
-}
-
 .results_table {
 	border-collapse: collapse;
 	border:1px solid #000;
