@@ -75,6 +75,7 @@ class EPFileUploadFactory
 			$configs[] = array_merge($defaultConfig, (array)$config);
 			$result->MoveNext();
 		}
+		if (!empty($name)) $configs = current($configs);
 		return $configs;
 	}
 
