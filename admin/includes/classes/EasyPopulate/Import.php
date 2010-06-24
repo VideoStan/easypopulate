@@ -36,6 +36,11 @@ class EasyPopulateImport extends EasyPopulateProcess
 		$file = $fileInfo->openFile('r');
 
 		$file->setCsvControl($column_delimiter, stripslashes($column_enclosure));
+		$file->setFileLayout($file->getFileLayout());
+
+		$tempFName = ep_get_config('temp_path') . 'EP-'. $import_handler . '-'. date(DATE_ATOM) . '.csv';
+		$tempFile = new EasyPopulateCsvFileObject($tempFName , 'w+');
+		$tempFile->setCsvControl(',', '"');
 
 		// model name length error handling
 		$modelsize = zen_field_length(TABLE_PRODUCTS, 'products_model');
@@ -681,9 +686,15 @@ class EasyPopulateImport extends EasyPopulateProcess
 			}
 			// end specials for this product
 			$output_data = array_values($items);
-			$output['items'][] = array('status' => $output_status, 'message' => $output_message, 'data' => $output_data);
-			// end of row insertion code
+			// @todo write  status message and status to tempFile 
+			//$output['items'][] = array('status' => $output_status, 'message' => $output_message, 'data' => $output_data);
 
+			$output_data = $this->flattenArray($items);
+			if (empty($tempFile->filelayout)) {
+				$tempFile->setFileLayout(array_keys($output_data), true);
+			}
+
+			$tempFile->write($output_data);
 
 			$file->onItemFinish($products_id, $products_model);
 		}
@@ -703,7 +714,9 @@ class EasyPopulateImport extends EasyPopulateProcess
 		if (isset($has_attributes)) {
 			$this->updateAttributesSortOrder();
 		}
-		return $output;
+		$tempFileInfo = $tempFile->getFileInfo();
+		unset($tempFile);
+		return $tempFileInfo;
 	}
 
 	/**
