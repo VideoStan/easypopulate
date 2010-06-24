@@ -2,15 +2,7 @@
 <html <?php echo HTML_PARAMS; ?>>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo CHARSET; ?>">
-	<?php
-		$scheme = $scheme = !isset($_SERVER['HTTPS']) || ($_SERVER['HTTPS'] == 'off') ? 'http' : 'https';
-		$port = $_SERVER['SERVER_PORT'];
-		$baseUrl = $scheme . '://' . $_SERVER['HTTP_HOST'];
-		if (($scheme == 'http' && $port != 80) || ($scheme == 'https' && $port != 443)) {
-			$baseUrl .= ':' . $port;
-		}
-		$adminUrl = $baseUrl . DIR_WS_ADMIN;
-	?> 
+	<?php $adminUrl = EasyPopulate::baseUrl() . DIR_WS_ADMIN; // @todo use app mountpoint? ?>
 	<title><?php echo TITLE; ?> - Easy Populate</title>
 	<!-- <base href=<?php echo DIR_WS_ADMIN; ?>"> -->
 	<link rel="stylesheet" type="text/css" href="<?php echo $adminUrl; ?>includes/stylesheet.css">
@@ -19,7 +11,7 @@
 	<script type="text/javascript" src="<?php echo $adminUrl; ?>includes/menu.js"></script>
 	<script type="text/javascript" src="<?php echo $adminUrl; ?>includes/general.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script type="text/javascript" src="<?php echo $adminUrl; ?>includes/classes/EasyPopulate/public/form/jquery.form.js"></script> 
+	<script type="text/javascript" src="<?php echo $adminUrl; ?>includes/classes/EasyPopulate/public/form/jquery.form.js"></script>
 
 	<script type="text/javascript">
 	/*! jQuery serializeObject - v0.2 - 1/20/2010 http://benalman.com/projects/jquery-misc-plugins/
