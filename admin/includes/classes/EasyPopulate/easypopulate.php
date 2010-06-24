@@ -200,14 +200,11 @@ class EasyPopulate extends Fitzgerald
 		}
 
 		$import = new EasyPopulateImport($config);
-		$tpl = $this->getImportTplVars();
-		$tpl['local_file'] = $this->request->local_file;
-		$tpl['output'] = $import->run($fileInfo);
-		$tpl['import'] = $import;
-
-		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $this->log(EASYPOPULATE_MSGSTACK_ERROR_SQL);
-		$tpl = array_merge($tpl, $config);
-		return $this->render('import', $tpl);
+		$result = $import->run($fileInfo);
+		$resultFileName = $result->getBasename();
+		//if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $this->log(EASYPOPULATE_MSGSTACK_ERROR_SQL);
+		print $result->getFileName();
+		exit();
 	}
 
 	public function post_upload()
