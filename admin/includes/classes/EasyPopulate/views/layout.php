@@ -75,10 +75,6 @@
 		});
 		$(".results_table tr:nth-child(even)").addClass("alt");
 
-		$("#show_uploaded_files").click(function() {
-			$("#uploaded_files").toggle();
-		});
-
 		var options = {
 			target: "#uploaded_file ~ .message",
 			data: { ajax : true },
