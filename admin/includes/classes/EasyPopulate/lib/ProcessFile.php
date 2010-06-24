@@ -25,6 +25,28 @@ class EasyPopulateProcess
 	}
 
 	/**
+	 * Flatten array
+	 *
+	 * @param array $array array to flatten
+	 * @param string $prefix prefix all array keys with $prefix
+	 * @return array
+	 * @todo replace with an iterator
+	 */
+	protected function flattenArray($array, $prefix = null)
+	{
+		$items = array();
+
+		foreach ($array as $key => $value) {
+			if (is_array($value)) {
+				$items = array_merge($items,  $this->flattenArray($value, $prefix . $key));
+			} else {
+				$items[$prefix . $key] = $value;
+			}
+		}
+		return $items;
+	}
+
+	/**
 	 * Get tax class rate
 	 * @param int $taxClassId
 	 * @return int tax rate
