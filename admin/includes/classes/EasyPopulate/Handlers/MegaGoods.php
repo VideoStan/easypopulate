@@ -36,15 +36,16 @@ class EPUploadMegaGoods extends EPUploadStandard
 	{
 		$config = parent::defaultConfig();
 		$config['column_delimiter'] = 'tab';
-		$config['feed_url'] = 'https://www.megagoods.com/export.php?show=format_tab';
+		$config['feed_url'] = 'http://www.megagoods.com/export.php?show=format_tab';
 		$config['local_file'] = 'MegaGoods.txt';
 		$config['images_url'] = 'http://www.megagoods.com/pimages/regular.zip';
-		$config['images_file_path'] = ''; 
+		$config['images_file_path'] = '';
 		return $config;
 	}
 
 	public function mapFileLayout(array $filelayout)
 	{
+
 		$filelayout[0] = 'products_model';
 		$filelayout[5] = 'manufacturers_name';
 		$filelayout[6] = 'products_price';
