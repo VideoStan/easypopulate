@@ -205,7 +205,7 @@ class EasyPopulate extends Fitzgerald
 		$resultFileName = $result->getBasename();
 		if ((bool)$this->request->feed_send_email) {
 			$message = "Feed $import_handler has been updated. Please see 
-			" . HTTP_CATALOG_SERVER . '/' . ep_get_config('temp_path') . $resultFileName . " for details";
+			" . HTTP_CATALOG_SERVER . '/' . ep_get_config('tempdir') . $resultFileName . " for details";
 			$original_error_level = error_reporting();
 			error_reporting(0);
 			zen_mail(EMAIL_FROM, STORE_OWNER_EMAIL_ADDRESS, 'EasyPopulate Update', $message, EMAIL_FROM, STORE_OWNER_EMAIL_ADDRESS, $message);
