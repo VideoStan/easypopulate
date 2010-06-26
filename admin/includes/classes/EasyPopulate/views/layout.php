@@ -78,9 +78,13 @@
 		var options = {
 			target: "#upload_form .message",
 			data: { ajax : true },
+			beforeSubmit: function(formData, jqForm, options) {
+				$("#import_form :submit").attr('disabled', 'disabled');
+			},
 			success: function(responseString) {
 				local_file = $("#uploaded_file").val().replace(/^.*[\/\\]/g, '');
 				$("#upload_form .message").addClass('success');
+				$("#import_form :submit").removeAttr('disabled');
 				$("#local_file").val(local_file);
 			}
 		}
@@ -89,6 +93,7 @@
 		var options = {
 			target: "#import_form .message",
 			beforeSubmit: function(formData, jqForm, options) {
+				$("#import_form :submit").attr('disabled', 'disabled');
 				$("#import_form .message").html('<strong>Importing...</strong>');
 			},
 			success: function(responseString) {
@@ -97,12 +102,15 @@
 				$("#import_form .message").removeClass('error');
 				$("#import_form .message").addClass('success');
 				$("#import_form .message").html('Success: ' + responseString);
+				$("#import_form :submit").removeAttr('disabled');
+				
 			},
 			error: function (xhr, status) {
 				$("#import_form .message").html('');
 				$("#import_form .message").removeClass();
 				$("#import_form .message").addClass('error');
-				$("#import_form .message").html(xhr.responseText);	
+				$("#import_form .message").html(xhr.responseText);
+				$("#import_form :submit").removeAttr('disabled');
 			}
 		}
 		$("#import_form").ajaxForm(options);

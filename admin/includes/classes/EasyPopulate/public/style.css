@@ -1,3 +1,5 @@
+/* @todo better styles */
+
 #ep_header {
 	margin-top: 5px;
 	height: 25px;
@@ -54,25 +56,11 @@ label {
 	background: grey;
 }
 
-.results_table {
-	border-collapse: collapse;
-	border:1px solid #000;
+.fail {
+	background-color: #E68080;
 }
-.results_table th {
-	padding-right: 0.5em;
-	background-color: #D7D6CC;
-}
-.results_table tr.fail td.status {
-	color: #E68080;
-}
-.results_table tr.success td.status {
-	color: #599659;
-}
-td.status {
-	font-weight: bold;
-}
-.results_table tr.alt {
-	background-color: #E7E6E0;
+.success {
+	background-color: #3f6;
 }
 .error {
 	color: red;
