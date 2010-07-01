@@ -13,6 +13,7 @@
  */
 class EasyPopulateProcess
 {
+	protected $itemCount = 0;
 	protected $taxClassMultipliers = array();
 	protected $config = array();
 
