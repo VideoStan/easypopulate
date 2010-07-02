@@ -1,6 +1,6 @@
 <?php
 /**
- * EasyPopulate imports
+ * EasyPopulate products import
  *
  * @package easypopulate
  * @author langer
@@ -13,7 +13,7 @@
  */
 
 
-class EasyPopulateImport extends EasyPopulateProcess
+class EasyPopulateImportProducts extends EasyPopulateProcess
 {
 	public $itemCount = 0;
 

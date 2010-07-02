@@ -11,7 +11,7 @@
 define('TABLE_EASYPOPULATE_FEEDS', DB_PREFIX . 'easypopulate_feeds');
 
 require DIR_WS_CLASSES . 'EasyPopulate/lib/ProcessFile.php';
-require DIR_WS_CLASSES . 'EasyPopulate/Import.php';
+require DIR_WS_CLASSES . 'EasyPopulate/lib/ImportProducts.php';
 require DIR_WS_CLASSES . 'EasyPopulate/Export.php';
 
 class EPFileUploadFactory

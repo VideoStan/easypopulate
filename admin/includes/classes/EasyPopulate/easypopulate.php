@@ -134,9 +134,9 @@ class EasyPopulate extends Fitzgerald
 
 	public function post_dross()
 	{
-		EasyPopulateImport::purgeDross($dross);
+		EasyPopulateImportProducts::purgeDross($dross);
 		// now check it is really gone...
-		$dross = EasyPopulateImport::getDross();
+		$dross = EasyPopulateImportProducts::getDross();
 		if (!empty($dross)) {
 			$string = "Product debris corresponding to the following product_id(s) cannot be deleted by EasyPopulate:\n";
 			foreach ($dross as $products_id) {
@@ -199,7 +199,7 @@ class EasyPopulate extends Fitzgerald
 			$this->error(sprintf(EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED, $fileInfo->getFileName()));
 		}
 
-		$import = new EasyPopulateImport($config);
+		$import = new EasyPopulateImportProducts($config);
 		$result = $import->run($fileInfo);
 
 		$resultFileName = $result->getBasename();
