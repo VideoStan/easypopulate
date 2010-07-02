@@ -525,6 +525,9 @@ class EasyPopulateImport extends EasyPopulateProcess
 								$data['products_options_id'] = $option_id;
 								$data['language_id'] = $lid;
 								$data['products_options_name'] = $name;
+								if (isset($attribute['type'])) {
+									$data['products_options_type'] = $attribute['type'];
+								}
 								$query = ep_db_modify(TABLE_PRODUCTS_OPTIONS, $data, 'INSERT');
 								$attribute_options_insert = ep_query($query);
 
@@ -608,6 +611,9 @@ class EasyPopulateImport extends EasyPopulateProcess
 								$data['products_id'] = $products_id;
 								$data['options_id'] = $option_id;
 								$data['options_values_id'] = $values['id'];
+								if (isset($values['display_only'])) {
+									$data['attributes_display_only'] = $values['display_only'];
+								}
 								$data['options_values_price'] = (float)$values['price'];
 								$data['price_prefix'] = $attribute_values_price_prefix;
 								$query = ep_db_modify(TABLE_PRODUCTS_ATTRIBUTES, $data, 'INSERT');
