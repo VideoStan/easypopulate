@@ -19,6 +19,11 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 
 	protected $taxClassIds = array();
 
+	public function dependenciesMet()
+	{
+		return true;
+	}
+
 	public function run(SplFileInfo $fileInfo)
 	{
 		$transforms = array();

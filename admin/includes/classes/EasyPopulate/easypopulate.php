@@ -200,6 +200,11 @@ class EasyPopulate extends Fitzgerald
 		}
 
 		$import = new EasyPopulateImportProducts($config);
+		if (!$import->setImportHandler($config['import_handler'])) {
+			$message = "Could not use Import Handler '" . $config['import_handler'] . "' because: " . $import->error;
+			$this->error($message);
+		}
+
 		$result = $import->run($fileInfo);
 
 		$resultFileName = $result->getBasename();

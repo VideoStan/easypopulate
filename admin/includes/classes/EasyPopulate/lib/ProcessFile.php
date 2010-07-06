@@ -25,6 +25,12 @@ class EasyPopulateProcess
 		@ini_set('max_input_time', $time_limit);	
 	}
 
+	public function setImportHandler($handler)
+	{
+		if (!$this->dependenciesMet()) return false;
+		$this->importHandler = $handler;
+		return true;
+	}
 	/**
 	 * Flatten array
 	 *
