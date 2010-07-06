@@ -101,13 +101,11 @@
 				$("#import_form .message").html('');
 				$("#import_form .message").removeClass('error');
 				$("#import_form .message").addClass('success');
-				$("#import_form .message").html('Success: ' + responseString);
+				$("#import_form .message").append('Success: ' + responseString);
 				$("#import_form :submit").removeAttr('disabled');
-				
 			},
 			error: function (xhr, status) {
 				$("#import_form .message").html('');
-				$("#import_form .message").removeClass();
 				$("#import_form .message").addClass('error');
 				$("#import_form .message").html(xhr.responseText);
 				$("#import_form :submit").removeAttr('disabled');
