@@ -205,9 +205,10 @@ class EasyPopulate extends Fitzgerald
 			$this->error($message);
 		}
 
+		$import->openTempFile();
 		$result = $import->run($fileInfo);
 
-		$resultFileName = $result->getBasename();
+		$resultFileName = $import->tempFile->getBasename();
 		if ((bool)$this->request->feed_send_email) {
 			$message = "Feed $import_handler has been updated. Please see 
 			" . HTTP_CATALOG_SERVER . '/' . ep_get_config('tempdir') . $resultFileName . " for details";
@@ -218,7 +219,9 @@ class EasyPopulate extends Fitzgerald
 
 		}
 		//if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $this->log(EASYPOPULATE_MSGSTACK_ERROR_SQL);
-		print $result->getFileName();
+		print $import->tempFile->getFileName();
+		exit();
+	}
 		exit();
 	}
 

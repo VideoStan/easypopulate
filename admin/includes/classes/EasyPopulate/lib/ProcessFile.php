@@ -13,7 +13,10 @@
  */
 class EasyPopulateProcess
 {
-	protected $itemCount = 0;
+	public $itemCount = 0;
+	public $tempFile;
+	public $importHandler;
+	public $error = '';
 	protected $taxClassMultipliers = array();
 	protected $config = array();
 
@@ -30,6 +33,14 @@ class EasyPopulateProcess
 		if (!$this->dependenciesMet()) return false;
 		$this->importHandler = $handler;
 		return true;
+	}
+
+	public function openTempFile()
+	{
+		$tempFName = ep_get_config('temp_path') . 'EP-'. $this->importHandler . '-'. date(DATE_ATOM) . '.csv';
+		$tempFile = new EasyPopulateCsvFileObject($tempFName , 'w+');
+		$tempFile->setCsvControl(',', '"');
+		$this->tempFile = $tempFile;
 	}
 	/**
 	 * Flatten array
