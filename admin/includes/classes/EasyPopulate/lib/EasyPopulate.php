@@ -253,5 +253,19 @@ class EasyPopulateCsvFileObject extends SplFileObject
 		$this->seek($pos); // Go back to where we were
 		return $lineCount;
 	}
+
+	/**
+	 * Set the delimiter and enclosure character for CSV
+	 *
+	 * @param string $delimiter
+	 * @param string $enclosure
+	 * @param string $escape
+	 * @todo bring back the escape argument to the parent method when we can depend on a higher php version
+	 */
+	public function setCsvControl($delimiter = ',', $enclosure = '"', $escape = '\\')
+	{
+		if ($delimiter == 'tab') $delimiter = "\t";
+		parent::setCsvControl($delimiter, $enclosure);
+	}
 }
 ?>
