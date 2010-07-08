@@ -229,8 +229,6 @@ class EasyPopulate extends Fitzgerald
 		print $import->tempFile->getFileName();
 		exit();
 	}
-		exit();
-	}
 
 	public function post_upload()
 	{
