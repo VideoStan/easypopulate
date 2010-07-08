@@ -199,7 +199,14 @@ class EasyPopulate extends Fitzgerald
 			$this->error(sprintf(EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED, $fileInfo->getFileName()));
 		}
 
-		$import = new EasyPopulateImportProducts($config);
+		if ($config['import_handler'] == 'Testimonials') {
+			// @todo autoload this
+			require DIR_WS_CLASSES . 'EasyPopulate/lib/ImportTestimonials.php';
+			$import = new EasyPopulateImportTestimonials($config);
+		} else {
+			$import = new EasyPopulateImportProducts($config);
+		}
+
 		if (!$import->setImportHandler($config['import_handler'])) {
 			$message = "Could not use Import Handler '" . $config['import_handler'] . "' because: " . $import->error;
 			$this->error($message);
