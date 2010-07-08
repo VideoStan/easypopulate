@@ -225,7 +225,7 @@ class EasyPopulate extends Fitzgerald
 			error_reporting($original_error_level);
 
 		}
-		//if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $this->log(EASYPOPULATE_MSGSTACK_ERROR_SQL);
+
 		print $import->tempFile->getFileName();
 		exit();
 	}
