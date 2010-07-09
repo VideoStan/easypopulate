@@ -53,11 +53,20 @@ class EasyPopulateImportTestimonials extends EasyPopulateProcess
 				$items['date_added'] = 'NOW()';
 			}
 
-			if (isset($items['site']) && empty($items['site'])) {
-				$items['site'] = $_SERVER['HTTP_HOST'];
-			}
 			$query = "SELECT * FROM " . TABLE_TESTIMONIALS_MANAGER . "
 			WHERE testimonials_mail = '" . zen_db_input($items['testimonials_mail']) . "'";
+
+			if (isset($items['site']) && empty($items['site'])) {
+				if (isset($this->config['site'])) {
+					$items['site'] = $this->config['site'];
+				} else {
+					$items['site'] = $_SERVER['HTTP_HOST'];
+				}
+			}
+			if (isset($items['site']) && !empty($items['site'])) {
+				$items['site'] = trim($items['site']);
+				$query .= " AND site = '" . $items['site'] . "'"; 
+			}
 
 			$result = ep_query($query);
 
