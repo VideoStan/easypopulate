@@ -172,7 +172,7 @@ class EasyPopulate extends Fitzgerald
 			$this->error('Please select an import handler');
 		}
 
-		$config = array();
+		$config = ep_get_config();
 		// @todo put config entries in $this->request->config again?
 		foreach ($this->request as $k => $v) {
 			if (is_null($v)) continue;
