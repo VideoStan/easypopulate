@@ -433,9 +433,11 @@ function ep_get_config($var = NULL)
 	foreach ($config['langcode'] as $value) {
 		if ($value['code'] == DEFAULT_LANGUAGE) {
 			$epdlanguage_id = $value['id'];
+			$language = $value['directory'];
 			break;
 		}
 	}
+	$config['language'] = $language;
 	$config['epdlanguage_id'] = $epdlanguage_id;
 
 	return ep_get_config($var);
