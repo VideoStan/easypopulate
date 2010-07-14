@@ -17,6 +17,9 @@ class EasyPopulateProcess
 	public $tempFile;
 	public $importHandler;
 	public $error = '';
+
+	protected $errorLevel;
+	protected $zenErrorLevel;
 	protected $taxClassMultipliers = array();
 	protected $config = array();
 
@@ -25,7 +28,8 @@ class EasyPopulateProcess
 		$time_limit = ep_get_config('time_limit');
 		$this->config = $config;
 		@set_time_limit($time_limit);
-		@ini_set('max_input_time', $time_limit);	
+		@ini_set('max_input_time', $time_limit);
+		$this->errorLevel = error_reporting();
 	}
 
 	public function setImportHandler($handler)

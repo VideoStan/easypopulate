@@ -10,6 +10,7 @@
  * @todo validate all parameters
  */
 //require_once 'includes/application_top.php';
+$GLOBALS['zen_error_level'] = error_reporting();
 error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
 
 require DIR_WS_CLASSES . 'EasyPopulate/lib/EasyPopulate.php';
