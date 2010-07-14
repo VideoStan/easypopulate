@@ -120,6 +120,9 @@ class EPFileUploadFactory
 class EasyPopulateCsvFileObject extends SplFileObject
 {
 	public $filelayout = array();
+	public static $DELIMITERS = array(',', 'tab', '|', ':', ';', '^');
+
+	private $headerSize;
 
 	public function __construct($file, $mode = 'r')
 	{
@@ -147,6 +150,33 @@ class EasyPopulateCsvFileObject extends SplFileObject
 	public function autoDetectLineEndings($enable = true)
 	{
 		return @ini_set('auto_detect_line_endings', (int)$enable);
+	}
+
+	/**
+	 * Detect CSV delimiter
+	 *
+	 * @param string file
+	 * @return string $character detected CSV delimiter
+	 */ 
+	public static function detectDelimiter($file , $tries = 10)
+	{
+		$counts = array();
+
+		foreach (self::$DELIMITERS as $delimiter) {
+			$fileObject = new EasyPopulateCsvFileObject($file);
+			$fileObject->setCsvControl($delimiter, '"');
+			$headerSize = count($fileObject->current());
+			foreach (new LimitIterator($fileObject, 1, $tries) as $line) {
+				$lineSize = count($line);
+    			if (is_array($line) && ($lineSize > 1) && ($headerSize == $lineSize)) {
+    				$counts[$delimiter]++;
+    			}
+			}
+		}
+
+		if (empty($counts)) return false;
+		$character =  current(array_keys($counts, max($counts)));
+		return $character;
 	}
 
 	/**

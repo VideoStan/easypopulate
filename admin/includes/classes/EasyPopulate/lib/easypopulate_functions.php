@@ -18,10 +18,6 @@ define('EASYPOPULATE_VERSION', '3.9.5');
  * EasyPopulate extra configuration
  * @todo move these defines elsewhere
  */
-
-define('EASYPOPULATE_CONFIG_COLUMN_DELIMITERS', serialize(
-	array(',', 'tab', '|', ':', ';', '^')
-));
 define('EASYPOPULATE_CONFIG_SMART_TAGS_LIST', serialize(
 	array("\r\n|\r|\n" => '<br />')
 ));
@@ -228,7 +224,7 @@ function install_easypopulate()
 	$query = ep_db_modify(TABLE_CONFIGURATION_GROUP, $data, 'UPDATE', "configuration_group_id = $group_id");
 	$db->Execute($query);
 
-	$delimiters = unserialize(EASYPOPULATE_CONFIG_COLUMN_DELIMITERS);
+	$delimiters = EasyPopulateCsvFileObject::$DELIMITERS;
 
 	$entries = array();
 	$entries[] = array('title' => 'Uploads Directory',
@@ -402,7 +398,7 @@ function ep_get_config($var = NULL)
 		return !empty($var) ? $config[$var] : $config;
 	}
 
-	$config['column_delimiters'] = unserialize(EASYPOPULATE_CONFIG_COLUMN_DELIMITERS);
+	$config['column_delimiters'] = EasyPopulateCsvFileObject::$DELIMITERS;
 	// @todo do we actually need this if we can query the qty discount table for the MAX() value?
 	// If so, we need to put it in the installer
 	$config['max_qty_discounts'] = 6;
