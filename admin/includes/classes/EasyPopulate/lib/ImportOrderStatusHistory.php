@@ -34,7 +34,6 @@ class EasyPopulateImportOrderStatusHistory extends EasyPopulateProcess
 		// @todo make sure tracking fields exist in orders status history table
 		if ($filelayout = $file->getFileLayout()) {
 		$this->filelayout = $filelayout;
-		$file->onFileStart();
 
 		foreach ($file as $items) {
 			$output_message = '';
