@@ -204,6 +204,9 @@ class EasyPopulate extends Fitzgerald
 			// @todo autoload this
 			require DIR_WS_CLASSES . 'EasyPopulate/lib/ImportTestimonials.php';
 			$import = new EasyPopulateImportTestimonials($config);
+		} else if ($config['import_handler'] == 'OrderStatusHistory') {
+			require DIR_WS_CLASSES . 'EasyPopulate/lib/ImportOrderStatusHistory.php';
+			$import = new EasyPopulateImportOrderStatusHistory($config);
 		} else {
 			$import = new EasyPopulateImportProducts($config);
 		}
