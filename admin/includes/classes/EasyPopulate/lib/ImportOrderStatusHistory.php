@@ -180,8 +180,9 @@ class EasyPopulateImportOrderStatusHistory extends EasyPopulateProcess
 		error_reporting($this->errorLevel);
 		$comments = (isset($order['comments'])) ? $order['comments'] : '';
 
-		$htmlmsg = array();
-
+		$html_msg = array();
+		$html_msg['EMAIL_TEXT_STATUS_TRACKING'] = '';
+		$html_msg['EMAIL_TEXT_STATUS_COMMENTS'] = '';
 		if (isset($order['tracking_numbers']) && !empty($order['tracking_numbers'])) {
 			$trackingNumbers = preg_split("/[ ,;]+/", $order['tracking_numbers'], -1, PREG_SPLIT_NO_EMPTY);
 
@@ -194,6 +195,7 @@ class EasyPopulateImportOrderStatusHistory extends EasyPopulateProcess
 				} else {
 					$trackingSnippet .= $trackingNumber;
 				}
+				$htmlmsg['EMAIL_TEXT_STATUS_TRACKING'] = $trackingSnippet;
 				$trackingSnippet = EMAIL_TEXT_TRACKING_NUMBER . "\n" . $trackingSnippet . "\n\n";
 			}
 		}
