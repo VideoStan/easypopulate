@@ -80,7 +80,7 @@ class EasyPopulateImportOrderStatusHistory extends EasyPopulateProcess
 				$data['orders_status'] = zen_db_input($items['orders_status_id']);
 				$data['last_modified'] = 'NOW()';
 				$query = ep_db_modify(TABLE_ORDERS, $data, 'UPDATE', $where);
-				die(var_dump($query));
+
 				$result = ep_query($query);
 				// @todo notify comments?
 				if ($items['notify_customer']) {
