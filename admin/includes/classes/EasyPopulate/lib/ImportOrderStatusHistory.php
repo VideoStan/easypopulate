@@ -88,6 +88,7 @@ class EasyPopulateImportOrderStatusHistory extends EasyPopulateProcess
 					$order['comments'] = $items['comments'];
 					if (isset($trackingInfo)) {
 						$order['tracking_numbers'] = $items['tracking_numbers'];
+						$order['tracker_status'] = $trackingInfo['tracker_status'];
 						$order['tracker_carrier_name'] = $trackingInfo['tracker_carrier_name'];
 						$order['tracker_carrier_link'] = $trackingInfo['tracker_carrier_link'];
 					}
@@ -187,7 +188,7 @@ class EasyPopulateImportOrderStatusHistory extends EasyPopulateProcess
 			$trackingSnippet = $order['tracker_carrier_name'] . ":";              
 			foreach ($trackingNumbers as $trackingNumber) {
 				$trackingSnippet .= "\n";
-				if ($trackingInfo['tracker_status']) {
+				if ($order['tracker_status']) {
 					$trackerLink = sprintf($order['tracker_carrier_link'], $trackingNumber);
 					$trackingSnippet .= '<a href="' . $trackerLink . '" target="_blank">' . $trackerLink . '</a>';
 				} else {
