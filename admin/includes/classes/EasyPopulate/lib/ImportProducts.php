@@ -52,13 +52,17 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 		$file->transforms['metatags_description'] = $metatags_description;
 		$file->transforms['metatags_title'] = $metatags_title;
 
+		$filelayout = $file->getFileLayout();
+		if (!$file->fileLayoutValidated()) {
+			$this->error(' Could not validate filelayout');
+		}
 
-		if ($filelayout = $file->getFileLayout()) {
 		$this->filelayout = $filelayout;
 		$file->onFileStart();
 
 		foreach ($file as $items) {
 			$output_message = '';
+			$categories_name = array();
 			$items = $file->handleRow($items);
 
 			if (!isset($items['products_model']) && !zen_not_null($items['products_model'])) {
@@ -704,7 +708,6 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 			$this->tempFile->write($output_data);
 
 			$file->onItemFinish($products_id, $products_model);
-		}
 		}
 		/**
 		* Post-upload tasks start

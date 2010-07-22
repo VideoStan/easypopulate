@@ -120,6 +120,8 @@ class EPFileUploadFactory
 class EasyPopulateCsvFileObject extends SplFileObject
 {
 	public $filelayout = array();
+	public $expectedFileLayout = array();
+	public $originalFileLayout = array();
 	public static $DELIMITERS = array(',', 'tab', '|', ':', ';', '^');
 
 	private $headerSize;
@@ -233,6 +235,7 @@ class EasyPopulateCsvFileObject extends SplFileObject
 		$this->seek(0);
 		$filelayout = $this->current();
 		$this->seek($pos);
+		$this->originalFileLayout = $filelayout;
 		$this->filelayout = $this->mapFileLayout($filelayout);
 		return $this->filelayout;
 	}
@@ -240,6 +243,13 @@ class EasyPopulateCsvFileObject extends SplFileObject
 	protected function mapFileLayout(array $filelayout)
 	{
 		return $filelayout;
+	}
+
+	public function fileLayoutValidated()
+	{
+		if (empty($this->expectedFileLayout)) return true;
+		if ($this->originalFileLayout != $this->expectedFilelayout) return true;
+		return false;
 	}
 
 	/**
