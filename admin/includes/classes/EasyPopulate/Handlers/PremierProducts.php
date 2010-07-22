@@ -14,26 +14,28 @@
  * @todo provide a sample entry
  *
  * All Available Fields:
-   0  BRAND
-   1  CATNAME
-   2  DESCRIPTION
-   3  DIMENSIONS
-   4  INSTOCK
-   5  ITEM
-   6  ITEMID
-   7  MODELNUM
-   8  PIC
-   9  PRICE
-   10 RETAILPRICE
-   11 SPECIAL
-   12 TAGLINE
-   13 TPIC
-   14 UPC
-   15 WEIGHT
+
  */
 class EPUploadPremierProducts extends EPUploadStandard
 {
 	public $name = 'PremierProducts';
+	public $expectedFileLayout = array(
+		'Brand',
+		'Category',
+		'Description',
+		'Dimensions',
+		'Instock',
+		'Item',
+		'ItemID',
+		'Modelnum',
+		'Pic',
+		'Price',
+		'Retailprice',
+		'Special',
+		'TAGLINE',
+		'Tpic',
+		'UPC',
+		'WEIGHT');
 
 	public static function defaultConfig()
 	{
@@ -62,7 +64,7 @@ class EPUploadPremierProducts extends EPUploadStandard
 	{
 		$item['metatags'] = array();
 		$descriptions = array();
-		$descriptions['name'] = $item['ITEM'];
+		$descriptions['name'] = $item['Item'];
 
 		$item['manufacturers_name'] = str_replace('?', '', $item['manufacturers_name']);
 
@@ -72,8 +74,8 @@ class EPUploadPremierProducts extends EPUploadStandard
 		}
 
 		$descriptions['description'] =  $item['TAGLINE'] . '<br>' .
-		'<em><strong>Retail Price: $' . $item['RETAILPRICE'] .'</strong></em><br>' .
-		$item['DESCRIPTION'];
+		'<em><strong>Retail Price: $' . $item['Retailprice'] .'</strong></em><br>' .
+		$item['Description'];
 		if (strpos($item['products_model'], '(R)') !== false) {
 			$descriptions['description'] .= '<br> Reconditioned';
 		}
