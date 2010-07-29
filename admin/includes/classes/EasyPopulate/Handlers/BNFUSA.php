@@ -12,50 +12,51 @@
  * BNFUSA Upload csv conversion class
  *
  * @todo provide a sample entry
- *
- * All Available Fields:
-  Item Title
-  Item Status
-  Available Inventory
-  Item Number
-  4Item Short Description
-  Parent Number
-  Web Description
-  Catalog Description
-  Item Supplemental Tab 1
-  Country of Origin
-  Points
-  Retail Price
-  Major Category
-  Minor Category
-  Case Count
-  Each Price
-  Column 2 Price
-  Column 2 Break
-  Column 3 Price
-  Column 3 Break
-  Column 4 Price
-  Column 4 Break
-  Column 5 Price
-  Column 5 Break
-  Each UPC
-  Case UPC
-  Catalog Page
-  Each Weight (lbs.)
-  Each Length (in.)
-  Each Width (in.)
-  Each Height (in.)
-  Case Weight
-  Case Length (in.)
-  Case Width (in.)
-  Case Height (in.)
-  Estimated Next Ship Date
-  Item Categories
-  Item Categories (numeric)
  */
 class EPUploadBNFUSA extends EPUploadStandard
 {
 	public $name = 'BNFUSA';
+	public $expectedFileLayout = array('Item Title',
+		'Item Status',
+		'Available Inventory',
+		'Item Number',
+		'Item Short Description',
+		'Parent Number',
+		'Web Description',
+		'Catalog Description',
+		'Item Supplemental Tab 1',
+		'Country of Origin',
+		'Points',
+		'Retail Price',
+		'Major Category',
+		'Minor Category',
+		'Case Count',
+		'Each Price',
+		'Column 2 Price',
+		'Column 2 Break',
+		'Column 3 Price',
+		'Column 3 Break',
+		'Column 4 Price',
+		'Column 4 Break',
+		'Column 5 Price',
+		'Column 5 Break',
+		'Each UPC',
+		'Case UPC',
+		'Catalog Page',
+		'Each Weight (lbs.)',
+		'Each Length (in.)',
+		'Each Width (in.)',
+		'Each Height (in.)',
+		'Case Weight',
+		'Case Length (in.)',
+		'Case Width (in.)',
+		'Case Height (in.)',
+		'Estimated Next Ship Date',
+		'Item Categories',
+		'Item Categories (numeric)',
+		'Item Size-Color Desc',
+		'Size-Color Key Numeric'
+	);
 	public $masterRowCount = 1;
 	public $productIds = array();
 
