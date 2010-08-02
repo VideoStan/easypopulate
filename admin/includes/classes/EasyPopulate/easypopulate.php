@@ -102,6 +102,7 @@ class EasyPopulate extends Fitzgerald
 
 	public function get_export($format = 'full', $download = 'stream')
 	{
+		global $messageStack;
 		$export = new EasyPopulateExport();
 		$export->setFormat($format);
 		$export->run();
