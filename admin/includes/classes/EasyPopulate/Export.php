@@ -38,8 +38,8 @@ class EasyPopulateExport extends EasyPopulateProcess
 		// @todo scan array in future to reveal if any mods for inclusion in downloads
 		$ep_supported_mods = array();
 		$ep_supported_mods['psd'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_short_desc');
-		$ep_supported_mods['uom'] = true; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_uom'); // uom = unit of measure
-		$ep_supported_mods['upc'] = true; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
+		$ep_supported_mods['uom'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_uom'); // uom = unit of measure
+		$ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
 		/**
 		 * END check for existance of various mods
 		 */
