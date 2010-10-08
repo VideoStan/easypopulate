@@ -129,7 +129,7 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 				 */
 				$row_tax_multiplier = $this->getTaxClassRate($row['products_tax_class_id']);
 				$row['tax_class_title'] = zen_get_tax_class_title($row['products_tax_class_id']);
-				if ($price_with_tax){
+				if ($prices_include_tax){
 					$row['products_price'] = round($row['products_price'] + ($row['products_price'] * $row_tax_multiplier / 100),2);
 				}
 
@@ -192,8 +192,8 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 			$row_tax_multiplier = $this->getTaxClassRate($products_tax_class_id);
 
 			// Recalculate price without the included tax
-			if ($price_with_tax) {
-				$products_price = round( $products_price / (1 + ( $row_tax_multiplier * $price_with_tax/100) ), 4);
+			if ($prices_include_tax) {
+				$products_price = round( $products_price / (1 + ( $row_tax_multiplier * $prices_include_tax/100) ), 4);
 			}
 
 			unset ($categories_name); // default to not set.
@@ -468,7 +468,7 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 					if (isset($value['url'])) $data['products_url'] = $this->smartTags($value['url'], false);
 
 					if ($ep_supported_mods['psd']) {
-						$data['products_short_desc'] = $this->smartTags($value['short_desc'], $strip_smart_tags);
+						$data['products_short_desc'] = $this->smartTags($value['short_desc'], $replace_newlines);
 					}
 					if (mysql_num_rows($result) == 0) {
 						$query = ep_db_modify(TABLE_PRODUCTS_DESCRIPTION, $data, 'INSERT');

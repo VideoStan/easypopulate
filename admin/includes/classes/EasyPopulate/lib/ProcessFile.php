@@ -157,9 +157,9 @@ class EasyPopulateProcess
 	protected function smartTags($string, $doit = true)
 	{
 		if ($doit) {
-			$tags = ep_get_config('smart_tags');
-			if (ep_get_config('enable_advanced_smart_tags')) {
-				$advancedSmartTags = ep_get_config('advanced_smart_tags');
+			$tags = ep_get_config('smart_tags_list');
+			if ($this->config['advanced_smart_tags']) {
+				$advancedSmartTags = ep_get_config('advanced_smart_tags_list');
 				$tags = array_merge($advancedSmartTags, $smartTags);
 			}
 			foreach ($tags as $tag => $new) {

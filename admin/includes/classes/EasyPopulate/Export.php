@@ -161,7 +161,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 			$filelayout[] = 'manufacturers_name';
 
 			// build the categories name options based on the max categories configuration setting
-			for($i=1;$i<$max_categories+1;$i++){
+			for($i=1;$i<$max_category_levels+1;$i++){
 				$filelayout[] = 'categories_name_' . $i;
 			}
 
@@ -326,7 +326,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 			$filelayout[] = 'products_model';
 
 			// build the categories name section of the array based on the number of categories the user wants to have
-			for($i=1;$i<$max_categories+1;$i++){
+			for($i=1;$i<$max_category_levels+1;$i++){
 				$filelayout[] = 'categories_name_' . $i;
 			}
 
@@ -655,7 +655,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 
 			if (isset($row['categories_id'])) {
 				$categories = $this->getCategories($row['categories_id']);
-				$categories = array_slice($categories, 0, $max_categories, true);
+				$categories = array_slice($categories, 0, $max_category_levels, true);
 				if ($ep_dltype == 'froogle') {
 					$fullcategory = ''; // @todo move to froogle output
 					foreach ($categories as $k => $v) {
@@ -664,7 +664,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 					// now trim off the last ">" from the category stack
 					$row['category_fullpath'] = substr($fullcategory,0,strlen($fullcategory)-3);
 				}
-				$categories = array_pad($categories, $max_categories, '');
+				$categories = array_pad($categories, $max_category_levels, '');
 				foreach ($categories as $k => $v) {
 					$row['categories_name_' . ($k + 1)] = $categories[$k];
 				}
@@ -792,11 +792,11 @@ class EasyPopulateExport extends EasyPopulateProcess
 			 }
 
 			//We check the value of tax class and title instead of the id
-			//Then we add the tax to price if $price_with_tax is set to 1
+			//Then we add the tax to price if $prices_include_tax is set to 1
 			if (isset($filelayout['products_price'])) {
 				$row_tax_multiplier     = $this->getTaxClassRate($row['tax_class_id']);
 				$row['tax_class_title']   = zen_get_tax_class_title($row['tax_class_id']);
-				$row['products_price']  = round($row['products_price'] + ($price_with_tax * $row['products_price'] * $row_tax_multiplier / 100),2);
+				$row['products_price']  = round($row['products_price'] + ($prices_include_tax * $row['products_price'] * $row_tax_multiplier / 100),2);
 			}
 
 			$tempcsvrow = array();
