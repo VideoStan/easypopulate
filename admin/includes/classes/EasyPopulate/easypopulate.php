@@ -54,7 +54,6 @@ class EasyPopulate extends Fitzgerald
 				// @todo print this error somewhere
 				print(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $config['temp_path'], DIR_FS_CATALOG));
 			}
-			ep_update_handlers();
 			$config = ep_get_config();
 
 		}

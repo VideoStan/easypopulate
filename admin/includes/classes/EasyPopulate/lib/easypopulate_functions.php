@@ -360,33 +360,6 @@ function remove_easypopulate()
 	return true;
 }
 
-function ep_update_handlers()
-{
-	global $db;
-
-	$query = "SELECT name FROM " . TABLE_EASYPOPULATE_FEEDS;
-	$result = mysql_query($query);
-
-	$handlers_db = array();
-	while ($row = mysql_fetch_array($result)) {
-		$handlers_db[] = $row['name'];
-	}
-
-	$handlers = EPFileUploadFactory::find();
-	foreach ($handlers as $handler) {
-		if (in_array($handler,$handlers_db)) continue;
-		$className = EPFileUploadFactory::get($handler);
-		$config = call_user_func_array(array($className, 'defaultConfig'), array());
-		$data = array();
-		$data['name'] = $handler;
-		$data['config'] = json_encode($config);
-		$data['last_run_data'] = json_encode(array());
-		$data['modified'] = 'NOW()';
-		$data['created'] = 'NOW()';
-		$query = ep_db_modify(TABLE_EASYPOPULATE_FEEDS, $data, 'INSERT');
-		$db->Execute($query);
-	}
-}
 /**
  * Get one or all config vars
  *
