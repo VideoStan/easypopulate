@@ -1,0 +1,260 @@
+# @todo this format is still under construction
+global:
+  version: 3.9.5
+  # do we need a default import handler?
+  # 'set_function' => 'zen_cfg_select_option(EPFileUploadFactory::find(),')
+  # import_handler: Standard
+  temp_dir: tempEP/
+  time_limit: 1200
+  debug_logging: false
+  log_queries: false
+
+# default options for all files
+file: &file
+  local_file:
+    value:
+  detect_line_endings:
+    value: true
+  column_delimiter:
+    value: ','
+    options: 'EasyPopulateCsvFileObject::$DELIMITERS'
+  column_enclosure: 
+    value: '"'
+    size: 1
+
+# default options for import/export 
+both: &both
+  << : *file
+  file_date_format:
+    value: m-d-y
+    options: ['m-d-y', 'd-m-y', 'y-m-d']
+  split_max:
+    value: 300
+    size: 6
+    # @todo allow this once it works
+    input: false
+  advanced_smart_tags:
+    value: false
+    input: false
+  custom_fields:
+    value:
+    input: false
+  default_raw_time:
+    value: 09:00:00
+    size: 8
+  feed_send_email:
+    value: false
+  site:
+    value:
+    #todo: needs to be made optional
+    options: 'read_sites()' 
+
+# default options for imports
+import: &import
+  replace_newlines:
+    value: true
+  image_path_prefix:
+    value:
+
+# default options for exports
+export: &export
+  filelayout:
+    input: false
+
+# default options for product imports/exports
+products_both: &products_both
+  << : *both
+  prices_include_tax:
+    value: false
+  price_modifier:
+    value: 0
+    size: 8
+  deactivate_on_zero_qty:
+    value: false
+
+# default options for products import
+products_import: &products_import
+  << : *import
+  metatags_keywords:
+    value:
+  metatags_description:
+    value:
+  metatags_title:
+    value:
+  tax_class_title:
+    value:
+    options: 'ep_get_tax_class_titles()'
+  feed_fetch:
+     value: false
+     input: false
+  images_fetch:
+    value: false
+    input: false
+
+# default options for products export
+products_export: &products_export
+  << : *export
+  max_category_levels:
+    value: 7
+    size: 3
+  max_qty_discounts:
+    value: 6
+    size: 2
+
+handlers:
+  Standard:
+    item_type: products
+    import:
+      << : [*products_both, *products_import]
+      filelayout_required:
+        value:
+        input: false
+      filelayout_optional:
+        input: false
+        value:
+    export:
+      << : [*products_both, *products_export]
+
+  MegaGoods:
+    item_type: products
+    import:
+      << : [*products_both, *products_import]
+      filelayout_required:
+        value: model,mpn,name,description,upc,manufacturer,price,retails online,MSRP,weight,condition,image,category,status
+        input: false
+      filelayout_map:
+        value: products_model,,,,,manufacturers_name,products_price,,,products_weight,,products_image,categories_name_1,products_status
+        input: false
+      column_delimiter:
+        value: tab
+        input: false
+      local_file:
+        value: MegaGoods.txt
+      feed_fetch:
+        value: false
+        input: true
+      images_fetch:
+        value: false
+        input: true
+      feed_url:
+        value: http://www.megagoods.com/export.php?show=format_tab
+        input: false
+      images_url:
+        value: http://www.megagoods.com/pimages/regular.zip
+        type: false
+      images_file_path:
+        value: 
+        input: false
+
+  PremierProducts:
+    item_type: products
+    import:
+      << : [*products_both, *products_import]
+      filelayout_required:
+        value: Brand,Category,Description,Dimensions,Instock,Item,ItemID,Modelnum,Pic,Price,Retailprice,Special,TAGLINE,Tpic,UPC,WEIGHT
+        input: false
+      filelayout_map: 
+        value: manufacturers_name,categories_name_1,,,products_quantity,,,,products_model,products_image,products_price,,,,,,products_weight
+        input: false
+      local_file:
+        value: PremierProducts.csv
+      column_delimiter:
+        value: ,
+        input: false;
+      feed_fetch:
+        value: false
+        input: true
+      images_fetch:
+        value: false
+        input: true
+      feed_url:
+        value: http://hotbuy4u.com/products.csv
+        input: false
+      images_url:
+        value: http://www.hotbuy4u.com/picsdl.cfm
+        input: false
+      images_file_path:
+        value: inetpub/wwwroot/products/pics
+        input: false
+
+  Evertek:
+    item_type: products
+    import:
+      << : [*products_both, *products_import]
+      filelayout_required:
+        value: QtyAvail,PartNumber,Product Description,Link,Condition,UPC,Disc Qty,Disc Price,Reg Price,Warranty,Unit Weight,70x70 Image,300x300 Image,Manufacturer,Unit Dims,Category Code,Cat-SubCat Pairs,Product Note,Features/Specifications,Package Includes,Additional Information
+        input: false
+      filelayout_map:
+        value: products_quantity,products_model,,,,,products_model,discount_qty_1,discount_price_1,products_price,,products_weight,,products_image,manufacturers_name,,categories_name_1
+        input: false
+      local_file:
+        value: Evertek.csv
+      column_delimiter:
+        value: ,
+        input: false
+      feed_fetch:
+        value: false
+        input: true
+      images_fetch:
+        value: false
+        input: true
+      feed_url:
+        value: http://www.evertek.com/Inventory_list/Evertek_Inventory_List.csv
+        input: false 
+  BNFUSA:
+    item_type: products
+    import:
+       << : [*products_both, *products_import]
+       filelayout_required:
+         value: Item Title,Item Status,Available Inventory,Item Number,Item Short Description,Parent Number,Web Description,Catalog Description,Item Supplemental Tab 1,Country of Origin,Points,Retail Price,Major Category,Minor Category,Case Count,Each Price,Column 2 Price,Column 2 Break,Column 3 Price,Column 3 Break,Column 4 Price,Column 4 Break,Column 5 Price,Column 5 Break,Each UPC,Case UPC,Catalog Page,Each Weight (lbs.),Each Length (in.),Each Width (in.),Each Height (in.),Case Weight,Case Length (in.),Case Width (in.),Case Height (in.),Estimated Next Ship Date,Item Categories,Item Categories (numeric),Item Size-Color Desc,Size-Color Key Numeric
+         input: false
+       local_file:
+         value: BNFUSA.csv
+       column_delimiter:
+         value: ,
+         input: false
+       feed_fetch:
+         value: false
+         input: true
+       images_fetch:
+         value: false
+         input: true
+       feed_url:
+         value: http://www.bnfusa.com/utilities/cgen.lasso?an8=10151431&fmt=csv
+         input: false 
+       images_url:
+         value: http://statics.bnfusa.com/By_Part_Number.zip
+         input: false
+       images_file_path:
+         value: By_Part_Number
+         input: false
+
+  OrderStatusHistory:
+    item_type: orderstatushistory
+    import:
+      << : [*both, *import]
+      filelayout_required:
+        value: order_id,order_status,notify_customer,comments
+        input: false
+      filelayout_map:
+        value: orders_id,orders_status_id,notify_customer,comments,tracking_numbers,tracker_id
+        input: false
+      filelayout_optional:
+        value: tracking_numbers,tracker_id
+        inputl: null
+
+  Testimonials:
+    item_type: testimonials
+    import:
+      << : [*both, *import]
+      filelayout_required:
+        value: title,url,name,image,text,email,company,city,country,show_email,status,date_added
+        type: internal
+        input: false
+      filelayout_map:
+        value: testimonials_title,testimonials_url,testimonials_name,testimonials_image,testimonials_html_text,testimonials_mail,testimonials_company,testimonials_city,testimonials_country,testimonials_show_email,status,date_added,site
+        input: false
+      filelayout_optional:
+        value: site
+        type: internal
+        input: false
