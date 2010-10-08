@@ -13,52 +13,11 @@
  *
  * @todo provide a sample entry
  *
- * All Available Fields:
 
  */
 class EPUploadPremierProducts extends EPUploadStandard
 {
 	public $name = 'PremierProducts';
-	public $expectedFileLayout = array(
-		'Brand',
-		'Category',
-		'Description',
-		'Dimensions',
-		'Instock',
-		'Item',
-		'ItemID',
-		'Modelnum',
-		'Pic',
-		'Price',
-		'Retailprice',
-		'Special',
-		'TAGLINE',
-		'Tpic',
-		'UPC',
-		'WEIGHT');
-
-	public static function defaultConfig()
-	{
-		$config = parent::defaultConfig();
-		$config['feed_url'] = 'http://hotbuy4u.com/products.csv';
-		$config['local_file'] = 'PremierProducts.csv';
-		$config['images_url'] = 'http://www.hotbuy4u.com/picsdl.cfm';
-		$config['images_file_path'] = 'inetpub/wwwroot/products/pics';
-		return $config;
-	}
-
-	public function mapFileLayout(array $filelayout)
-	{
-		$filelayout[0] = 'manufacturers_name';
-		$filelayout[1] = 'categories_name_1';
-		$filelayout[4] = 'products_quantity';
-		$filelayout[7] = 'products_model';
-		$filelayout[8] = 'products_image';
-		$filelayout[9] = 'products_price';
-		$filelayout[15] = 'products_weight';
-		$filelayout = array_flip($filelayout);
-		return $filelayout;
-	}
 
 	public function handleRow(array $item)
 	{

@@ -12,51 +12,9 @@
  *
  * @todo provide a sample entry
  *
- * All Available Fields:
-   0 => model
-   1 => mpn
-   2 => name
-   3 => description
-   4 => upc
-   5 => manufacturer
-   6 => price
-   7 => retails online
-   8 => MSRP
-   9 => weight
-   10 => condition
-   11 => image
-   12 => category
-   13 => status
  */
 class EPUploadMegaGoods extends EPUploadStandard
 {
-	public $name = 'MegaGoods';
-
-	public static function defaultConfig()
-	{
-		$config = parent::defaultConfig();
-		$config['column_delimiter'] = 'tab';
-		$config['feed_url'] = 'http://www.megagoods.com/export.php?show=format_tab';
-		$config['local_file'] = 'MegaGoods.txt';
-		$config['images_url'] = 'http://www.megagoods.com/pimages/regular.zip';
-		$config['images_file_path'] = '';
-		return $config;
-	}
-
-	public function mapFileLayout(array $filelayout)
-	{
-
-		$filelayout[0] = 'products_model';
-		$filelayout[5] = 'manufacturers_name';
-		$filelayout[6] = 'products_price';
-		$filelayout[9] = 'products_weight';
-		$filelayout[11] = 'products_image';
-		$filelayout[12] = 'categories_name_1';
-		$filelayout[13] = 'products_status';
-		$filelayout = array_flip($filelayout);
-		return $filelayout;
-	}
-
 	public function handleRow(array $item)
 	{
 		$descriptions = array();

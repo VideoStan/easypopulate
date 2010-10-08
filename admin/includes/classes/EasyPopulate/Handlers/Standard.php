@@ -25,33 +25,6 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 	public $transforms = array();
 	public $imagePathPrefix = '';
 
-	function __construct($file)
-	{
-		$this->transforms = array();
-		$this->autoDetectLineEndings(ep_get_config('detect_line_endings'));
-		parent::__construct($file);
-	}
-
-	public static function defaultConfig()
-	{
-		$config = array();
-		$config['column_delimiter'] = ',';
-		$config['column_enclosure'] = '"';
-		$config['price_modifier'] = 0;
-		$config['image_path_prefix'] = '';
-		$config['tax_class_title'] = '';
-		$config['metatags_keywords'] = '';
-		$config['metatags_description'] = '';
-		$config['metatags_title'] = '';
-		$config['feed_fetch'] = false;
-		$config['images_fetch'] = false;
-		$config['feed_send_email'] = false;
-		if (function_exists('get_sites')) {
-			$config['site'] = '';
-		}
-		return $config;
-	}
-
 	/**
 	 * Map csv column header names to column names
 	 *

@@ -12,58 +12,12 @@
  * Evertek Upload csv conversion class
  *
  * @todo provide a sample entry
- [0] => QtyAvail
- [1] => PartNumber
- [2] => Product Description
- [3] => Link
- [4] => Condition
- [5] => UPC
- [6] => Disc Qty
- [7] => Disc Price
- [8] => Reg Price
- [9] => Warranty
- [10] => Unit Weight
- [11] => 70x70 Image
- [12] => 300x300 Image
- [13] => Manufacturer
- [14] => Unit Dims
- [15] => Category Code
- [16] => Cat-SubCat Pairs
- [17] => Product Note
- [18] => Features/Specifications
- [19] => Package Includes
- [20] => Additional Information
- *
  */
 class EPUploadEvertek extends EPUploadStandard
 {
 	public $name = 'Evertek';
 
 	private $category = '';
-
-	public static function defaultConfig()
-	{
-		$config = parent::defaultConfig();
-		$config['feed_url'] = 'http://www.evertek.com/Inventory_list/Evertek_Inventory_List.csv';
-		$config['local_file'] = 'Evertek.csv';
-		return $config;
-	}
-
-	public function mapFileLayout(array $filelayout)
-	{
-
-		$filelayout[0] = 'products_quantity';
-		$filelayout[1] = 'products_model';
-		$filelayout[6] = 'discount_qty_1';
-		$filelayout[7] = 'discount_price_1';
-		$filelayout[8] = 'products_price';
-		$filelayout[10] = 'products_weight';
-		$filelayout[12] = 'products_image';
-		$filelayout[13] = 'manufacturers_name';
-		$filelayout[15] = 'categories_name_1';
-		$filelayout = array_flip($filelayout);
-		return $filelayout;
-	}
 
 	public function handleRow(array $item)
 	{
