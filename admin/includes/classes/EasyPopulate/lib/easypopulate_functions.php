@@ -337,4 +337,34 @@ function ep_get_config($var = NULL)
 
 	return ep_get_config($var);
 }
+
+/**
+ * Hacky function to create a select box with multiple data sources
+ */
+function ep_pull_down_menu_options($options = array())
+{
+	if (empty($options)) return array();
+
+	$pull_down_options = array();
+
+	if (is_string($options)) {
+		// @todo restrict to a common class/function prefix
+		if ((false !== strpos($options, '(')) || (false !== strpos($options, '$'))) {
+			$options = eval('return ' . $options . ';');
+		} else {
+			$options = explode(',', $options);
+		}
+	}
+
+	if (is_null($options)) $options = array();
+
+	foreach ($options as $k => $v) {
+		if (is_numeric($k)) {
+			$pull_down_options[] = array('id' => $v, 'text' => $v);
+		} else {
+			$pull_down_options[] = array('id' => $k, 'text' => $v);
+		}
+	}					
+	return $pull_down_options;
+}
 ?>

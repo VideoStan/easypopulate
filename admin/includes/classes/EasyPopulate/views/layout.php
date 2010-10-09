@@ -42,23 +42,25 @@
 	});
 	$(document).ready(function() {
 		$("#import_handler").change(function() {
-			$.getJSON("/admin/easypopulate.php/preset/" + $(this).val(), function(json) {
-				$("#feed_fetch").attr("disabled", "disabled");
-				$("#images_fetch").attr("disabled", "disabled");
-				$.each(json, function(k, v){
-					isCheckBox = $("#" + k).is("input:checkbox");
-					if (isCheckBox) {
-						$("#" + k).attr("checked", v);
-					} else {
-						$("#" + k).val(unescape(v));
-					}
-				});
-
-				if (json.name != 'Standard') {
-					$("#feed_fetch").removeAttr("disabled");
-					$("#images_fetch").removeAttr("disabled");
+			$("#config").load("/admin/easypopulate.php/import/" + $(this).val(), function(response, status, xhr) {
+				if (status == "error") {
+					var msg = "Sorry but there was an error: ";
+					$(this).html(msg + xhr.status + " " + xhr.statusText);
 				}
 			});
+
+		});
+		$("#item_type").change(function() {
+			var curItemType = $(this).val();
+			$("#import_handler").empty();
+			$.each(handlers_all, function(itemType, handlers) {
+				if (itemType == curItemType) {
+					$.each(handlers, function(index, option) {
+						$("#import_handler").append("<option value=" + option + ">" + option + "</option>");
+					});
+				}
+			});
+			$("#import_handler").change();
 		});
 
 		$("#import_form input[name=setconfig]").click(function() {

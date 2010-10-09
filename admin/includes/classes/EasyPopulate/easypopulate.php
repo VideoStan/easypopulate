@@ -23,8 +23,13 @@ if (!isset($_SESSION['easypopulate'])) {
 
 class EasyPopulate extends Fitzgerald
 {
+	protected $isXhr = false;
 	public function __construct($options = array())
 	{
+		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && (strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')) {
+			$this->isXhr = true;
+			$options['layout'] = null;
+		}
 		parent::__construct($options);
 		$language = 'english';
 		if (!is_null($this->session->language)) {
@@ -152,16 +157,26 @@ class EasyPopulate extends Fitzgerald
 		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
 	}
 
-	public function get_import()
+	public function get_import($handler = null)
 	{
+		$import_handler = $handler;
 		$tpl = array();
-		$tpl['output'] = array();
-		$tpl['max_file_size'] = min(ep_get_bytes(ini_get('upload_max_filesize')), ep_get_bytes(ini_get('post_max_size')));
-		$tpl['local_file'] = '';
 
 		$config = ep_get_config();
 		$tpl = array_merge($tpl, $config);
-		$tpl = array_merge($tpl, EPFileUploadFactory::getConfig($config['import_handler']));
+
+		if (empty($import_handler)) $import_handler = $config['import_handler']; 
+		$handler_config = $this->config->getConfig($import_handler);
+		$tpl = array_merge($tpl,$handler_config['import']);
+		$tpl['item_type'] = $handler_config['item_type'];
+		$tpl['handler'] = $handler_config['import'];
+
+		if ($this->isXhr) return $this->render('import-fields', $tpl);
+
+		$tpl['item_types'] = $this->config->getItemTypes();
+		$tpl['handlers'] = $this->config->getHandlers($tpl['item_type']);
+		$tpl['handlers_all'] = $this->config->getHandlers(null, true);
+		$tpl['max_file_size'] = min(ep_get_bytes(ini_get('upload_max_filesize')), ep_get_bytes(ini_get('post_max_size')));
 		return $this->render('import', $tpl);
 	}
 
@@ -296,7 +311,7 @@ class EasyPopulate extends Fitzgerald
 
 	$app->get('/dross', 'get_dross');
 	$app->post('/dross', 'post_dross');
-	$app->get('/import', 'get_import');
+	$app->get('/import/:handler', 'get_import', array('handler' => '.*'));
 	$app->post('/import', 'post_import');
 	$app->post('/upload', 'post_upload');
 
