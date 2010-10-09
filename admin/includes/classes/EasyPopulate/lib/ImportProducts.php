@@ -196,26 +196,22 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 				$products_price = round( $products_price / (1 + ( $row_tax_multiplier * $prices_include_tax/100) ), 4);
 			}
 
-			unset ($categories_name); // default to not set.
-
-			if (isset($filelayout['categories_name_1'])) { // does category 1 column exist in our file..
-				$category_strlen_long = false;
-				$newlevel = 1;
-				// @todo decouple import from max_categories altogether
-				for ($categorylevel = 10; $categorylevel>0; $categorylevel--) {
-					if (isset($items['categories_name_' . $categorylevel])) {
-						if (strlen($items['categories_name_' . $categorylevel]) > $category_strlen_max) $category_strlen_long = TRUE;
-						if (!empty($items['categories_name_' . $categorylevel])) {
-							$categories_name[$newlevel++] = $items['categories_name_' . $categorylevel];
-						}
+			$category_strlen_long = false;
+			$newlevel = 1;
+			// @todo decouple import from max_categories altogether
+			for ($categorylevel = 10; $categorylevel>0; $categorylevel--) {
+				if (isset($items['categories_name_' . $categorylevel])) {
+					if (strlen($items['categories_name_' . $categorylevel]) > $category_strlen_max) $category_strlen_long = TRUE;
+					if (!empty($items['categories_name_' . $categorylevel])) {
+						$categories_name[$newlevel++] = $items['categories_name_' . $categorylevel];
 					}
 				}
+			}
 
-				if ($category_strlen_long) {
-					$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
-					$output_message = sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NAME_LONG, $category_strlen_max);
-					continue;
-				}
+			if ($category_strlen_long) {
+				$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
+				$output_message = sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NAME_LONG, $category_strlen_max);
+				continue;
 			}
 
 			if (!isset($manufacturers_name)) $manufacturers_name = NULL; 
