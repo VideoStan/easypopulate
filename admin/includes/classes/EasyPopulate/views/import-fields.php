@@ -35,7 +35,7 @@
 				echo zen_draw_pull_down_menu($field, $pull_down_options, $options['value'], $attributes);
 				break;
 			default:
-				if (isset($options['size'])) $attribues .= 'size="' . $options['size'] . '" ';
+				if (isset($options['size'])) $attributes .= 'size="' . $options['size'] . '" ';
 				echo zen_draw_input_field($field, (string)$options['value'], $attributes, false /*,$type = 'text'*/);
 		}
 		?>
