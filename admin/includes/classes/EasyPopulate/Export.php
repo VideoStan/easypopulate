@@ -20,10 +20,6 @@ class EasyPopulateExport extends EasyPopulateProcess
 
 	public function setFormat($type = 'full')
 	{
-		if ($type == 'froogle') {
-			$this->columnDelimiter = "\t";
-			$this->columnEnclosure = ' ';
-		}
 		$this->type = $type;
 		$this->fileName = 'EP-' . $type . strftime('%Y%b%d-%H%M%S') . '.' . (($this->columnDelimiter == ',') ? 'csv' : 'txt');
 	}
@@ -346,61 +342,6 @@ class EasyPopulateExport extends EasyPopulateProcess
 				ptoc.categories_id = subc.categories_id';
 			break;
 
-		case 'froogle':
-			// Map easypopulate field names to froogle names
-			// The file layout is dynamically made depending on the number of languages
-
-			$filetemp = array();
-
-			$filetemp['product_url'] = 'froogle_products_url_1';
-			$filetemp['name'] = 'froogle_products_name_1';
-			$filetemp['description'] = 'froogle_products_description_1';
-			$filetemp['price'] = 'products_price';
-			$filetemp['image_url'] = 'products_fullpath_image';
-			$filetemp['category'] = 'category_fullpath';
-			$filetemp['offer_id'] = 'froogle_offer_id';
-			$filetemp['instock'] = 'froogle_instock';
-			$filetemp['shipping'] = 'froogle_shipping';
-			$filetemp['brand'] = 'manufacturers_name';
-			$filetemp['upc'] = 'froogle_upc';
-			//$filetemp['color'] = 'froogle_color';
-			//$filetemp['size'] = 'froogle_size';
-			//$filetemp['quantity'] = 'froogle_quantitylevel';
-			//$filetemp['product_id'] = 'froogle_product_id';
-			$filetemp['manufacturer_id'] = 'froogle_manufacturer_id';
-			//$filetemp['exp_date'] = 'froogle_exp_date';
-			$filetemp['product_type'] = 'froogle_product_type';
-			//$filetemp['delete'] = 'froogle_delete';
-			$filetemp['currency'] = 'froogle_currency';
-
-
-			$fileheaders = array_keys($filetemp);
-			$filelayout = array_values($filetemp);
-
-			$filelayout_sql = "SELECT
-				p.products_id,
-				p.products_model,
-				p.products_image,
-				p.products_price,
-				p.products_weight,
-				p.products_date_added AS date_added,
-				p.products_last_modified AS last_modified,
-				p.products_tax_class_id AS tax_class_id,
-				p.products_quantity,
-				p.manufacturers_id,
-				subc.categories_id".
-				$custom_filelayout_sql.
-				" FROM
-				".TABLE_PRODUCTS." as p,
-				".TABLE_CATEGORIES." as subc,
-				".TABLE_PRODUCTS_TO_CATEGORIES." as ptoc
-				WHERE
-				p.products_id = ptoc.products_id AND
-				ptoc.categories_id = subc.categories_id AND
-				p.products_status = '1'
-				";
-			break;
-
 		case 'attrib':
 
 			$filelayout[] = 'products_model';
@@ -526,14 +467,6 @@ class EasyPopulateExport extends EasyPopulateProcess
 		//*******************************
 		//*******************************
 
-		//if ($_GET['dltype']=='froogle'){
-			// set the things froogle wants at the top of the file
-	//    $filestring .= " html_escaped=YES\n";
-	//    $filestring .= " updates_only=NO\n";
-	//    $filestring .= " product_type=OTHER\n";
-	//    $filestring .= " quoted=YES\n";
-		//}
-
 		$result = ep_query($filelayout_sql);
 
 		/**
@@ -542,7 +475,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 		 * the field mapping array only needs to cover those fields that need to have their name changed
 		 */
 		if (count($fileheaders) != 0 ) {
-			// if they gave us fileheaders for the dl, then use them; only overridden by froogle atm
+			// if they gave us fileheaders for the dl, then use them; 
 			// @todo <johnny> make it configurable
 			$filelayout_header = $fileheaders;
 		} else {
@@ -563,42 +496,6 @@ class EasyPopulateExport extends EasyPopulateProcess
 		$num_of_langs = count($langcode);
 
 		while ($row = mysql_fetch_array($result, MYSQL_ASSOC)){
-
-			// build the long full froogle image path
-			// check for a large image else use medium else use small else no link
-			// thanks to Tim Kroeger - www.breakmyzencart.com
-			if (isset($row['products_image'])) {
-			$products_image = (($row['products_image'] == PRODUCTS_IMAGE_NO_IMAGE) ? '' : $row['products_image']);
-			$products_image_extension = substr($products_image, strrpos($products_image, '.'));
-			$products_image_base = ereg_replace($products_image_extension . '$', '', $products_image);
-			$products_image_medium = $products_image_base . IMAGE_SUFFIX_MEDIUM . $products_image_extension;
-			$products_image_large = $products_image_base . IMAGE_SUFFIX_LARGE . $products_image_extension;
-			if (!file_exists(DIR_FS_CATALOG_IMAGES . 'large/' . $products_image_large)) {
-				if (!file_exists(DIR_FS_CATALOG_IMAGES . 'medium/' . $products_image_medium)) {
-					$image_url = (($products_image == '') ? '' : DIR_WS_CATALOG_IMAGES . $products_image);
-				} else {
-					$image_url = DIR_WS_CATALOG_IMAGES . 'medium/' . $products_image_medium;
-				}
-			} else {
-				$image_url = DIR_WS_CATALOG_IMAGES . 'large/' . $products_image_large;
-			}
-
-			$row['products_fullpath_image'] = $image_url;
-			}
-			// Other froogle defaults go here for now
-			$row['froogle_instock']     = 'Y';
-			$row['froogle_shipping']    = '';
-			$row['froogle_upc']       = '';
-	//		$row['froogle_color']     = '';
-	//		$row['froogle_size']      = '';
-	//		$row['froogle_quantitylevel']   = '';
-			$row['froogle_manufacturer_id'] = '';
-	//		$row['froogle_exp_date']    = '';
-			$row['froogle_product_type']    = 'OTHER';
-	//		$row['froogle_delete']    = '';
-			$row['froogle_currency']    = 'usd';
-			$row['froogle_offer_id']    = $row['products_model'];
-	//		$row['froogle_product_id']    = $row['products_model'];
 
 			foreach ($langcode as $key => $lang) {
 				$lid = $lang['id'];
@@ -628,10 +525,6 @@ class EasyPopulateExport extends EasyPopulateProcess
 				}
 				$row['products_url_' . $lid]    = $row2['products_url'];
 
-				// froogle advanced format needs the quotes around the name and desc
-				$row['froogle_products_name_' . $lid] = '"' . html_entity_decode(strip_tags(str_replace('"','""',$row2['products_name']))) . '"';
-				$row['froogle_products_description_' . $lid] = '"' . html_entity_decode(strip_tags(str_replace('"','""',$row2['products_description']))) . '"';
-				$row['froogle_products_url_' . $lid] = $row['products_url_' . $lid];
 			}
 
 			// START specials
@@ -657,15 +550,8 @@ class EasyPopulateExport extends EasyPopulateProcess
 
 			if (isset($row['categories_id'])) {
 				$categories = $this->getCategories($row['categories_id']);
+
 				$categories = array_slice($categories, 0, $max_category_levels, true);
-				if ($ep_dltype == 'froogle') {
-					$fullcategory = ''; // @todo move to froogle output
-					foreach ($categories as $k => $v) {
-						$fullcategory .= $v . ' > ';
-					}
-					// now trim off the last ">" from the category stack
-					$row['category_fullpath'] = substr($fullcategory,0,strlen($fullcategory)-3);
-				}
 				$categories = array_pad($categories, $max_category_levels, '');
 				foreach ($categories as $k => $v) {
 					$row['categories_name_' . ($k + 1)] = $categories[$k];
@@ -754,28 +640,6 @@ class EasyPopulateExport extends EasyPopulateProcess
 					$ll++;
 				}
 			}
-			if ($ep_dltype == 'froogle'){
-				// For froogle, we check the specials prices for any applicable specials, and use that price
-				// by grabbing the specials id descending, we always get the most recently added special price
-				$sql2 = "SELECT
-						specials_new_products_price
-					FROM
-						".TABLE_SPECIALS."
-					WHERE
-					products_id = " . $row['products_id'] . " and
-					status = 1 and
-					expires_date < CURRENT_TIMESTAMP
-					ORDER BY
-						specials_id DESC"
-					;
-				$result2 = ep_query($sql2);
-				$ll = 1;
-				$row2 =  mysql_fetch_array($result2);
-				if (!empty($row2)){
-					// reset the products price to our special price if there is one for this product
-					$row['products_price']  = $row2['specials_new_products_price'];
-				}
-			}
 
 			// Price/Qty/Discounts - chadd
 			 $discount_index = 1;
@@ -806,11 +670,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 				// only the specified keys are used
 				$tempcsvrow[] = $row[$key];
 			}
-			switch ($ep_dltype) {
-				case 'froogle':
-					$tempcsvrow = array_map(array($this, 'killBreaks'), $tempcsvrow);
-					break;
-				}
+
 			$tempFile->write($tempcsvrow);
 		}
 
@@ -867,17 +727,5 @@ class EasyPopulateExport extends EasyPopulateProcess
 		return $filelayout;
 	}
 
-	/**
-	 * Kills all line breaks and tabs
-	 *
-	 * Used for Froogle (Google Products)
-	 *
-	 * @param string $line line to kill breaks on
-	 * @return mixed
-	 */
-	private function killBreaks($line) {
-		if (is_array($line)) return array_map('kill_breaks', $line);
-		return str_replace(array("\r","\n","\t")," ",$line);
-	}
 }
 ?>
