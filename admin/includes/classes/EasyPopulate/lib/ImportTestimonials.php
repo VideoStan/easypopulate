@@ -23,19 +23,15 @@ class EasyPopulateImportTestimonials extends EasyPopulateProcess
 
 	public function run(SplFileInfo $fileInfo)
 	{
-		// @todo this shouldn't have to be here here
-		$fileInfo->setFileClass(EPFileUploadFactory::get($this->config['import_handler']));
-		$file = $fileInfo->openFile('r');
+		$config = $this->config->getValues($this->importHandler);
 
-		$file->setCsvControl($this->config['column_delimiter'], stripslashes($this->config['column_enclosure']));
-		$file->setFileLayout($file->getFileLayout());
+		$file = $this->openFile($fileInfo);
 
+		if ($file === false) return false;
 		// @todo put this somewhere else
-		$file->imagePathPrefix = $this->config['image_path_prefix'];
+		$file->imagePathPrefix = $config['image_path_prefix'];
 
 
-		if ($filelayout = $file->getFileLayout()) {
-		$this->filelayout = $filelayout;
 		$file->onFileStart();
 
 		foreach ($file as $items) {
@@ -57,8 +53,8 @@ class EasyPopulateImportTestimonials extends EasyPopulateProcess
 			WHERE testimonials_mail = '" . zen_db_input($items['testimonials_mail']) . "'";
 
 			if (isset($items['site']) && empty($items['site'])) {
-				if (isset($this->config['site'])) {
-					$items['site'] = $this->config['site'];
+				if (isset($config['site'])) {
+					$items['site'] = $config['site'];
 				} else {
 					$items['site'] = $_SERVER['HTTP_HOST'];
 				}
@@ -91,6 +87,7 @@ class EasyPopulateImportTestimonials extends EasyPopulateProcess
 					continue; 
 				}
 			}
+
 			$output_data = array_values($items);
 			// @todo write  status message and status to tempFile 
 
@@ -103,7 +100,7 @@ class EasyPopulateImportTestimonials extends EasyPopulateProcess
 
 			//$file->onItemFinish($products_id, $products_model);
 		}
-		}
+
 		/**
 		* Post-upload tasks start
 		*/

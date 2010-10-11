@@ -33,6 +33,8 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 	 */
 	public function mapFileLayout($filelayout)
 	{
+		$filelayout = parent::mapFileLayout($filelayout);
+		$filelayout = array_flip($filelayout); // @todo don't flip twice
 		foreach ($filelayout as &$column) {
 			$column = str_replace('v_', '', $column);
 			if ($column == 'status') $column = 'products_status';

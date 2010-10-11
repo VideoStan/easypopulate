@@ -23,7 +23,7 @@ class EasyPopulateProcess
 	protected $taxClassMultipliers = array();
 	protected $config = array();
 
-	public function __construct(array $config = array())
+	public function __construct(EasyPopulateConfig $config)
 	{
 		$time_limit = ep_get_config('time_limit');
 		$this->config = $config;
@@ -46,6 +46,31 @@ class EasyPopulateProcess
 		$tempFile->setCsvControl(',', '"');
 		$this->tempFile = $tempFile;
 	}
+
+	/**
+	 * @todo do this before run()
+	 */
+	public function openFile(SplFileInfo $fileInfo)
+	{
+		$config = $this->config->getValues($this->importHandler);
+
+		$fileInfo->setFileClass(EPFileUploadFactory::get($this->importHandler));
+		$file = $fileInfo->openFile('r');
+		$file->init($config['column_delimiter'], $config['column_enclosure'], $config['detect_line_endings']);
+
+		if (isset($config['filelayout_required']) && is_array($config['filelayout_required'])) {
+			if (!$this->fileLayoutValidated($config['filelayout_required'])) {
+				$this->error('Could not validate filelayout');
+				return false;
+			}
+		}
+
+		if (!isset($config['filelayout_map'])) $config['filelayout_map'] = array();
+		$file->setFileLayout($config['filelayout_map']);
+
+		return $file;
+	}
+
 	/**
 	 * Flatten array
 	 *

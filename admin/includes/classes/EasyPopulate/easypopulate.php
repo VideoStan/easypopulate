@@ -24,6 +24,8 @@ if (!isset($_SESSION['easypopulate'])) {
 class EasyPopulate extends Fitzgerald
 {
 	protected $isXhr = false;
+	protected $config;
+
 	public function __construct($options = array())
 	{
 		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && (strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')) {
@@ -39,6 +41,12 @@ class EasyPopulate extends Fitzgerald
 		foreach (glob($langDir . '*php') as $langFile) {
 			if (is_readable($langFile)) include $langFile;
 		}
+
+		$configObject = new EasyPopulateConfig();
+		if (defined('EASYPOPULATE_CONFIG_VERSION')) {
+			$configObject->refreshConfig(); // @todo we don't have it installed yet
+		}
+		$this->config = $configObject;
 	}
 
 	protected function views()
@@ -85,7 +93,7 @@ class EasyPopulate extends Fitzgerald
 	 */
 	public function get_preset($name = NULL)
 	{
-		$configs = EPFileUploadFactory::getConfig($name);
+		$configs = $this->configObject->getValues($name);
 		echo json_encode($configs);
 		exit();
 	}
@@ -93,7 +101,17 @@ class EasyPopulate extends Fitzgerald
 	public function post_preset()
 	{
 		if (!is_null($this->request->preset) && !is_null($this->request->config)) {
-			EPFileUploadFactory::setConfig($this->request->preset, $this->request->config);
+			$postedConfig = $this->request->config;
+			$dbConfig = $this->config->getValues($this->request->preset);
+
+			foreach ($dbConfig as $key => $value) {
+				if (is_bool($value)) { // checkboxes
+					if (!isset($postedConfig[$key])) $postedConfig[$key] = false;
+					if ($postedConfig[$key] == 'on') $postedConfig[$key] = true;
+				}
+			}
+
+			$this->config->setConfig($this->request->preset, $postedConfig);
 		}
 		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
 		exit();
@@ -107,7 +125,10 @@ class EasyPopulate extends Fitzgerald
 	public function get_export($format = 'full', $download = 'stream')
 	{
 		global $messageStack;
-		$export = new EasyPopulateExport();
+		$this->config->importOrExport = 'export';
+		$config = $this->config->getValues('Standard'); // @todo dont' hardcode this
+		$export = new EasyPopulateExport($config);
+		
 		$export->setFormat($format);
 		$export->run();
 
@@ -187,15 +208,15 @@ class EasyPopulate extends Fitzgerald
 			$this->error('Please select an import handler');
 		}
 
-		$config = ep_get_config();
 		// @todo put config entries in $this->request->config again?
 		foreach ($this->request as $k => $v) {
 			if (is_null($v)) continue;
 			$config[$k] = $v;
 		}
 
-		$saved_config = EPFileUploadFactory::getConfig($config['import_handler']);
-		$config = array_merge($saved_config, $config);
+		$handlerConfig = $this->config->getConfig($config['import_handler']);
+		$this->config->setValues($config['import_handler'],$config);
+		$config = $this->config->getValues($config['import_handler']);
 
 		$config['local_file'] = ep_get_config('temp_path') . $config['local_file'];
 		if (!is_null($this->request->feed_fetch) && !empty($config['local_file']) && isset($config['feed_url'])) {
@@ -215,19 +236,11 @@ class EasyPopulate extends Fitzgerald
 			$this->error(sprintf(EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED, $fileInfo->getFileName()));
 		}
 
-		if ($config['import_handler'] == 'Testimonials') {
-			// @todo autoload this
-			require DIR_WS_CLASSES . 'EasyPopulate/lib/ImportTestimonials.php';
-			$import = new EasyPopulateImportTestimonials($config);
-		} else if ($config['import_handler'] == 'OrderStatusHistory') {
-			require DIR_WS_CLASSES . 'EasyPopulate/lib/ImportOrderStatusHistory.php';
-			$import = new EasyPopulateImportOrderStatusHistory($config);
-		} else {
-			$import = new EasyPopulateImportProducts($config);
-		}
+		// @todo sanitize and autoload me
+		$import = EPFileUploadFactory::getProcessFile($import_handler, $this->config, $handlerConfig['item_type']);
 
-		if (!$import->setImportHandler($config['import_handler'])) {
-			$message = "Could not use Import Handler '" . $config['import_handler'] . "' because: " . $import->error;
+		if (!$import->setImportHandler($import_handler)) {
+			$message = "Could not use Import Handler '" . $import_handler . "' because: " . $import->error;
 			$this->error($message);
 		}
 

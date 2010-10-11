@@ -24,16 +24,9 @@ class EasyPopulateImportOrderStatusHistory extends EasyPopulateProcess
 
 	public function run(SplFileInfo $fileInfo)
 	{
-		// @todo this shouldn't have to be here
-		$fileInfo->setFileClass(EPFileUploadFactory::get($this->config['import_handler']));
-		$file = $fileInfo->openFile('r');
-
-		$file->setCsvControl($this->config['column_delimiter'], stripslashes($this->config['column_enclosure']));
-		$file->setFileLayout($file->getFileLayout());
-
-		// @todo make sure tracking fields exist in orders status history table
-		if ($filelayout = $file->getFileLayout()) {
-		$this->filelayout = $filelayout;
+		// @todo do this before run()
+		$file = $this->openFile($fileInfo);
+		if ($file === false) return false
 
 		foreach ($file as $items) {
 			$output_message = '';
@@ -114,7 +107,7 @@ class EasyPopulateImportOrderStatusHistory extends EasyPopulateProcess
 		$file->onFileFinish();
 
 		$this->itemCount = $file->itemCount;
-		}
+
 		return true;
 	}
 		
@@ -175,8 +168,10 @@ class EasyPopulateImportOrderStatusHistory extends EasyPopulateProcess
 	 */
 	public function sendOrderStatusEmail($order, $notifyComments = false)
 	{
+		$config = $this->config->getValues($this->importHandler);
+
 		error_reporting($GLOBALS['zen_error_level']);
-		require_once DIR_FS_ADMIN . '/includes/languages/' . $this->config['language'] . '/orders.php';
+		require_once DIR_FS_ADMIN . '/includes/languages/' . $config['language'] . '/orders.php';
 		error_reporting($this->errorLevel);
 		$comments = (isset($order['comments'])) ? $order['comments'] : '';
 

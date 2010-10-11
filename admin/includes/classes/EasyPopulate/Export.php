@@ -45,6 +45,8 @@ class EasyPopulateExport extends EasyPopulateProcess
 		 */
 		$products_with_attributes = false;
 		extract(ep_get_config());
+		extract($this->config, EXTR_OVERWRITE);
+
 		// START Create attributes array
 		$attribute_options_array = array();
 		if (isset($attribute_options_select) && is_array($attribute_options_select) && (count($attribute_options_select) > 0)) {

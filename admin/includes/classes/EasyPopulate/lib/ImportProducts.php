@@ -35,13 +35,10 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 		$ep_supported_mods['uom'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_as'); // uom = unit of measure
 		$ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
 		extract(ep_get_config());
-		extract($this->config, EXTR_OVERWRITE);
+		extract($this->config->getValues($this->importHandler), EXTR_OVERWRITE);
 
-		$fileInfo->setFileClass(EPFileUploadFactory::get($import_handler));
-		$file = $fileInfo->openFile('r');
-
-		$file->setCsvControl($column_delimiter, stripslashes($column_enclosure));
-		$file->setFileLayout($file->getFileLayout());
+		$file = $this->openFile($fileInfo);
+		if ($file === false) return false;
 
 		// model name length error handling
 		$modelsize = zen_field_length(TABLE_PRODUCTS, 'products_model');
@@ -53,11 +50,7 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 		$file->transforms['metatags_title'] = $metatags_title;
 
 		$filelayout = $file->getFileLayout();
-		if (!$file->fileLayoutValidated()) {
-			$this->error(' Could not validate filelayout');
-		}
 
-		$this->filelayout = $filelayout;
 		$file->onFileStart();
 
 		foreach ($file as $items) {
