@@ -69,7 +69,7 @@ class EPUploadBNFUSA extends EPUploadStandard
 
 		$model = $item['products_model'];
 
-		$item['products_image'] = $this->imagePathPrefix . $model . '/' . $model . '_800.jpg';
+		$item['products_image'] = $model . '/' . $model . '_800.jpg';
 		if (!file_exists(DIR_FS_CATALOG . 'images/' . $item['products_image'])) {
 			$item['products_image'] = 'no_picture.gif';
 		}

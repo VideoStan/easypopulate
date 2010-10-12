@@ -27,7 +27,6 @@ class EPUploadPremierProducts extends EPUploadStandard
 
 		$item['manufacturers_name'] = str_replace('?', '', $item['manufacturers_name']);
 
-		$item['products_image'] = $this->imagePathPrefix . $item['products_image'];
 		if (!file_exists(DIR_FS_CATALOG . 'images/' . $item['products_image'])) {
 			$item['products_image'] = 'no_picture.gif';
 		}

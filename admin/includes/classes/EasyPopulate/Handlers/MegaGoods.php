@@ -29,7 +29,6 @@ class EPUploadMegaGoods extends EPUploadStandard
 
 		$item['products_quantity'] = 999;
 
-		$item['products_image'] = $this->imagePathPrefix . $item['products_image'];
 		if (!file_exists(DIR_FS_CATALOG . 'images/' . $item['products_image'])) {
 			$item['products_image'] = 'no_picture.gif';
 		}

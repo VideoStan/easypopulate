@@ -37,7 +37,7 @@ class EPUploadEvertek extends EPUploadStandard
 		$item['discount_price_1'] = str_replace('$', '', $item['discount_price_1']);
 
 		$imageURL = $item['products_image'];
-		$item['products_image'] = $this->imagePathPrefix . basename($item['products_image']);
+		$item['products_image'] = basename($item['products_image']);
 
 		$imagePath = DIR_FS_CATALOG . 'images/' . $item['products_image'];
 		if (!empty($item['products_image']) && !file_exists($imagePath)) {

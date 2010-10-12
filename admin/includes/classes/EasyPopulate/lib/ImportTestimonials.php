@@ -26,12 +26,11 @@ class EasyPopulateImportTestimonials extends EasyPopulateProcess
 		$config = $this->config->getValues($this->importHandler);
 
 		$file = $this->openFile($fileInfo);
-
 		if ($file === false) return false;
-		// @todo put this somewhere else
-		$file->imagePathPrefix = $config['image_path_prefix'];
 
-
+		if (!isset($config['image_path_prefix'])) {
+			$config['image_path_prefix'] = '';
+		}
 		$file->onFileStart();
 
 		foreach ($file as $items) {
@@ -51,6 +50,8 @@ class EasyPopulateImportTestimonials extends EasyPopulateProcess
 
 			$query = "SELECT * FROM " . TABLE_TESTIMONIALS_MANAGER . "
 			WHERE testimonials_mail = '" . zen_db_input($items['testimonials_mail']) . "'";
+
+			$items['testimonials_image'] = $config['image_path_prefix'] . $items['testimonials_image'];
 
 			if (isset($items['site']) && empty($items['site'])) {
 				if (isset($config['site'])) {

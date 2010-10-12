@@ -44,7 +44,6 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 		$modelsize = zen_field_length(TABLE_PRODUCTS, 'products_model');
 		$category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
 
-		$file->imagePathPrefix = $image_path_prefix;
 		$file->transforms['metatags_keywords'] = $metatags_keywords;
 		$file->transforms['metatags_description'] = $metatags_description;
 		$file->transforms['metatags_title'] = $metatags_title;
@@ -315,7 +314,12 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 			$product['products_model']	= $products_model;
 			$product['products_last_modified'] = 'NOW()';
 			$product['products_price'] = $products_price;
+
+			if (!empty($products_image) && ($products_image != PRODUCTS_IMAGE_NO_IMAGE)) {
+				$products_image = $image_path_prefix . $products_image;
+			}
 			$product['products_image'] = $products_image;
+
 			$product['products_weight'] = $products_weight;
 			$product['products_tax_class_id'] = $products_tax_class_id;
 			if (isset($products_discount_type)) {

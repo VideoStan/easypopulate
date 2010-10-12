@@ -23,7 +23,6 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 	public $name = 'Standard';
 	public $itemCount = 0;
 	public $transforms = array();
-	public $imagePathPrefix = '';
 
 	/**
 	 * Map csv column header names to column names
@@ -131,8 +130,6 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 		}
 		if ((trim($item['products_image']) == '') || !isset($item['products_image'])) {
 			$item['products_image'] = PRODUCTS_IMAGE_NO_IMAGE;
-		} else {
-			$item['products_image'] = $this->imagePathPrefix . $item['products_image'];
 		}
 
 		return $item;
