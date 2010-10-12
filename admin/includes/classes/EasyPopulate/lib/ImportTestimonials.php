@@ -31,7 +31,6 @@ class EasyPopulateImportTestimonials extends EasyPopulateProcess
 		if (!isset($config['image_path_prefix'])) {
 			$config['image_path_prefix'] = '';
 		}
-		$file->onFileStart();
 
 		foreach ($file as $items) {
 			$output_message = '';
@@ -102,11 +101,6 @@ class EasyPopulateImportTestimonials extends EasyPopulateProcess
 			$this->itemCount++;
 			//$file->onItemFinish($products_id, $products_model);
 		}
-
-		/**
-		* Post-upload tasks start
-		*/
-		$file->onFileFinish();
 
 		return true;
 	}

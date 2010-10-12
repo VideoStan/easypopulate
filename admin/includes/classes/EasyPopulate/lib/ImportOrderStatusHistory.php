@@ -102,11 +102,6 @@ class EasyPopulateImportOrderStatusHistory extends EasyPopulateProcess
 			$this->itemCount++;
 		}
 
-		/**
-		* Post-upload tasks start
-		*/
-		$file->onFileFinish();
-
 		return true;
 	}
 		

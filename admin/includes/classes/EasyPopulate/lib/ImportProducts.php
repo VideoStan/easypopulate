@@ -48,7 +48,7 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 
 		$filelayout = $file->getFileLayout();
 
-		$file->onFileStart();
+		//$this->onFileStart();
 
 		foreach ($file as $items) {
 			$output_message = '';
@@ -713,12 +713,12 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 
 			$this->tempFile->write($output_data);
 
-			$file->onItemFinish($products_id, $products_model);
+			//$this->onItemFinish($products_id, $products_model);
 		}
 		/**
 		* Post-upload tasks start
 		*/
-		$file->onFileFinish();
+		//$this->onFileFinish();
 
 		$this->updatePriceSortOrder();
 
