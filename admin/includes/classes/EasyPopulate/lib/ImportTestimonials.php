@@ -99,6 +99,7 @@ class EasyPopulateImportTestimonials extends EasyPopulateProcess
 
 			$this->tempFile->write($output_data);
 
+			$this->itemCount++;
 			//$file->onItemFinish($products_id, $products_model);
 		}
 
@@ -106,8 +107,6 @@ class EasyPopulateImportTestimonials extends EasyPopulateProcess
 		* Post-upload tasks start
 		*/
 		$file->onFileFinish();
-
-		$this->itemCount = $file->itemCount;
 
 		return true;
 	}

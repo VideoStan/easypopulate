@@ -99,14 +99,13 @@ class EasyPopulateImportOrderStatusHistory extends EasyPopulateProcess
 
 			$this->tempFile->write($output_data);
 			//$file->onItemFinish($products_id, $products_model);
+			$this->itemCount++;
 		}
 
 		/**
 		* Post-upload tasks start
 		*/
 		$file->onFileFinish();
-
-		$this->itemCount = $file->itemCount;
 
 		return true;
 	}
