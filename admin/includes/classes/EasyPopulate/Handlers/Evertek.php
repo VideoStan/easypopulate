@@ -13,10 +13,8 @@
  *
  * @todo provide a sample entry
  */
-class EPUploadEvertek extends EPUploadStandard
+class EPUploadEvertek extends EasyPopulateCsvFileObject
 {
-	public $name = 'Evertek';
-
 	private $category = '';
 
 	public function handleRow(array $item)

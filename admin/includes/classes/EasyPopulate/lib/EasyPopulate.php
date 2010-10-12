@@ -31,8 +31,6 @@ class EPFileUploadFactory
 	 */
 	public static function get($name)
 	{
-		// @todo make most of Standard an abstract class so we don't have to unconditonally include it here
-		require_once self::baseDirectory() . 'Standard.php';
 		$file = self::baseDirectory() . $name . '.php';
 		if (require_once($file)) {
 			$classname = 'EPUpload' . $name;

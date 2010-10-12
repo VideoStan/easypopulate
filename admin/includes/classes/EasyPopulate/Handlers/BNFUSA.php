@@ -13,10 +13,8 @@
  *
  * @todo provide a sample entry
  */
-class EPUploadBNFUSA extends EPUploadStandard
+class EPUploadBNFUSA extends EasyPopulateCsvFileObject
 {
-	public $name = 'BNFUSA';
-
 	public $masterRowCount = 1;
 
 	public function mapFileLayout(array $filelayout)

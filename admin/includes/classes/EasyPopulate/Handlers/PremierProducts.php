@@ -15,10 +15,8 @@
  *
 
  */
-class EPUploadPremierProducts extends EPUploadStandard
+class EPUploadPremierProducts extends EasyPopulateCsvFileObject
 {
-	public $name = 'PremierProducts';
-
 	public function handleRow(array $item)
 	{
 		$item['metatags'] = array();

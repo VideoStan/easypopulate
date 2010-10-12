@@ -13,7 +13,7 @@
  * @todo provide a sample entry
  *
  */
-class EPUploadMegaGoods extends EPUploadStandard
+class EPUploadMegaGoods extends EasyPopulateCsvFileObject
 {
 	public function handleRow(array $item)
 	{
