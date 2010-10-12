@@ -45,9 +45,6 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 		$modelsize = zen_field_length(TABLE_PRODUCTS, 'products_model');
 		$category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
 
-		$file->transforms['metatags_keywords'] = $metatags_keywords;
-		$file->transforms['metatags_description'] = $metatags_description;
-		$file->transforms['metatags_title'] = $metatags_title;
 
 		$filelayout = $file->getFileLayout();
 
@@ -56,6 +53,7 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 		foreach ($file as $items) {
 			$output_message = '';
 			$categories_name = array();
+			$itemBefore = $items;
 			$items = $file->handleRow($items);
 
 			if (!isset($items['products_model']) && !zen_not_null($items['products_model'])) {
@@ -404,9 +402,21 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 				$data = array();
 				$data['products_id'] = $products_id;
 				$data['language_id'] = $key;
-				$data['metatags_title']	= isset($metaData['title']) ? $metaData['title'] : '';
+
+				$data['metatags_title'] = isset($metaData['title']) ? $metaData['title'] : '';
 				$data['metatags_keywords'] = isset($metaData['keywords']) ? $metaData['keywords'] : '';
-				$data['metatags_description']	= isset($metaData['description']) ? $metaData['description'] : '';
+				$data['metatags_description'] = isset($metaData['description']) ? $metaData['description'] : '';
+
+				if (isset($metatags_title) && !empty($metatags_title) && empty($data['metatags_title'])) {
+					$data['metatags_title'] = $this->transformPlaceHolders($itemBefore, $metatags_title);
+				}
+
+				if (isset($metatags_keywords) && !empty($metatags_keywords) && empty($data['metatags_keywords'])) {
+					$data['metatags_keywords'] = $this->transformPlaceHolders($itemBefore, $metatags_keywords);
+				}
+				if (isset($metatags_description) && !empty($metatags_description) && empty($data['metatags_description'])) {
+					$data['metatags_description'] = $this->transformPlaceHolders($itemBefore, $metatags_description);
+				}
 
 				$query = "SELECT products_id FROM ".TABLE_META_TAGS_PRODUCTS_DESCRIPTION.
 				" WHERE products_id = $products_id AND language_id = $key";
@@ -946,6 +956,20 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 		foreach ($dross as $productId) {
 			zen_remove_product($productId);
 		}
+	}
+
+	/**
+	 * Transform {} placeholders to the field value
+	 *
+	 * If v_products_name_1 is foo, then it will transform {products_name_1} to foo
+	 *
+	 * @param mixed array of values to search
+	 * @param string string in which to replace search values
+	 * @return string
+	 */
+	protected function transformPlaceHolders(array $search, $replace)
+	{
+		return preg_replace("/\{([^\{]{1,100}?)\}/e", '$search[\'$1\']', $replace);
 	}
 }
 ?>

@@ -93,21 +93,8 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 				case 'metatags': // only for title,description,keywords
 					// @todo don't hardcode which fields we can use with the placeholders
 					if (isset($column[2]) && is_numeric($column[2])) {
-						$newvalue = $value;
-						if (($column[1] == 'keywords') && isset($this->transforms['metatags_keywords']) && empty($newvalue)) {
-							$newvalue = $this->transformPlaceHolders($olditem, $this->transforms['metatags_keywords']);
-							$newvalue = trim(strip_tags($newvalue));
-						}
-						if (($column[1] == 'description') && isset($this->transforms['metatags_description']) && empty($newvalue)) {
-							$newvalue = $this->transformPlaceHolders($olditem, $this->transforms['metatags_description']);
-							$newvalue = trim(strip_tags($newvalue));
-						}
-						if (($column[1] == 'title') && isset($this->transforms['metatags_title']) && empty($newvalue)) {
-							$newvalue = $this->transformPlaceHolders($olditem, $this->transforms['metatags_title']);
-							$newvalue = trim(strip_tags($newvalue));
-						}
-						if (empty($newvalue)) break;
-						$metatags[$column[2]][$column[1]] = $newvalue; //indexed by language_id
+						if (empty($value)) break;
+						$metatags[$column[2]][$column[1]] = $value; //indexed by language_id
 						break;
 					}
 				case 'products':
@@ -133,20 +120,6 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 		}
 
 		return $item;
-	}
-
-	/**
-	 * Transform {} placeholders to the field value
-	 *
-	 * If v_products_name_1 is foo, then it will transform {products_name_1} to foo
-	 *
-	 * @param mixed array of values to search
-	 * @param string string in which to replace search values
-	 * @return string
-	 */
-	protected function transformPlaceHolders(array $search, $replace)
-	{
-		return preg_replace("/\{([^\{]{1,100}?)\}/e", '$search[\'$1\']', $replace);
 	}
 }
 ?>
