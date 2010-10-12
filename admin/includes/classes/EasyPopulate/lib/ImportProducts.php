@@ -18,6 +18,7 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 	public $itemCount = 0;
 
 	protected $taxClassIds = array();
+	protected $productIds = array();
 
 	public function dependenciesMet()
 	{
@@ -693,6 +694,7 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 			// @todo write  status message and status to tempFile 
 			//$output['items'][] = array('status' => $output_status, 'message' => $output_message, 'data' => $output_data);
 
+			$this->productIds[] = $product_id;
 			$output_data = $this->flattenArray($items);
 			if (empty($this->tempFile->filelayout)) {
 				$this->tempFile->setFileLayout(array_keys($output_data), true);
@@ -716,6 +718,11 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 
 		if (isset($has_attributes)) {
 			$this->updateAttributesSortOrder();
+		}
+
+		// @todo move this into onFinish
+		if ($feed_fetch) {
+			$this->removeMissingProducts();
 		}
 
 		return true;
@@ -869,6 +876,33 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 
 			$products->MoveNext();
 		}
+	}
+
+	/**
+	 * @todo move this to an event handler outside of this class
+	 */
+	protected function removeMissingProducts()
+	{
+		global $db;
+
+		$query = "SELECT * FROM " . TABLE_EASYPOPULATE_FEEDS . " WHERE name = '" . $this->importHandler . "'";
+
+		$result = ep_query($query);
+		$row = mysql_fetch_array($result, MYSQL_ASSOC);
+		$lastProductIds = json_decode($row['last_run_data'], true);
+		if (!empty($lastProductIds)) {
+			$diff = array_diff($lastProductIds, $this->productIds);
+			foreach ($diff as $pid) {
+				zen_remove_product($pid);
+			}
+		}
+
+		$data = array();
+		$data['last_run_data'] = json_encode(array_unique($this->productIds));
+		$data['modified'] = 'NOW()';
+		$where = 'id = ' . $row['id'];
+		$query = ep_db_modify(TABLE_EASYPOPULATE_FEEDS, $data, 'UPDATE', $where);
+		$db->Execute($query);
 	}
 
 	/**

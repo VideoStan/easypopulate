@@ -18,7 +18,6 @@ class EPUploadBNFUSA extends EPUploadStandard
 	public $name = 'BNFUSA';
 
 	public $masterRowCount = 1;
-	public $productIds = array();
 
 	public function mapFileLayout(array $filelayout)
 	{
@@ -109,22 +108,6 @@ class EPUploadBNFUSA extends EPUploadStandard
 		}
 
 		return $item;
-	}
-
-	function onFileStart()
-	{
-		$this->productIds = array();
-	}
-
-	function onItemFinish($productId, $productModel)
-	{
-		$this->productIds[] = (int)$productId;
-		$this->itemCount++;
-	}
-
-	public function onFileFinish()
-	{
-		$this->removeMissingProducts();
 	}
 }
 ?>

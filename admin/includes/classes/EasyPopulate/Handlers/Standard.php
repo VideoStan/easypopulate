@@ -148,51 +148,5 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 	{
 		return preg_replace("/\{([^\{]{1,100}?)\}/e", '$search[\'$1\']', $replace);
 	}
-
-
-	protected function removeMissingProducts()
-	{
-		global $db;
-
-		$query = "SELECT * FROM " . TABLE_EASYPOPULATE_FEEDS . " WHERE name = '" . $this->name . "'";
-
-		$result = ep_query($query);
-		$row = mysql_fetch_array($result, MYSQL_ASSOC);
-		$lastProductIds = json_decode($row['last_run_data'], true);
-		if (!empty($lastProductIds)) {
-			$diff = array_diff($lastProductIds, $this->productIds);
-			foreach ($diff as $pid) {
-				zen_remove_product($pid);
-			}
-		}
-
-		$data = array();
-		$data['last_run_data'] = json_encode(array_unique($this->productIds));
-		$data['modified'] = 'NOW()';
-		$where = 'id = ' . $row['id'];
-		$query = ep_db_modify(TABLE_EASYPOPULATE_FEEDS, $data, 'UPDATE', $where);
-		$db->Execute($query);
-	}
-
-	public function onFileStart()
-	{
-	}
-
-	/**
-	 * Do something when the item is finished
-	 *
-	 * @todo think about this function signature
-	 */
-	public function onItemFinish($productId, $productModel)
-	{
-		$this->itemCount++;
-	}
-
-	/**
-	 * do something when the file is finished processing
-	 */
-	public function onFileFinish()
-	{
-	}
 }
 ?>

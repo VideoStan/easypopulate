@@ -58,21 +58,5 @@ class EPUploadEvertek extends EPUploadStandard
 
 		return $item;
 	}
-
-	function onFileStart()
-	{
-		$this->productIds = array();
-	}
-
-	function onItemFinish($productId, $productModel)
-	{
-		$this->productIds[] = (int)$productId;
-		$this->itemCount++;
-	}
-
-	public function onFileFinish()
-	{
-		$this->removeMissingProducts();
-	}
 }
 ?>
