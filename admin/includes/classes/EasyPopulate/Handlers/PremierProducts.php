@@ -19,7 +19,6 @@ class EPUploadPremierProducts extends EasyPopulateCsvFileObject
 {
 	public function handleRow(array $item)
 	{
-		$item['metatags'] = array();
 		$descriptions = array();
 		$descriptions['name'] = $item['Item'];
 

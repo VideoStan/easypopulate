@@ -63,8 +63,6 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 	public function handleRow(array $olditem)
 	{
 		$attributes = array();
-		$metatags = array();
-		$descriptions = array();
 		$item = array();
 		foreach ($olditem as $key => $value) {
 			$column = explode('_', $key);
@@ -94,13 +92,13 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 					// @todo don't hardcode which fields we can use with the placeholders
 					if (isset($column[2]) && is_numeric($column[2])) {
 						if (empty($value)) break;
-						$metatags[$column[2]][$column[1]] = $value; //indexed by language_id
+						$item['metatags'][$column[2]][$column[1]] = $value; //indexed by language_id
 						break;
 					}
 				case 'products':
 					if (in_array($column[1], array('name', 'description', 'url', 'short'))) {
 						if ($column[1] == 'short') $column[1] = 'short_desc';
-						$descriptions[$column[2]][$column[1]] = $value;
+						$item['descriptions'][$column[2]][$column[1]] = $value;
 						break;
 					} // fall through for the rest
 				default:
@@ -108,9 +106,7 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 					break;
 			}
 		}
-		$item['metatags'] = $metatags;
 		$item['attributes'] = $attributes;
-		$item['descriptions'] = $descriptions;
 
 		if ((trim($item['products_quantity']) == '') || !isset($item['products_quantity'])) {
 			$item['v_products_quantity'] = 0;

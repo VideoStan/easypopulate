@@ -47,7 +47,6 @@ class EPUploadBNFUSA extends EasyPopulateCsvFileObject
 
 	public function handleRow(array $item)
 	{
-		$item['metatags'] = array();
 		$descriptions = array();
 
 		$descriptions[1]['name'] = $item['Item Title'];
@@ -69,7 +68,6 @@ class EPUploadBNFUSA extends EasyPopulateCsvFileObject
 		$item['products_image'] = $model . '/' . $model . '_800.jpg';
 
 		$desc = $item['Item Size-Color Desc'];
-		$item['attributes'] = array();
 		$name = '';
 		if (!empty($desc)) {
 			$optionValues = array();

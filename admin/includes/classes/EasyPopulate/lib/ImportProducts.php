@@ -54,6 +54,9 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 			$output_message = '';
 			$categories_name = array();
 			$itemBefore = $items;
+			$items['description'] = array();
+			$items['metatags'] = array();
+			$items['attributes'] = array();
 			$items = $file->handleRow($items);
 
 			if (!isset($items['products_model']) && !zen_not_null($items['products_model'])) {
@@ -516,7 +519,7 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 			}
 
 			// START ATTRIBUTES
-			if (isset($attributes) && !empty($attributes)) {
+			if (!empty($attributes)) {
 				$has_attributes = true;
 				$attribute_rows = 1; // master row count
 				$languages = zen_get_languages();

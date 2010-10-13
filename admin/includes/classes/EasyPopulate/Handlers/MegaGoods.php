@@ -20,8 +20,6 @@ class EPUploadMegaGoods extends EasyPopulateCsvFileObject
 		$descriptions = array();
 		$descriptions['name'] = $item['name'];
 
-		$item['metatags'] = array();
-
 		$item['products_status'] = 1;
 		if ($item['products_status'] == 'soldout') {
 			$item['products_status'] == 0;

@@ -27,7 +27,6 @@ class EPUploadEvertek extends EasyPopulateCsvFileObject
 		}
 		$item['categories_name_1'] = $this->category;
 
-		$item['metatags'] = array();
 		$descriptions = array();
 		$descriptions['name'] = $item['Product Description'];
 
