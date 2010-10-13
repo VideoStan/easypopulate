@@ -25,10 +25,6 @@ class EPUploadPremierProducts extends EasyPopulateCsvFileObject
 
 		$item['manufacturers_name'] = str_replace('?', '', $item['manufacturers_name']);
 
-		if (!file_exists(DIR_FS_CATALOG . 'images/' . $item['products_image'])) {
-			$item['products_image'] = 'no_picture.gif';
-		}
-
 		$descriptions['description'] =  $item['TAGLINE'] . '<br>' .
 		'<em><strong>Retail Price: $' . $item['Retailprice'] .'</strong></em><br>' .
 		$item['Description'];

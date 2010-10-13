@@ -55,6 +55,9 @@ import: &import
     value: true
   image_path_prefix:
     value:
+  image_check_exists:
+    value: false
+    input: true
 
 # default options for exports
 export: &export
@@ -233,6 +236,8 @@ handlers:
     item_type: orderstatushistory
     import:
       << : [*both, *import]
+      image_check_exists:
+        input: false
       filelayout_required:
         value: order_id,order_status,notify_customer,comments
         input: false

@@ -314,6 +314,12 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 			$product['products_last_modified'] = 'NOW()';
 			$product['products_price'] = $products_price;
 
+			if ($image_check_exists) {
+				if (!file_exists(DIR_FS_CATALOG . 'images/' . $item['products_image'])) {
+					$item['products_image'] = PRODUCTS_IMAGE_NO_IMAGE;
+				}
+			}
+
 			if (!empty($products_image) && ($products_image != PRODUCTS_IMAGE_NO_IMAGE)) {
 				$products_image = $image_path_prefix . $products_image;
 			}

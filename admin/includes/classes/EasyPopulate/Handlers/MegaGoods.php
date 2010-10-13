@@ -29,10 +29,6 @@ class EPUploadMegaGoods extends EasyPopulateCsvFileObject
 
 		$item['products_quantity'] = 999;
 
-		if (!file_exists(DIR_FS_CATALOG . 'images/' . $item['products_image'])) {
-			$item['products_image'] = 'no_picture.gif';
-		}
-
 		$description = '<br><em><strong>Retails Online: $' . $item['retails online'] . '</strong></em>' .
 							'<br><em><strong>MSRP : $' . $item['MSRP'] . '</strong></em><br><br>' .
 							$item['description'] .'<br>' . $item['condition'];

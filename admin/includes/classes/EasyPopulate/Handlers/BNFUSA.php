@@ -67,9 +67,6 @@ class EPUploadBNFUSA extends EasyPopulateCsvFileObject
 		$model = $item['products_model'];
 
 		$item['products_image'] = $model . '/' . $model . '_800.jpg';
-		if (!file_exists(DIR_FS_CATALOG . 'images/' . $item['products_image'])) {
-			$item['products_image'] = 'no_picture.gif';
-		}
 
 		$desc = $item['Item Size-Color Desc'];
 		$item['attributes'] = array();
