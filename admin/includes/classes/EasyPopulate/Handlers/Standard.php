@@ -9,21 +9,13 @@
  */
 
 /**
- * Easy Populate record format
+ * Easy Populate standard product record format
  *
  * All headings in $filelayout['columnheading'] = columnnumber
  * All values are in $items[$filelayout] = 'value'
- *
- * @todo CHECKME the CSV support depends on php > 5.2.0, is this important?
- *       If so, we can replace the subclass the current method to call fgetcsv
- *       and implement setCsvControl
  */
 class EPUploadStandard extends EasyPopulateCsvFileObject
 {
-	public $name = 'Standard';
-	public $itemCount = 0;
-	public $transforms = array();
-
 	/**
 	 * Map csv column header names to column names
 	 *
@@ -41,18 +33,6 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 			if ($column == 'date_avail') $column = 'products_date_available';
 		}
 		return array_flip($filelayout);
-	}
-
-	/**
-	 * Get column value by name
-	 *
-	 * @param string $name
-	 * @return mixed $column
-	 */
-	public function get($column)
-	{
-		$line = $this->current();
-		return $line[$column];
 	}
 
 	/**
