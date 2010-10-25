@@ -34,6 +34,11 @@
 				$pull_down_options = ep_pull_down_menu_options($options['options']);
 				echo zen_draw_pull_down_menu($field, $pull_down_options, $options['value'], $attributes);
 				break;
+			case (isset($options['size']) && is_array($options['size'])):
+				if (!isset($options['size']['columns'])) $options['size']['columns'] = '60';
+				if (!isset($options['size']['rows'])) $options['size']['rows'] = '7';
+				echo zen_draw_textarea_field($field, 'soft', $options['size']['columns'], $options['size']['rows'], (string)$options['value'], $attributes);
+				break;
 			default:
 				if (isset($options['size'])) $attributes .= 'size="' . $options['size'] . '" ';
 				echo zen_draw_input_field($field, (string)$options['value'], $attributes, false /*,$type = 'text'*/);
