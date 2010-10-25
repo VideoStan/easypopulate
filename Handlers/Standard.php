@@ -75,14 +75,14 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 					}
 					break;
 				case 'metatags': // only for title,description,keywords
-					// @todo don't hardcode which fields we can use with the placeholders
 					if (isset($column[2]) && is_numeric($column[2])) {
 						if (empty($value)) break;
 						$item['metatags'][$column[2]][$column[1]] = $value; //indexed by language_id
 						break;
-					}/* else { // it goes with products
-						$item['products'][$key] = $value;
-					}*/
+					} else { // it goes with products
+						//$item['products'][$key] = $value;
+						break; // @todo don't break here
+					}
 				/*case 'specials':
 					if ($column[1] == 'expires') {
 						$item['specials']['expires_date'] = $value;
