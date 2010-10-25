@@ -306,6 +306,10 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 				$product['products_date_added'] = isset($products_date_added) && !empty($products_date_added) ? date("Y-m-d H:i:s",strtotime($products_date_added)) : 'NOW()';
 			}
 
+			if (!isset($products_quantity) || empty($products_quantity)) {
+				$products_quantity = 0;
+			}
+
 			if (!isset($products_status) || $products_status == '') {
 				$products_status = 1;
 			}

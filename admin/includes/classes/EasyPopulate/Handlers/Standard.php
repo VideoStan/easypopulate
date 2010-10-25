@@ -125,10 +125,6 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 		}
 		$item['attributes'] = $attributes;
 
-		if ((trim($item['products_quantity']) == '') || !isset($item['products_quantity'])) {
-			$item['v_products_quantity'] = 0;
-		}
-
 		return $item;
 	}
 }
