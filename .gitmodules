@@ -1,9 +1,9 @@
-[submodule "admin/includes/classes/EasyPopulate/lib/fitzgerald"]
-	path = admin/includes/classes/EasyPopulate/lib/fitzgerald
+[submodule "lib/fitzgerald"]
+	path = lib/fitzgerald
 	url = git://github.com/jrobeson/fitzgerald.git
-[submodule "admin/includes/classes/EasyPopulate/public/form"]
-	path = admin/includes/classes/EasyPopulate/public/form
+[submodule "public/form"]
+	path = public/form
 	url = git://github.com/malsup/form.git
-[submodule "admin/includes/classes/EasyPopulate/lib/yaml"]
-	path = admin/includes/classes/EasyPopulate/lib/yaml
-	url = http://github.com/fabpot/yaml.git
+[submodule "lib/yaml"]
+	path = lib/yaml
+	url = git://github.com/fabpot/yaml.git
