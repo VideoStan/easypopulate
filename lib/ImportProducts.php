@@ -717,7 +717,7 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 			// @todo write  status message and status to tempFile 
 			//$output['items'][] = array('status' => $output_status, 'message' => $output_message, 'data' => $output_data);
 
-			$this->productIds[] = $product_id;
+			$this->productIds[] = $products_id;
 			$this->itemCount++;
 			$output_data = $this->flattenArray($items);
 			if (empty($this->tempFile->filelayout)) {
