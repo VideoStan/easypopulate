@@ -46,6 +46,8 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 		$item = array();
 		foreach ($olditem as $key => $value) {
 			$column = explode('_', $key);
+			// don't touch already existing arrays
+			if (!is_string($key)) break;
 			switch ($column[0]) {
 				case 'attribute':
 					if ($column[1] == 'options') {
