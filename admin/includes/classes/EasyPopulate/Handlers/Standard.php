@@ -28,9 +28,13 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 		$filelayout = array_flip($filelayout); // @todo don't flip twice
 		foreach ($filelayout as &$column) {
 			$column = str_replace('v_', '', $column);
+			// Make item type grouping a little simpler in handleRow() by renaming some columns
 			if ($column == 'status') $column = 'products_status';
 			if ($column == 'date_added') $column = 'products_date_added';
 			if ($column == 'date_avail') $column = 'products_date_available';
+			//if ($column == 'tax_class_title') $column = 'products_tax_class_title';
+			//if ($column == 'specials_date_avail') $column = 'specials_date_available';
+			//if ($column == 'specials_price') $column = 'specials_new_products_price');
 		}
 		return array_flip($filelayout);
 	}
@@ -76,13 +80,44 @@ class EPUploadStandard extends EasyPopulateCsvFileObject
 						if (empty($value)) break;
 						$item['metatags'][$column[2]][$column[1]] = $value; //indexed by language_id
 						break;
+					}/* else { // it goes with products
+						$item['products'][$key] = $value;
+					}*/
+				/*case 'specials':
+					if ($column[1] == 'expires') {
+						$item['specials']['expires_date'] = $value;
+					} elseif ($column[1] == 'status') {
+						$item['specials']['status'] = $value;
+					} else {
+						$item['specials'][$key] = $value;
 					}
+					break;
+				*/
 				case 'products':
+					/*$fields = array('model', 'image', 'price', 'weight','quantity','tax');
+					if (in_array($column[1], $fields)) {
+						$item['products'][$key] = $value;
+					}*/
 					if (in_array($column[1], array('name', 'description', 'url', 'short'))) {
 						if ($column[1] == 'short') $column[1] = 'short_desc';
 						$item['descriptions'][$column[2]][$column[1]] = $value;
+						//$item['descriptions'][$column[2]][$key] = $value; NEW, use this
 						break;
 					} // fall through for the rest
+
+				/*case 'discount':
+					if ($column[1] == 'type')) {
+						$item['products'][$column[1]] = $value;
+						break;
+					}
+					$item['discounts'][$column[2]][$column[1]] = $value;
+					break;*/
+				/*case 'categories':
+					$item['categories'][$column[2][$column[1]] = $value;
+					break;*/
+				/*case 'manufacturers';
+					$item['manufacturers'][$column[1]] = $value;
+					break;*/
 				default:
 					$item[$key] = $value;
 					break;
