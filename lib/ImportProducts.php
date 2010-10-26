@@ -322,7 +322,7 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 			$product['products_price'] = $products_price;
 
 			if ($image_check_exists) {
-				if (!file_exists(DIR_FS_CATALOG . 'images/' . $item['products_image'])) {
+				if (!file_exists(DIR_FS_CATALOG . 'images/' . $products_image)) {
 					$item['products_image'] = PRODUCTS_IMAGE_NO_IMAGE;
 				}
 			}
