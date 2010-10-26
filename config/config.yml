@@ -156,13 +156,13 @@ handlers:
       filelayout_required:
         value: Brand,Category,Description,Dimensions,Instock,Item,ItemID,Modelnum,Pic,Price,Retailprice,Special,TAGLINE,Tpic,UPC,WEIGHT
         input: false
-      filelayout_map: 
-        value: manufacturers_name,categories_name_1,,,products_quantity,,,,products_model,products_image,products_price,,,,,,products_weight
+      filelayout_map:
+        value: manufacturers_name,categories_name_1,,,products_quantity,,,products_model,products_image,products_price,,,,,,products_weight
         input: false
       local_file:
         value: PremierProducts.csv
       column_delimiter:
-        value: ,
+        value: ','
         input: false;
       feed_fetch:
         value: false
@@ -193,7 +193,7 @@ handlers:
       local_file:
         value: Evertek.csv
       column_delimiter:
-        value: ,
+        value: ','
         input: false
       feed_fetch:
         value: false
@@ -214,7 +214,7 @@ handlers:
        local_file:
          value: BNFUSA.csv
        column_delimiter:
-         value: ,
+         value: ','
          input: false
        feed_fetch:
          value: false
