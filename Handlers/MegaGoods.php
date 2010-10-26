@@ -20,9 +20,7 @@ class EPUploadMegaGoods extends EPUploadStandard
 		$descriptions = array();
 		$descriptions['name'] = $item['name'];
 
-		if ($item['products_status'] == 'soldout') {
-			$item['products_status'] == 0;
-		}
+		$item['products_status'] = ($item['products_status'] == 'instock') ? 1 : 0;
 
 		$item['products_quantity'] = 999;
 
