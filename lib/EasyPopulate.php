@@ -31,6 +31,7 @@ class EPFileUploadFactory
 	 */
 	public static function get($name)
 	{
+		require_once self::baseDirectory() . 'Standard.php';
 		$file = self::baseDirectory() . $name . '.php';
 		if (require_once($file)) {
 			$classname = 'EPUpload' . $name;

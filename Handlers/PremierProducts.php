@@ -15,7 +15,7 @@
  *
 
  */
-class EPUploadPremierProducts extends EasyPopulateCsvFileObject
+class EPUploadPremierProducts extends EPUploadStandard
 {
 	public function handleRow(array $item)
 	{
