@@ -8,8 +8,6 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  */
 
-define('TABLE_EASYPOPULATE_FEEDS', DB_PREFIX . 'easypopulate_feeds');
-
 require DIR_FS_ADMIN . DIR_WS_CLASSES . 'EasyPopulate/lib/EasyPopulateCsvFileObject.php';
 require DIR_FS_ADMIN . DIR_WS_CLASSES . 'EasyPopulate/lib/EasyPopulateConfig.php';
 require DIR_WS_CLASSES . 'EasyPopulate/lib/ProcessFile.php';
