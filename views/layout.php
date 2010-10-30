@@ -34,12 +34,8 @@
 		cssjsmenu('navbar');
 		$('#hoverJS').attr('disabled', 'disabled');
 		$("#tabs li a[href=" + window.location.pathname + "]").parent().addClass("current");
-
-		$("#installer :button").click(function() {
-			$("#installer input[name=action]").val($(this).attr('name'));
-			$("#installer").submit();
-		});
 	});
+
 	$(document).ready(function() {
 		$("#import_handler").change(function() {
 			$("#config").load("/admin/easypopulate.php/import/" + $(this).val(), function(response, status, xhr) {
@@ -121,19 +117,6 @@
 <?php echo EasyPopulate::header(); ?>
 <div id="ep_header">
 	<h2>Easy Populate <?php echo EASYPOPULATE_VERSION ?></h2>
-	<form id="installer" action="/admin/easypopulate.php/installer" method="POST">
-		<input type="hidden" name="action" value="">
-		<?php if (defined('EASYPOPULATE_CONFIG_VERSION')) { ?>
-		<input type="button" name="remove" value="Remove EasyPopulate">
-		<!-- @todo <input type="button" name="upgrade" value="Upgrade"> -->
-		<?php // Old version detected ?>
-		<?php } else if(defined('EASYPOPULATE_CONFIG_TEMP_DIR') && !defined('EASYPOPULATE_CONFIG_VERSION')) { ?>
-			<input type="button" name="remove" value="Remove Old Version">
-		<?php } else { ?>
-		<span class="error"><?php echo EASYPOPULATE_ERROR_NOT_INSTALLED ?></span>
-		<input type="button" name="install" value="Install EasyPopulate">
-		<?php } ?>
-	</form>
 </div>
 <div>
 <ul id="tabs">
@@ -141,9 +124,7 @@
 	<li><a href="/admin/easypopulate.php/import">Import</a></li>
 	<li><a href="/admin/easypopulate.php/export">Export</a></li>
 </ul>
-<?php if (defined('EASYPOPULATE_CONFIG_VERSION')) { ?>
-	<?php echo $content; ?>
-<?php } ?>
+<?php echo $content; ?>
 </div>
 </body>
 </html>

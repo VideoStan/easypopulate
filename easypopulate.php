@@ -43,9 +43,8 @@ class EasyPopulate extends Fitzgerald
 		}
 
 		$configObject = new EasyPopulateConfig();
-		if (defined('EASYPOPULATE_CONFIG_VERSION')) {
-			$configObject->refreshConfig(); // @todo we don't have it installed yet
-		}
+		$configObject->refreshConfig();
+
 		$this->config = $configObject;
 	}
 
@@ -71,17 +70,6 @@ class EasyPopulate extends Fitzgerald
 
 		}
 		return $this->render('main');
-	}
-
-	public function post_installer()
-	{
-		if (!is_null($this->request->action)) {
-			$f = $this->request->action . '_easypopulate';
-			$f();
-			// @todo return true or false from the installer so we can print an error message
-			//$this->session->installSuccess = EASYPOPULATE_MSGSTACK_INSTALL_SUCCESS;
-		}
-		$this->redirect('/');
 	}
 
 	/**
@@ -316,7 +304,6 @@ class EasyPopulate extends Fitzgerald
 	'mountPoint' => '/admin/easypopulate.php'));
 
 	$app->get('/', 'get_index');
-	$app->post('/installer', 'post_installer');
 	$app->get('/preset/:name', 'get_preset', array('name' => '.*'));
 	$app->post('/preset', 'post_preset');
 	$app->get('/export', 'get_export_page');

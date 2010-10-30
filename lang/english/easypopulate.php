@@ -9,20 +9,6 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  */
 
-define('EASYPOPULATE_CONFIG_DEBUG_LOGGING_DESC', 'Log Errors  (efault: true)');
-define('EASYPOPULATE_CONFIG_DEBUG_LOGGING_TITLE', 'Log Errors');
-define('EASYPOPULATE_CONFIG_LOG_QUERIES_DESC', 'Log all SQL queries - useful for debugging (default: false)');
-define('EASYPOPULATE_CONFIG_LOG_QUERIES_TITLE', 'Log All Queries');
-define('EASYPOPULATE_CONFIG_TEMP_DIR_DESC', 'Name of directory for your uploads');
-define('EASYPOPULATE_CONFIG_TEMP_DIR_TITLE', 'Uploads Directory');
-define('EASYPOPULATE_CONFIG_TIME_LIMIT_DESC', '(In Seconds) You can change this if your script is taking too long to process. This functionality may be not always be enabled by your server administrator (Default: 1200)');
-define('EASYPOPULATE_CONFIG_TIME_LIMIT_TITLE', 'File Processing Time Limit');
-define('EASYPOPULATE_CONFIG_VERSION_DESC', 'Easy Populate version. DO NOT TOUCH!!!');
-define('EASYPOPULATE_CONFIG_VERSION_TITLE', 'Easy Populate Version');
-
-//define('EASYPOPULATE_CONFIG_IMPORT_HANDLER_TITLE', 'Default Upload File Format');
-//define('EASYPOPULATE_CONFIG_IMPORT_HANDLER_DESC', 'Import File Handler');
-
 // @todo <johnny> fix this path once it is somewhere near final
 define('EASYPOPULATE_CONFIG_ADVANCED_SMART_TAGS_DESC', 'Allow the use of complex regular expressions to format descriptions, making headings bold, add bullets, etc. Configuration is in \'admin/includes/extra_datafiles/easypopulate_config.php\' (default: false)');
 define('EASYPOPULATE_CONFIG_ADVANCED_SMART_TAGS_TITLE', 'Advanced Smart Tags');
@@ -108,7 +94,6 @@ define('EASYPOPULATE_UPLOAD_ERROR_CODE_' . UPLOAD_ERR_NO_TMP_DIR, 'System (not E
 define('EASYPOPULATE_UPLOAD_ERROR_CODE_' . UPLOAD_ERR_OK, 'The file was successfully uploaded');
 define('EASYPOPULATE_UPLOAD_ERROR_CODE_' . UPLOAD_ERR_PARTIAL, 'The file was not completely uploaded');
 
-define('EASYPOPULATE_ERROR_NOT_INSTALLED','Easy Populate Configuration Missing. Click Install EasyPopulate');
 
 /**
 * $messageStack defines
@@ -120,7 +105,6 @@ define('EASYPOPULATE_MSGSTACK_DROSS_DELETE_FAIL', '<b>Deleting of product data d
 define('EASYPOPULATE_MSGSTACK_DROSS_DELETE_SUCCESS', 'Deleting of product data debris succeeded!');
 define('EASYPOPULATE_MSGSTACK_DROSS_DETECTED', '<b>%s partially deleted product(s) found!</b> Delete this dross to prevent unwanted zencart behaviour by clicking <a href="%s">here.</a><br />You are seeing this because there are references in tables to a product that no longer exists, which is usually caused by an incomplete product deletion. This can cause Zen Cart to misbehave in certain circumstances.');
 define('EASYPOPULATE_MSGSTACK_DATE_FORMAT_FAIL', '%s is not a valid date format. If you upload any date other than raw format (such as from Excel) you will mangle your dates. Please fix this by correcting your date format in the Easy Populate config.');
-define('EASYPOPULATE_MSGSTACK_INSTALL_SUCCESS','<b>Installation Successfull!</b>  A full download of your store has been done and is available in your uploads (tempEP) directory. You can use this as your 1st template for uploading/updating products.');
 
 // file handling - msg stack alerts - output via $messageStack
 define('EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS', 'File <b>%s</b> successfully exported! The file is ready for download in your /%s directory.');

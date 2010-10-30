@@ -13,7 +13,6 @@
  * @todo document these functions
  */
 if (!defined('EASYPOPULATE_CONFIG_IMPORT_HANDLER')) define('EASYPOPULATE_CONFIG_IMPORT_HANDLER', 'Standard');
-define('EASYPOPULATE_VERSION', '3.9.5');
 /**
  * EasyPopulate extra configuration
  * @todo move these defines elsewhere
@@ -202,97 +201,6 @@ function ep_db_modify($table, $data, $action = 'INSERT', $parameters = '')
 	if (!empty($parameters)) $query .=' WHERE ' . $parameters;
 
 	return $query;
-}
-
-/**
- * Install Easy Populate configuration entries
- *
- * @todo do something with the db errors
- */
-function install_easypopulate()
-{
-	global $db;
-	$data = array();
-	$data['configuration_group_id'] = '';
-	$data['configuration_group_title'] = 'Easy Populate';
-	$data['configuration_group_description'] = 'Configuration options for Easy Populate';
-
-	$query = ep_db_modify(TABLE_CONFIGURATION_GROUP, $data, 'INSERT');
-	$db->Execute($query);
-	$group_id = mysql_insert_id();
-	$data = array('sort_order' => $group_id);
-	$query = ep_db_modify(TABLE_CONFIGURATION_GROUP, $data, 'UPDATE', "configuration_group_id = $group_id");
-	$db->Execute($query);
-
-	// get default config
-	$config = EasyPopulateConfig::loadFile();
-	
-	/*if (isset($config['global']['version'])) {
-		$config['global']['version'] = EASYPOPULATE_VERSION;
-	}*/
-	$count = 1;
-	foreach ($config['global'] as $key => $value) {
-		$entry = array();
-		$key = 'EASYPOPULATE_CONFIG_' . strtoupper($key);
-		$entry['set_function'] = 'NULL';
-		$entry['use_function'] = 'NULL';
-		$entry['configuration_title'] = constant($key . '_TITLE');
-		$entry['configuration_key'] = $key;
-		$entry['configuration_value'] = $value;
-		$entry['configuration_description'] = constant($key . '_DESC');
-		$entry['configuration_group_id'] = $group_id;
-		$entry['sort_order'] = $count;
-		$entry['last_modified'] = 'NOW()';
-		$entry['date_added'] = 'NOW()';
-		switch(true) {
-			case (is_bool($value)):
-				$entry['set_function'] = "zen_cfg_select_option(array('true', 'false'),";
-				break;
-		}
-
-		$query = ep_db_modify(TABLE_CONFIGURATION, $entry, 'INSERT');
-		$db->Execute($query);
-		$count++;
-	}
-
-	$query = 'CREATE TABLE IF NOT EXISTS ' . TABLE_EASYPOPULATE_FEEDS . ' (
-				id int(3) NOT NULL AUTO_INCREMENT,
-				name varchar(64),
-				handler varchar(64),
-				config text,
-				last_run_data text,
-				created datetime,
-				modified datetime,
-				UNIQUE KEY (name),
-				PRIMARY KEY (id)
-				)';
-	$db->Execute($query);
-}
-
-/**
- * Remove Easy Populate configuration entries
- */
-function remove_easypopulate()
-{
-	global $db;
-
-	$sql = "SELECT configuration_group_id
-		FROM " . TABLE_CONFIGURATION_GROUP . "
-		WHERE configuration_group_title = 'Easy Populate'";
-
-	$result = ep_query($sql);
-	if (mysql_num_rows($result)) {
-		$ep_groups =  mysql_fetch_array($result);
-		foreach ($ep_groups as $ep_group) {
-			$db->Execute("DELETE FROM " . TABLE_CONFIGURATION_GROUP . "
-			WHERE configuration_group_id = '" . (int)$ep_group . "'");
-			$db->Execute("DELETE FROM " . TABLE_CONFIGURATION . "
-			WHERE configuration_group_id = '" . $ep_group . "'");
-		}
-	}
-	$db->Execute('DROP TABLE IF EXISTS ' . TABLE_EASYPOPULATE_FEEDS);
-
-	return true;
 }
 
 /**
