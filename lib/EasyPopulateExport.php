@@ -41,7 +41,8 @@ class EasyPopulateExport extends EasyPopulateProcess
 		 */
 		$products_with_attributes = false;
 		extract(ep_get_config());
-		extract($this->config, EXTR_OVERWRITE);
+		$config = $this->config->getValues('Standard');
+		extract($config, EXTR_OVERWRITE);
 
 		// START Create attributes array
 		$attribute_options_array = array();
