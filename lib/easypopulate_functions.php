@@ -12,6 +12,9 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  * @todo document these functions
  */
+
+if (!function_exists('zen_db_input')) { function zen_db_input($input) { return addslashes($input); }}
+
 if (!defined('EASYPOPULATE_CONFIG_IMPORT_HANDLER')) define('EASYPOPULATE_CONFIG_IMPORT_HANDLER', 'Standard');
 /**
  * EasyPopulate extra configuration
