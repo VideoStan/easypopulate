@@ -251,10 +251,6 @@ function ep_get_config($var = NULL)
  */
 function ep_pull_down_menu_options($options = array())
 {
-	if (empty($options)) return array();
-
-	$pull_down_options = array();
-
 	if (is_string($options)) {
 		// @todo restrict to a common class/function prefix
 		if ((false !== strpos($options, '(')) || (false !== strpos($options, '$'))) {
@@ -263,16 +259,7 @@ function ep_pull_down_menu_options($options = array())
 			$options = explode(',', $options);
 		}
 	}
-
 	if (is_null($options)) $options = array();
-
-	foreach ($options as $k => $v) {
-		if (is_numeric($k)) {
-			$pull_down_options[] = array('id' => $v, 'text' => $v);
-		} else {
-			$pull_down_options[] = array('id' => $k, 'text' => $v);
-		}
-	}					
-	return $pull_down_options;
+	return $options;
 }
 ?>
