@@ -28,13 +28,8 @@ class EasyPopulateConfig
 	function __construct($importOrExport = 'import')
 	{
 	    $this->importOrExport = $importOrExport;
-		$this->fileConfig = self::loadFile();
-	}
-
-	public static function loadFile()
-	{
-		require_once DIR_WS_CLASSES . 'EasyPopulate/lib/yaml/lib/sfYaml.php';
-		return sfYaml::load(DIR_WS_CLASSES . 'EasyPopulate/config/config.yml');
+		$yaml = file_get_contents(DIR_FS_ADMIN . DIR_WS_CLASSES . 'EasyPopulate/config/config.yml');
+		$this->fileConfig = ZMRuntime::yamlload2($yaml);
 	}
 
 	public function getItemTypes()
