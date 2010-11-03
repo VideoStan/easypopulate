@@ -36,15 +36,7 @@ class ZMEasyPopulatePlugin extends Plugin {
      */
     function __construct() {
         parent::__construct('EasyPopulate', 'Import/Export delimited files');
-        $this->setLoaderPolicy(ZMPlugin::LP_FOLDER);
         $this->setContext(Plugin::CONTEXT_ADMIN);
-    }
-
-    /**
-     * Destruct instance.
-     */
-    function __destruct() {
-        parent::__destruct();
     }
 
     public function install() {
@@ -58,7 +50,7 @@ class ZMEasyPopulatePlugin extends Plugin {
         $this->addConfigValue('Uploads Directory', 'temp_dir', 'tempEP/', 'Name of directory for your uploads',
             'widget@TextFormWidget#name=temp_dir&default=tempEP&size=50&maxlength=255');
         $this->addConfigValue('File Processing Time Limit', 'time_limit', '1200', '(In Seconds) You can change this if your script is taking too long to process. This functionality may be not always be enabled by your server administrator',
-            'widget@TextFormWidget#name=temp_dir&default=1200&size=6&maxlength=6');
+            'widget@TextFormWidget#name=time_limit&default=1200&size=6&maxlength=6');
         $this->addConfigValue('Version', 'version', '3.9.5', 'EasyPopulate Version. DO NOT TOUCH!!!',
             'widget@TextFormWidget#name=version&default=3.9.5&size=8&maxlength=8');
     }
