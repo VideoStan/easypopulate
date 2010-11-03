@@ -1,9 +1,0 @@
-[submodule "lib/fitzgerald"]
-	path = lib/fitzgerald
-	url = git://github.com/jrobeson/fitzgerald.git
-[submodule "public/form"]
-	path = public/form
-	url = git://github.com/malsup/form.git
-[submodule "lib/yaml"]
-	path = lib/yaml
-	url = git://github.com/fabpot/yaml.git
