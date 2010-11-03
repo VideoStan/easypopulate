@@ -1,11 +1,11 @@
 <?php
 /**
- * EasyPopulate main administrative interface
+ * EasyPopulate handler configuration options class
  *
  * @package easypopulate
  * @author John William Robeson, Jr, <johnny@localmomentum.net>
  * @copyright 2010
- * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2 (or any later version)
  */
 
 /**
@@ -91,20 +91,20 @@ class EasyPopulateConfig
 
 	public function getConfigs()
 	{
-		global $db;
 		$query = "SELECT name, handler, config FROM  " . TABLE_EASYPOPULATE_FEEDS;
 
-		if (!empty($name)) $query .= " WHERE name = '" . zen_db_input($name) . "'";
-		$result = $db->Execute($query);
+		if (!empty($name)) $query .= ' WHERE name = :name';
+		$result = ZMRuntime::getDatabase()->query($query, array('name' => $name), TABLE_EASYPOPULATE_FEEDS );
 		$configs = array();
-		while (!$result->EOF) {
-			$name = $result->fields['name'];
+		foreach ($result as $fields) {
+		//while (!$result->EOF) {
+			$name = $fields['name'];
 			$defaultConfig = $this->fileConfig['handlers'][$name];
-			$defaultConfig['handler'] = $result->fields['handler'];
+			$defaultConfig['handler'] = $fields['handler'];
 			//$defaltConfig['item_type'] = $result->fields['item_type'];
-			$config = json_decode($result->fields['config'], true);
+			$config = json_decode($fields['config'], true);
 			$configs[$name] = array_merge($defaultConfig, (array)$config);
-			$result->MoveNext();
+			//$result->MoveNext();
 		}
 		$this->configs = $configs;
 		return $configs;
@@ -132,9 +132,7 @@ class EasyPopulateConfig
 	 */
 	public function setConfig($name, array $config = array())
 	{
-		global $db;
 		$configs = $this->fileConfig;
-	
 		$defaultConfig = array();
 		if (isset($configs['handlers'][$name])) {
 			$defaultConfig = $configs['handlers'][$name];
@@ -146,26 +144,25 @@ class EasyPopulateConfig
 		$exists = (bool)$this->getConfig($name);
 		if (empty($exists)) {
 			$modify = 'INSERT';
-			$data['created'] = 'NOW()';
+			$data['created'] = date('Y-m-d H:i:s');
 			$data['last_run_data'] = json_encode(array());
 			$data['handler'] = $name;
 			$data['name'] = $name;
 
 			$where = '';
-			$handlerConfig = $defaultConfig;
+			$this->configs[$name] = $defaultConfig;
 		} else {
 			$modify = 'UPDATE';
-			$where = "name = '" . zen_db_input($name) . "'";
+			$data['name'] = $name;
+			$where = 'name = :name';
 			if (!isset($config['item_type'])) { // just values
 				$this->setValues($name, $config);
 			}
 		}
-		$data['modified'] = 'NOW()';
-
-		$data['config'] = json_encode($this->getConfig());
-
+		$data['modified'] = date('Y-m-d H:i:s');
+		$data['config'] = json_encode($this->getConfig($name));
 		$query = ep_db_modify(TABLE_EASYPOPULATE_FEEDS, $data, $modify, $where);
-		$db->Execute($query);
+		$result = ZMRuntime::getDatabase()->update($query, $data, TABLE_EASYPOPULATE_FEEDS);
 		return true;
 	}
 }
