@@ -10,6 +10,7 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
  * @todo <johnny> make it a better class
  * @todo <chadd> change v_products_price_as to v_products_price_uom
+ * @todo <johnny> let ZM handle field errors
  */
 
 
@@ -41,11 +42,6 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 		$file = $this->openFile($fileInfo);
 		if ($file === false) return false;
 
-		// model name length error handling
-		$modelsize = zen_field_length(TABLE_PRODUCTS, 'products_model');
-		$category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
-
-
 		$filelayout = $file->getFileLayout();
 
 		//$this->onFileStart();
@@ -63,13 +59,6 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 				$output_message = EASYPOPULATE_DISPLAY_RESULT_NO_MODEL;
 				continue;
 			}
-
-			if (strlen($items['products_model']) > $modelsize) {
-				$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
-				$output_message = EASYPOPULATE_DISPLAY_RESULT_MODEL_NAME_LONG;
-				continue;
-			}
-
 
 			$sql = 'SELECT	p.*, subc.categories_id'.
 			" FROM
@@ -190,22 +179,14 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 				$products_price = round( $products_price / (1 + ( $row_tax_multiplier * $prices_include_tax/100) ), 4);
 			}
 
-			$category_strlen_long = false;
 			$newlevel = 1;
 			// @todo decouple import from max_categories altogether
 			for ($categorylevel = 10; $categorylevel>0; $categorylevel--) {
 				if (isset($items['categories_name_' . $categorylevel])) {
-					if (strlen($items['categories_name_' . $categorylevel]) > $category_strlen_max) $category_strlen_long = TRUE;
 					if (!empty($items['categories_name_' . $categorylevel])) {
 						$categories_name[$newlevel++] = $items['categories_name_' . $categorylevel];
 					}
 				}
-			}
-
-			if ($category_strlen_long) {
-				$output_status = EASYPOPULATE_DISPLAY_RESULT_SKIPPED;
-				$output_message = sprintf(EASYPOPULATE_DISPLAY_RESULT_CATEGORY_NAME_LONG, $category_strlen_max);
-				continue;
 			}
 
 			if (!isset($manufacturers_name)) $manufacturers_name = NULL; 
@@ -931,8 +912,6 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 	/**
 	 * Find deleted products entries in other ZenCart tables
 	 *
-	 * @todo <johnny> is reviews really supported, an old comment suggested so, but i don't believe it
-	 * @todo <johnny> look for other data debris
 	 *
 	 * @return array product_id => "dross", so duplicate products simply over-write same in array
 	 */
