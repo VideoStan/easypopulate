@@ -13,7 +13,7 @@
 /**
  * EasyPopulate Admin Controller
  */
-class EasyPopulate extends Fitzgerald
+class ZMEasyPopulateController extends ZMController
 {
 	protected $isXhr = false;
 	protected $config;
@@ -224,24 +224,4 @@ class EasyPopulate extends Fitzgerald
 		}
 	}
 }
-
-	$app = new EasyPopulate(array(
-	'errorLevel' => error_reporting(),
-	'layout' => 'layout',
-	'sessions' => false, // We use zencart's sessions
-	'mountPoint' => '/admin/easypopulate.php'));
-
-	$app->get('/', 'get_index');
-	$app->get('/preset/:name', 'get_preset', array('name' => '.*'));
-	$app->post('/preset', 'post_preset');
-	$app->get('/export', 'get_export_page');
-	$app->get('/export/:format/:download', 'get_export');
-
-	$app->get('/dross', 'get_dross');
-	$app->post('/dross', 'post_dross');
-	$app->get('/import/:handler', 'get_import', array('handler' => '.*'));
-	$app->post('/import', 'post_import');
-	$app->post('/upload', 'post_upload');
-
-	$app->run();
 ?>
