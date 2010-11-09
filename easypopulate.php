@@ -9,6 +9,7 @@
  * @todo validate all parameters
  * @todo show sql errors
  */
+if (false) {
 
 /**
  * EasyPopulate Admin Controller
@@ -18,22 +19,15 @@ class ZMEasyPopulateController extends ZMController
 	protected $isXhr = false;
 	protected $config;
 
-	public function __construct($options = array())
+	public function __construct()
 	{
 		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && (strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')) {
 			$this->isXhr = true;
 			$options['layout'] = null;
 		}
-		parent::__construct($options);
-		$language = 'english';
-		if (!is_null($this->session->language)) {
-			$language = $this->session->language;
-		}
-		$langDir = dirname( __FILE__) . '/lang/' . $language . '/';
-		foreach (glob($langDir . '*php') as $langFile) {
-			if (is_readable($langFile)) include $langFile;
-		}
-
+		parent::__construct();
+		$this->plugin_ = ZMPlugins::instance()->getPluginForId('easyPopulate');
+		include_once dirname(__FILE__). '/../lang/english.php'; // @todo remove me once these constants are no longer used
 		$configObject = new EasyPopulateConfig();
 		$configObject->refreshConfig();
 
