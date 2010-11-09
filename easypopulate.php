@@ -1,26 +1,18 @@
 <?php
 /**
- * EasyPopulate main administrative interface
+ * EasyPopulate Admin Controller
  *
  * @package easypopulate
- * @author langer
- * @author too many to list, see history.txt
- * @copyright 200?-2010
- * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
+ * @copyright 2009-2010
+ * @license http://www.gnu.org/licenses/gpl.html GNU General Public License 2+
+ * @todo separate import/export?
  * @todo validate all parameters
+ * @todo show sql errors
  */
-//require_once 'includes/application_top.php';
-$GLOBALS['zen_error_level'] = error_reporting();
-error_reporting(E_ALL ^ E_DEPRECATED); // zencart uses functions deprecated in php 5.3
 
-require DIR_WS_CLASSES . 'EasyPopulate/lib/EasyPopulate.php';
-include DIR_WS_CLASSES . 'EasyPopulate/lib/easypopulate_functions.php';
-require DIR_WS_CLASSES . 'EasyPopulate/lib/fitzgerald/lib/fitzgerald.php';
-
-if (!isset($_SESSION['easypopulate'])) {
-	$_SESSION['easypopulate'] = array();
-}
-
+/**
+ * EasyPopulate Admin Controller
+ */
 class EasyPopulate extends Fitzgerald
 {
 	protected $isXhr = false;
@@ -48,12 +40,6 @@ class EasyPopulate extends Fitzgerald
 		$this->config = $configObject;
 	}
 
-	protected function views()
-	{
-		$views = parent::views();
-		array_unshift($views, dirname(__FILE__) . '/');
-		return $views;
-	}
 
 	public function get_index()
 	{
@@ -132,38 +118,6 @@ class EasyPopulate extends Fitzgerald
 			if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
 			$this->redirect('/export');
 		}
-	}
-
-	/**
-    * This is a rudimentary date integrity check for references to any non-existant product_id entries
-	 * this check ought to be last, so it checks the tasks just performed as a quality check of EP...
-	 * @todo langer  data present in table products, but not in descriptions.. user will need product info, and decide to add description, or delete product
-	 */
-	public function get_dross()
-	{
-		$dross = EasyPopulateImport::getDross();
-		if (!empty($dross)) {
-			//$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_DROSS_DETECTED, count($dross), zen_href_link('easypopulate.php', 'dross=delete')), 'caution');
-		}
-	}
-
-	public function post_dross()
-	{
-		EasyPopulateImportProducts::purgeDross($dross);
-		// now check it is really gone...
-		$dross = EasyPopulateImportProducts::getDross();
-		if (!empty($dross)) {
-			$string = "Product debris corresponding to the following product_id(s) cannot be deleted by EasyPopulate:\n";
-			foreach ($dross as $products_id) {
-				$string .= $products_id . "\n";
-			}
-			$string .= "It is recommended that you delete this corrupted data using phpMyAdmin.\n\n";
-			write_debug_log($string, 'dross');
-			//$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_FAIL, 'caution');
-		} else {
-			//$messageStack->add(EASYPOPULATE_MSGSTACK_DROSS_DELETE_SUCCESS, 'success');
-		}
-		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
 	}
 
 	public function get_import($handler = null)
@@ -268,32 +222,6 @@ class EasyPopulate extends Fitzgerald
 			print $out; 
 			exit(0);
 		}
-	}
-
-	public function handleError($number, $message, $file = '', $line = 0)
-	{
-		// a proper resource isn't always available to RecordCount() in queryFactoryResult
-		// @todo find a way just ignore that one
-		return parent::handleError($number, $message, $file, $line);
-	}
-	
-	/**
-	 * Rewrite the zencart header urls so they point to the right place
-	 */
-	public static function header()
-	{
-		global $db, $messageStack, $PHP_SELF;
-		$new_version = TEXT_VERSION_CHECK_CURRENT;
-		$replace = array();
-		$replace['/admin/easypopulate.php/'] = '';
-		$replace['="images/'] = '="../images/';
-		$replace['="includes/languages'] = '="../includes/languages';
-
-		ob_start();
-		require DIR_WS_INCLUDES . 'header.php';
-		$header = ob_get_clean();
-		$header = str_replace(array_keys($replace), array_values($replace), $header);
-		return $header;
 	}
 }
 
