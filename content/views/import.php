@@ -1,8 +1,9 @@
 <script type="text/javascript">
 handlers_all = <?php echo json_encode($handlers_all, true); ?>
 </script>
-<form id="upload_form" enctype="multipart/form-data" action="/admin/easypopulate.php/upload" method="POST">
-	<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $max_file_size ?>">
+<form id="upload_form" enctype="multipart/form-data" action="<?php echo $request->url('temp_upload') ?>" method="POST">
+	<?php $maxSize = min(ZMLangUtils::asBytes(ini_get('upload_max_filesize')), ZMLangUtils::asBytes(ini_get('post_max_size'))); ?>
+	<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $maxSize ?>">
 		<div>
 		<label for="uploaded_file">Upload EP File</label>
 		<input id="uploaded_file" name="uploaded_file" type="file" size="50">

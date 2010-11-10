@@ -198,15 +198,15 @@ class ZMEasyPopulateController extends ZMController
 		exit();
 	}
 
-	public function post_upload()
+	public function upload($request)
 	{
 		if (!isset($_FILES['uploaded_file']) || empty($_FILES['uploaded_file']['type'])) {
-			$this->error('Failed to read uploaded file');
+			$this->error(_zm('Failed to read uploaded file'));
 		}
 		$file = $_FILES['uploaded_file'];
 		$error = constant('EASYPOPULATE_UPLOAD_ERROR_CODE_' . $file['error']);
 		if ($file['error'] != UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) {
-			$this->error($error);
+			$this->error(_zm($error));
 		} else {
 			$fileName = ep_get_config('temp_path') . $file['name'];
 			move_uploaded_file($file['tmp_name'], $fileName);
