@@ -38,13 +38,18 @@ class ZMEasyPopulatePlugin extends Plugin {
         $this->setContext(Plugin::CONTEXT_ADMIN);
     }
 
+    public function set($name, $value) {
+        parent::set($name, $value);
+        ZMObject::__set($name, $value);
+    }
+
     public function install() {
         parent::install();
         ZMDbUtils::executePatch(file(ZMDbUtils::resolveSQLFilename($this->getPluginDirectory()."sql/install.sql")), $this->messages_);
 
-        $this->addConfigValue('Log Errors', 'debug_logging', false, 'Log Errors',
+        $this->addConfigValue('Log Errors', 'debug_logging', 'false', 'Log Errors',
             'widget@BooleanFormWidget#name=debug_logging&default=false&label=Log Errors&style=checkbox');
-        $this->addConfigValue('Log All Queries', 'log_queries', false, 'Log all SQL queries - useful for debugging',
+        $this->addConfigValue('Log All Queries', 'log_queries', 'false', 'Log all SQL queries - useful for debugging',
             'widget@BooleanFormWidget#name=log_queries&default=false&label=Log Queries&style=checkbox');
         $this->addConfigValue('Uploads Directory', 'temp_dir', 'tempEP/', 'Name of directory for your uploads',
             'widget@TextFormWidget#name=temp_dir&default=tempEP&size=50&maxlength=255');
@@ -60,13 +65,17 @@ class ZMEasyPopulatePlugin extends Plugin {
         ZMDbUtils::executePatch(file(ZMDbUtils::resolveSQLFilename($this->getPluginDirectory()."sql/uninstall.sql")), $this->messages_);
     }
 
-
     /**
      * {@inheritDoc}
      */
     public function init() {
         parent::init();
+        foreach ($this->getConfigValues() as $entry) {
+            $this->set(strtolower($entry->getName()), $entry->getValue());
+        }
+        $this->set('temp_path', DIR_FS_CATALOG . $this->get('temp_dir'));
 
+        $GLOBALS['epConfig'] = $this->getProperties(); // @todo ZM MIGRATE, drop this line when ep_get_config() is gone
         // add admin pages
         $menuKey = $this->addMenuGroup(_zm('EasyPopulate'));
         $this->addMenuItem2(_zm('Import'), 'import', $menuKey);

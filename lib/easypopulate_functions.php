@@ -128,7 +128,7 @@ function ep_query($query, $log = false)
 	$result = mysql_query($query);
 	if (mysql_errno()) {
 		$ep_stack_sql_error = true;
-		if (ep_get_config('ep_debug_logging')) {
+		if (ep_get_config('debug_logging')) {
 			// @todo langer - will add time & date..
 			$string = "MySQL error ".mysql_errno().": ".mysql_error()."\nWhen executing:\n$query\n";
 			write_debug_log($string, 'sql_errors');
@@ -187,33 +187,22 @@ function ep_get_config($var = NULL)
 	if (!empty($config)) {
 		return !empty($var) ? $config[$var] : $config;
 	}
-
-	$config['ep_debug_logging'] = ((EASYPOPULATE_CONFIG_DEBUG_LOGGING == 'true') ? true : false);
-	$config['log_queries'] = ((EASYPOPULATE_CONFIG_LOG_QUERIES == 'true') ? true : false);
-	$config['time_limit'] = EASYPOPULATE_CONFIG_TIME_LIMIT;
+	$config = $GLOBALS['epConfig'];
 	$config['import_handler'] = EASYPOPULATE_CONFIG_IMPORT_HANDLER;
 	$config['smart_tags_list'] = EASYPOPULATE_CONFIG_SMART_TAGS_LIST;
 	$config['adv_smart_tags_list'] = EASYPOPULATE_CONFIG_ADV_SMART_TAGS_LIST;
-	$tempdir = EASYPOPULATE_CONFIG_TEMP_DIR;
-	if (substr($tempdir, -1) != '/') $tempdir .= '/';
-	if (substr($tempdir, 0, 1) == '/') $tempdir = substr($tempdir, 1);
-	$config['tempdir'] = $tempdir;
-	$config['temp_path'] = DIR_FS_CATALOG . $tempdir;
 	$config['debug_log_path'] = $config['temp_path'];
 
-	$langcode = zen_get_languages();
-	// start array at one, the rest of the code expects it that way
-	$config['langcode'] = array_combine(range(1, count($langcode)), array_values($langcode));
-
-	foreach ($config['langcode'] as $value) {
-		if ($value['code'] == DEFAULT_LANGUAGE) {
-			$epdlanguage_id = $value['id'];
-			$language = $value['directory'];
-			break;
-		}
+	
+	$langcode = array();
+	foreach (ZMLanguages::instance()->getLanguages() as $lang) { 
+		$langcode[$lang->getId()] = array('code' => $lang->getCode(), 'id' => $lang->getId());
 	}
-	$config['language'] = $language;
-	$config['epdlanguage_id'] = $epdlanguage_id;
+	$config['langcode'] = $langcode;
+
+	$defaultLanguage = ZMLanguages::instance()->getLanguageForCode(ZMSettings::get('defaultLanguageCode'));
+
+	$config['epdlanguage_id'] = $defaultLanguage->getId();
 
 	return ep_get_config($var);
 }
