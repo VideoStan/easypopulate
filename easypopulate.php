@@ -32,24 +32,19 @@ class ZMEasyPopulateController extends ZMController
 		$configObject->refreshConfig();
 
 		$this->config = $configObject;
-	}
 
-
-	public function get_index()
-	{
-		$tpl = array();
-
-		if (defined('EASYPOPULATE_CONFIG_VERSION')) {
-			$config = ep_get_config();
-			$chmod_check = is_dir($config['temp_path']) && is_writable($config['temp_path']);
-			if (!$chmod_check) {
-				// @todo print this error somewhere
-				print(sprintf(EASYPOPULATE_MSGSTACK_TEMP_FOLDER_MISSING, $config['temp_path'], DIR_FS_CATALOG));
-			}
-			$config = ep_get_config();
-
+		$tempPath = $this->plugin_->get('temp_path') ;
+		$writable = is_dir($tempPath) && is_writable($tempPath);
+		if (!$writable) {
+			$message = <<<STRING
+<p><strong>Import folder not found!</strong></p>
+<br />
+Your configuration indicates that your import directory is: <strong>%s</strong>
+<br>
+Please make sure this directory exists and is writeable.
+STRING;
+		    ZMMessages::instance()->error(sprintf($message, $tempPath));
 		}
-		return $this->render('main');
 	}
 
 	/**
