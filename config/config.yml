@@ -1,6 +1,5 @@
 # @todo this format is still under construction
 global:
-  version: 3.9.5
   # do we need a default import handler?
   # 'set_function' => 'zen_cfg_select_option(EPFileUploadFactory::find(),')
   # import_handler: Standard

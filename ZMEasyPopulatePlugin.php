@@ -30,12 +30,11 @@ define('TABLE_EASYPOPULATE_FEEDS', ZM_DB_PREFIX . 'easypopulate_feeds');
  * @package org.zenmagick.plugins.easypopulate
  */
 class ZMEasyPopulatePlugin extends Plugin {
-
     /**
      * Create new instance.
      */
     function __construct() {
-        parent::__construct('EasyPopulate', 'Import/Export delimited files');
+        parent::__construct('EasyPopulate', 'Import/Export delimited files', '3.9.5');
         $this->setContext(Plugin::CONTEXT_ADMIN);
     }
 
@@ -51,8 +50,6 @@ class ZMEasyPopulatePlugin extends Plugin {
             'widget@TextFormWidget#name=temp_dir&default=tempEP&size=50&maxlength=255');
         $this->addConfigValue('File Processing Time Limit', 'time_limit', '1200', '(In Seconds) You can change this if your script is taking too long to process. This functionality may be not always be enabled by your server administrator',
             'widget@TextFormWidget#name=time_limit&default=1200&size=6&maxlength=6');
-        $this->addConfigValue('Version', 'version', '3.9.5', 'EasyPopulate Version. DO NOT TOUCH!!!',
-            'widget@TextFormWidget#name=version&default=3.9.5&size=8&maxlength=8');
     }
 
     /**
