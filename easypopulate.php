@@ -40,7 +40,6 @@ class ZMEasyPopulateController extends ZMController
 		if (!$writable) {
 			$message = <<<STRING
 <p><strong>Import folder not found!</strong></p>
-<br />
 Your configuration indicates that your import directory is: <strong>%s</strong>
 <br>
 Please make sure this directory exists and is writeable.
@@ -147,32 +146,28 @@ STRING;
 		exit();
 	}
 
-	public function get_export_page()
+	public function get_export()
 	{
-		return $this->render('export', ep_get_config());
-	}
-
-	public function get_export($format = 'full', $download = 'stream')
-	{
-		global $messageStack;
+		$format = $this->request->getParameter('format', 'full');
+		$download = $this->request->getParameter('download', 'stream');
 		$this->config->importOrExport = 'export';
 		$config = $this->config->getValues('Standard'); // @todo dont' hardcode this
-		$export = new EasyPopulateExport($config);
+		$export = new EasyPopulateExport($this->config);
 		
 		$export->setFormat($format);
 		$export->run();
 
 		if ($download == 'stream') {
-			//if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
-			return $this->sendFile($export->fileName, 'text/csv', $export->tempFName);
+			return $this->sendFile($export->tempFName, 'text/csv', $export->fileName);
 			exit();
 		} else {
 			if (!rename($export->tempFName, ep_get_config('temp_path') . $export->fileName)) {
 				// @todo error
 			}
-			$messageStack->add(sprintf(EASYPOPULATE_MSGSTACK_FILE_EXPORT_SUCCESS, $export->fileName, ep_get_config('temp_path')), 'success');
-			if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
-			$this->redirect('/export');
+			$message = 'Your file was successfully exported. <a href="%s">Download</a>';
+			// @todo generate a URL
+			ZMMessages::instance()->success(sprintf(_zm($message), '/' . ep_get_config('temp_path') . $export->fileName));
+			$this->request->redirect($request->url('export'));
 		}
 	}
 
