@@ -569,7 +569,7 @@ class EasyPopulateExport extends EasyPopulateProcess
 
 			// VJ product attribs begin
 			if (isset($filelayout['attribute_options_id_1'])){
-				$languages = zen_get_languages();
+				$languages = $langcode;
 
 				$attribute_options_count = 1;
 				foreach ($attribute_options_array as $attribute_options) {
