@@ -14,10 +14,7 @@ $.fn.serializeObject = function(){
 	};
 })(jQuery);
 
-$(document).ready(function() {
-	$("#tabs li a[href=" + window.location.pathname + "]").parent().addClass("current");
-});
-
+/* @todo don't hardcode these urls */
 $(document).ready(function() {
 	$("#import_handler").change(function() {
 		$("#config").load("/zenmagick/apps/admin/web/import/import_handler/" + $(this).val(), function(response, status, xhr) {
@@ -45,7 +42,7 @@ $(document).ready(function() {
 		var config = $("#import_form .config").serializeObject();
 		var name = $("#import_form #import_handler").val();
 		var vals = { "name" : name, "config" : config };
-		$.post("/apps/admin/web/preset/", vals);
+		$.post("/zenmagick/apps/admin/web/preset", vals);
 	});
 
 	$(".results_table tr").mouseover(function(){
