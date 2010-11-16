@@ -13,7 +13,13 @@
  * @todo document these functions
  */
 
+// TEMP ZENCART SUPPORT
+global $db;
+$db = get_db();
 if (!function_exists('zen_db_input')) { function zen_db_input($input) { return addslashes($input); }}
+include_once DIR_FS_ADMIN . 'includes/functions/general.php';
+include_once DIR_FS_ADMIN . 'includes/functions/extra_functions/multisite.php';
+// END TEMP ZENCART SUPPORT
 
 if (!defined('EASYPOPULATE_CONFIG_IMPORT_HANDLER')) define('EASYPOPULATE_CONFIG_IMPORT_HANDLER', 'Standard');
 /**
@@ -164,7 +170,6 @@ function ep_db_modify($table, $data, $action = 'INSERT', $parameters = '')
 
 	if (!is_array($data)) return '';
 
-	'NOW()');
 	foreach ($data as $column => $value) {
 			$query .= " $column = :$column , ";
 	}
