@@ -1,13 +1,4 @@
 # @todo this format is still under construction
-global:
-  # do we need a default import handler?
-  # 'set_function' => 'zen_cfg_select_option(EPFileUploadFactory::find(),')
-  # import_handler: Standard
-  temp_dir: tempEP/
-  time_limit: 1200
-  debug_logging: false
-  log_queries: false
-
 # default options for all files
 file: &file
   local_file:
