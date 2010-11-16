@@ -25,23 +25,25 @@
 		?>
 		</label>
 		<?php
-		$attributes = 'id="'. $field . '" class="config" ';
+		$attributes = array('class' => 'config');
 		switch(true) {
 			case (is_bool($options['value'])): 
-				echo zen_draw_checkbox_field($field, '', (bool)$options['value'], '', $attributes);
+				echo $this->widget('BooleanFormWidget', $field, (bool)$options['value'], $attributes);
 				break;
 			case (isset($options['options'])):
-				$pull_down_options = ep_pull_down_menu_options($options['options']);
-				echo zen_draw_pull_down_menu($field, $pull_down_options, $options['value'], $attributes);
+				$attributes['options'] = ep_pull_down_menu_options($options['options']);
+				echo $this->widget('SelectFormWidget', $field, $options['value'], $attributes);
 				break;
 			case (isset($options['size']) && is_array($options['size'])):
 				if (!isset($options['size']['columns'])) $options['size']['columns'] = '60';
 				if (!isset($options['size']['rows'])) $options['size']['rows'] = '7';
-				echo zen_draw_textarea_field($field, 'soft', $options['size']['columns'], $options['size']['rows'], (string)$options['value'], $attributes);
+				$attributes = array_merge($attributes, $options['size']);
+				echo $this->widget('TextAreaFormWidget', $field, (string)$options['value'], $attributes);
 				break;
 			default:
-				if (isset($options['size'])) $attributes .= 'size="' . $options['size'] . '" ';
-				echo zen_draw_input_field($field, (string)$options['value'], $attributes, false /*,$type = 'text'*/);
+				if (isset($options['size'])) $attributes['size'] = $options['size'];
+				//echo zen_draw_input_field($field, (string)$options['value'], $attributes, false /*,$type = 'text'*/);
+				echo $this->widget('TextFormWidget', $field, (string)$options['value'], $attributes);
 		}
 		?>
 		<span class="error"></span>

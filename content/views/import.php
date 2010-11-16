@@ -1,3 +1,6 @@
+<?php $admin2->title() ?>
+<?php $resources->jsFile('js/common.js'); ?>
+<?php $resources->cssFile('styles/style.css'); ?>
 <script type="text/javascript">
 handlers_all = <?php echo json_encode($handlers_all, true); ?>
 </script>
@@ -12,23 +15,23 @@ handlers_all = <?php echo json_encode($handlers_all, true); ?>
 		</div>
 </form>
 
-<form id="import_form" enctype="multipart/form-data" action="/admin/easypopulate.php/import" method="POST">
+<form id="import_form" enctype="multipart/form-data" action="<?php echo $request->url('import') ?>" method="POST">
 	<p class="message"></p>
 	<fieldset>
 		<legend>Import delimited files</legend>
 		<div>
 		<label for="item_type">Import Item Type</label>
-		<?php echo zen_draw_pull_down_menu('item_types', ep_pull_down_menu_options($item_types), $item_type, 'id="item_type"'); ?>
+		<?php echo $this->widget('SelectFormWidget', 'item_types', $item_type, array('options' => ep_pull_down_menu_options($item_types,true))); ?>
 		<div>
 		<label for="import_handler">Import File Handler</label>
 		<?php 
-			$handlers_options = ep_pull_down_menu_options($handlers);
-			echo zen_draw_pull_down_menu('import_handler', $handlers_options, $import_handler, 'id="import_handler"');
+			$handlers_options = array('options' => ep_pull_down_menu_options($handlers, true));
+			echo $this->widget('SelectFormWidget', 'import_handler', $import_handler, $handlers_options);
 		?>
 		</div>
 	</fieldset>
 	<fieldset id="config">
-	<?php $subTemplate = new Template($this->root, 'import-fields'); echo $subTemplate->render(array('handler' => $handler)); ?>
+    <?php echo $this->fetch('views/import-fields.php', array('handler' => $handler)); ?>
 	</fieldset>
 	<fieldset>
 		<input type="submit" name="import" value="Import">
@@ -54,7 +57,7 @@ handlers_all = <?php echo json_encode($handlers_all, true); ?>
 					<td><input type="button" onclick="this.form.local_file.value='<?php echo $tempFile->getFileName() ?>';" value="Choose"></td>
 					<td><a href="<?php echo $linkBase . $tempFile->getFileName(); ?>"><?php echo $tempFile->getFileName(); ?></a></td>
 					<td><?php echo round(($tempFile->getSize() / 1024)); ?> KB</td>
-					<td><?php echo strftime(DATE_FORMAT_LONG, $tempFile->getMTime()); ?></td>
+					<td><?php echo strftime(UI_DATE_FORMAT, $tempFile->getMTime()); ?></td>
 				</tr>
 			<?php } ?>
 			<?php } ?>

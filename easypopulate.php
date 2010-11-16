@@ -8,6 +8,7 @@
  * @todo separate import/export?
  * @todo validate all parameters
  * @todo show sql errors
+ * @todo send 404 if something doesn't exist
  */
 if (false) {
 
@@ -16,15 +17,11 @@ if (false) {
  */
 class ZMEasyPopulateController extends ZMController
 {
-	protected $isXhr = false;
 	protected $config;
+	protected $request;
 
 	public function __construct()
 	{
-		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && (strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')) {
-			$this->isXhr = true;
-			$options['layout'] = null;
-		}
 		parent::__construct();
 		$this->plugin_ = ZMPlugins::instance()->getPluginForId('easyPopulate');
 		include_once $this->plugin_->getPluginDirectory() . '/lang/english/easypopulate.php'; // @todo remove me once these constants are no longer used
@@ -171,27 +168,31 @@ STRING;
 		}
 	}
 
-	public function get_import($handler = null)
+	public function get_import()
 	{
-		$import_handler = $handler;
+		$config = ep_get_config();
+		$import_handler = $this->request->getParameter('import_handler', $config['import_handler']);
 		$tpl = array();
 
-		$config = ep_get_config();
 		$tpl = array_merge($tpl, $config);
 
-		if (empty($import_handler)) $import_handler = $config['import_handler']; 
 		$handler_config = $this->config->getConfig($import_handler);
 		$tpl = array_merge($tpl,$handler_config['import']);
 		$tpl['item_type'] = $handler_config['item_type'];
 		$tpl['handler'] = $handler_config['import'];
 
-		if ($this->isXhr) return $this->render('import-fields', $tpl);
+		if ($this->isXhr()) {
+			// @todo ZM_MIGRATE
+			$view = $this->findView('import-fields', $tpl);
+			$view->setTemplate('import-fields');
+			$view->setLayout(null);
+			return $view;
+		}
 
 		$tpl['item_types'] = $this->config->getItemTypes();
 		$tpl['handlers'] = $this->config->getHandlers($tpl['item_type']);
 		$tpl['handlers_all'] = $this->config->getHandlers(null, true);
-		$tpl['max_file_size'] = min(ep_get_bytes(ini_get('upload_max_filesize')), ep_get_bytes(ini_get('post_max_size')));
-		return $this->render('import', $tpl);
+		return $this->findView('import', $tpl);
 	}
 
 	public function post_import()
