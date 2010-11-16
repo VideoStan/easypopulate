@@ -47,6 +47,36 @@ STRING;
 		}
 	}
 
+	// @todo ZM_MIGRATE temporary router until zenmagick is a bit more flexible
+	public function route()
+	{
+		$request = $this->request;
+
+		switch($request->getRequestId()) {
+			case 'import':
+				switch ($request->getMethod()) {
+					case 'GET': return $this->get_import();
+					case 'POST': return $this->post_import();
+				}
+				break;
+			case 'preset':
+				switch($request->getMethod()) {
+					case 'GET': return $this->get_preset();
+					case 'POST': return $this->post_preset();
+				}
+				break;
+			case 'export':
+				$testParam = $request->getParameter('format');
+				if (empty($testParam)) {
+					return $this->findView('export', array('temp_dir' => $this->plugin_->get('temp_dir')));
+				} else {
+					return $this->get_export();
+				}
+				break;
+		}
+		ZMMessages::instance()->error(_zm('Invalid request method'));
+		return $this->findView('error');
+	}
 	/**
 	 * Get a single provider preset
 	 *
