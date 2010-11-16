@@ -117,20 +117,23 @@ STRING;
 	 *
 	 * @param string $name
 	 * @return string template output
-	 * @todo send a 404 if list is empty
+	 * @todo use jsonrpc
 	 */
-	public function get_preset($name = NULL)
+	public function get_preset()
 	{
-		$configs = $this->configObject->getValues($name);
+		$this->setContentType('application/json');
+		$configs = $this->config->getValues($this->request->getParameter('name'));
 		echo json_encode($configs);
 		exit();
 	}
 
 	public function post_preset()
 	{
-		if (!is_null($this->request->preset) && !is_null($this->request->config)) {
-			$postedConfig = $this->request->config;
-			$dbConfig = $this->config->getValues($this->request->preset);
+		$name = $this->request->getParameter('name');
+		$config = $this->request->getParameter('config');
+		if (!empty($name) && !empty($config)) {
+			$postedConfig = $config;
+			$dbConfig = $this->config->getValues($name);
 
 			foreach ($dbConfig as $key => $value) {
 				if (is_bool($value)) { // checkboxes
@@ -139,9 +142,8 @@ STRING;
 				}
 			}
 
-			$this->config->setConfig($this->request->preset, $postedConfig);
+			$this->config->setConfig($name, $postedConfig);
 		}
-		if (isset($ep_stack_sql_error) &&  $ep_stack_sql_error) $messageStack->add(EASYPOPULATE_MSGSTACK_ERROR_SQL, 'caution');
 		exit();
 	}
 
