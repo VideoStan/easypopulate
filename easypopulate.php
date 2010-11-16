@@ -32,7 +32,9 @@ class ZMEasyPopulateController extends ZMController
 		$configObject->refreshConfig();
 
 		$this->config = $configObject;
+		$this->request = ZMRequest::instance();
 
+		// @todo probably shouldn't be in the constructor
 		$tempPath = $this->plugin_->get('temp_path') ;
 		$writable = is_dir($tempPath) && is_writable($tempPath);
 		if (!$writable) {
@@ -77,6 +79,39 @@ STRING;
 		ZMMessages::instance()->error(_zm('Invalid request method'));
 		return $this->findView('error');
 	}
+
+	// @todo ZM_MIGRATE
+	public function setResponseCode($code)
+	{
+		header('placeholder', true, $code);
+	}
+
+	// @todo ZM_MIGRATE
+	public function error($text, $statusCode = 500)
+	{
+		$this->setResponseCode($statusCode);
+		echo $text;
+		exit(1);
+	}
+
+	// @todo ZM_MIGRATE
+	public function sendFile($file, $contentType, $fileName = null)
+	{
+		$this->setContentType($contentType);
+		if (is_null($fileName)) {
+			$fileName = basename($file);
+		}
+		header("Content-Disposition: attachment; filename=" . $fileName);
+		print readfile($file);
+	}
+
+	// @todo ZM_MIGRATE
+	public function isXhr()
+	{
+		$headers = ZMNetUtils::getAllHeaders(); // @todo ZM MIGRATE shouldn't have to set this here, it should be in the available in the controller
+		return (array_key_exists('X-Requested-With', $headers) && 'XMLHttpRequest' == $headers['X-Requested-With']);
+	}
+
 	/**
 	 * Get a single provider preset
 	 *
