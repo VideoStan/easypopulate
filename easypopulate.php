@@ -255,7 +255,7 @@ STRING;
 		exit();
 	}
 
-	public function upload($request)
+	public function upload()
 	{
 		if (!isset($_FILES['uploaded_file']) || empty($_FILES['uploaded_file']['type'])) {
 			$this->error(_zm('Failed to read uploaded file'));
@@ -269,8 +269,15 @@ STRING;
 			move_uploaded_file($file['tmp_name'], $fileName);
 			$fileInfo = new SplFileInfo($fileName);
 			$size = round(($fileInfo->getSize() / 1024)) . ' KB';
-			$out = sprintf(EASYPOPULATE_DISPLAY_FILE_SPEC, $error, $fileInfo->getFileName(), $size);
-			print $out; 
+
+			$message = <<<STRING
+%s
+<br />
+<strong>File Name:</strong>%s
+<br />
+<strong>Size:</strong>%s
+STRING;
+			print(sprintf(_zm($message), $error, $fileInfo->getFileName(), $size));
 			exit(0);
 		}
 	}
