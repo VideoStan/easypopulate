@@ -27,7 +27,7 @@ class ZMEasyPopulateController extends ZMController
 		}
 		parent::__construct();
 		$this->plugin_ = ZMPlugins::instance()->getPluginForId('easyPopulate');
-		include_once dirname(__FILE__). '/../lang/english.php'; // @todo remove me once these constants are no longer used
+		include_once $this->plugin_->getPluginDirectory() . '/lang/english/easypopulate.php'; // @todo remove me once these constants are no longer used
 		$configObject = new EasyPopulateConfig();
 		$configObject->refreshConfig();
 
