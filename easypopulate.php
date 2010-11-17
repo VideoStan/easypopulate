@@ -198,13 +198,14 @@ STRING;
 
 	public function post_import()
 	{
-		$import_handler = $this->request->import_handler;
+		$import_handler = $this->request->getParameter('import_handler');
 		if (is_null($import_handler) || !is_string($import_handler)) {
-			$this->error('Please select an import handler');
+			$this->error(_zm('Please select an import handler'));
 		}
 
-		// @todo put config entries in $this->request->config again?
-		foreach ($this->request as $k => $v) {
+		// @todo put config entries into $config array in the request again?
+		$params = $this->request->getParameterMap();
+		foreach ($params as $k => $v) {
 			if (is_null($v)) continue;
 			$config[$k] = $v;
 		}
@@ -214,21 +215,21 @@ STRING;
 		$config = $this->config->getValues($config['import_handler']);
 
 		$config['local_file'] = ep_get_config('temp_path') . $config['local_file'];
-		if (!is_null($this->request->feed_fetch) && !empty($config['local_file']) && isset($config['feed_url'])) {
+		if ($config['feed_fetch'] && !empty($config['local_file']) && isset($config['feed_url'])) {
 			if(!@copy($config['feed_url'], $config['local_file'])) {
 				$error = error_get_last();
-				$this->error(sprintf('Unable to save %s to %s because: %s', $config['feed_url'], $config['local_file'], $error['message']));
+				$this->error(_zm(sprintf('Unable to save %s to %s because: %s', $config['feed_url'], $config['local_file'], $error['message'])));
 			}
 		}
 
 		$fileInfo = new SplFileInfo($config['local_file']);
 
 		if (!$fileInfo->isFile()) {
-			$this->error(sprintf(EASYPOPULATE_DISPLAY_FILE_NOT_EXIST, $fileInfo->getFileName()));
+			$this->error(_zm(sprintf('File does not exist: %s', $fileInfo->getFileName())));
 		}
 
 		if (!$fileInfo->isReadable()) {
-			$this->error(sprintf(EASYPOPULATE_DISPLAY_FILE_OPEN_FAILED, $fileInfo->getFileName()));
+			$this->error(_zm(sprintf('Could not open file: %s', $fileInfo->getFileName())));
 		}
 
 		// @todo sanitize and autoload me
@@ -236,22 +237,22 @@ STRING;
 
 		if (!$import->setImportHandler($import_handler)) {
 			$message = "Could not use Import Handler '" . $import_handler . "' because: " . $import->error;
-			$this->error($message);
+			$this->error(_zm($message));
 		}
 
 		$import->openTempFile();
 		$result = $import->run($fileInfo);
 
 		$resultFileName = $import->tempFile->getBasename();
-		if ((bool)$this->request->feed_send_email) {
+		// @todo ZM_MIGRATE figure out how to do this with zenmagick
+		/*if ((bool)$this->request->feed_send_email) {
 			$message = "Feed $import_handler has been updated. Please see 
 			" . HTTP_CATALOG_SERVER . '/' . ep_get_config('tempdir') . $resultFileName . " for details";
 			$original_error_level = error_reporting();
 			error_reporting(0);
 			zen_mail(EMAIL_FROM, STORE_OWNER_EMAIL_ADDRESS, 'EasyPopulate Update', $message, EMAIL_FROM, STORE_OWNER_EMAIL_ADDRESS, $message);
 			error_reporting($original_error_level);
-
-		}
+		}*/
 
 		print $import->tempFile->getFileName();
 		exit();
