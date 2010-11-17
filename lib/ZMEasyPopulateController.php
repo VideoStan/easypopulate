@@ -10,7 +10,6 @@
  * @todo show sql errors
  * @todo send 404 if something doesn't exist
  */
-if (false) {
 
 /**
  * EasyPopulate Admin Controller
