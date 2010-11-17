@@ -33,6 +33,7 @@ class ZMEasyPopulateController extends ZMController
 
 		// @todo probably shouldn't be in the constructor
 		$tempPath = $this->plugin_->get('temp_path') ;
+		require_once $this->plugin_->getPluginDirectory() . '/lib/EasyPopulate.php';
 		$writable = is_dir($tempPath) && is_writable($tempPath);
 		if (!$writable) {
 			$message = <<<STRING

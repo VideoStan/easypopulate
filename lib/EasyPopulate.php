@@ -5,20 +5,15 @@
  * @package easypopulate
  * @author John William Robeson, Jr <johnny>
  * @copyright 2010
- * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (v2 only)
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License (version 2 or any later version)
+ * @todo deprecated replace with zenmagick loader
  */
-
-require DIR_FS_ADMIN . DIR_WS_CLASSES . 'EasyPopulate/lib/EasyPopulateCsvFileObject.php';
-require DIR_FS_ADMIN . DIR_WS_CLASSES . 'EasyPopulate/lib/EasyPopulateConfig.php';
-require DIR_WS_CLASSES . 'EasyPopulate/lib/ProcessFile.php';
-require DIR_WS_CLASSES . 'EasyPopulate/lib/ImportProducts.php';
-require DIR_WS_CLASSES . 'EasyPopulate/Export.php';
 
 class EPFileUploadFactory
 {
 	private static function baseDirectory()
 	{
-		return DIR_FS_ADMIN . DIR_WS_CLASSES . 'EasyPopulate/Handlers/';
+		return ZM_BASE_PATH . '/plugins/easyPopulate/Handlers/';
 	}
 
 	/**
@@ -51,12 +46,12 @@ class EPFileUploadFactory
 	 */
 	public static function getProcessFile($name, EasyPopulateConfig $config, $item_type = '')
 	{
-		$file =  DIR_WS_CLASSES . 'EasyPopulate/lib/Import' . ucwords($item_type) . '.php';
+		$file =  ZM_BASE_PATH . '/plugins/easyPopulate/lib/Import' . ucwords($item_type) . '.php';
 		if (!require_once($file)) {
 			return false;
 		}
 
-		$file = DIR_WS_CLASSES . 'EasyPopulate/lib/Import' . ucwords($name) . '.php';
+		$file = ZM_BASE_PATH . '/plugins/easyPopulate/lib/Import' . ucwords($name) . '.php';
 		if (file_exists($file)) {
 			require_once($file);
 		}
