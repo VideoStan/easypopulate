@@ -7,7 +7,7 @@ file: &file
     value: true
   column_delimiter:
     value: ','
-    options: 'EasyPopulateCsvFileObject::$DELIMITERS'
+    options: {',' : ',', 'tab' : 'tab', '|' : '|', ':' : ':', ';' : ';', '^' : '^'}
   column_enclosure: 
     value: '"'
     size: 1
@@ -17,7 +17,7 @@ both: &both
   << : *file
   file_date_format:
     value: m-d-y
-    options: ['m-d-y', 'd-m-y', 'y-m-d']
+    options: {'m-d-y' : 'm-d-y', 'd-m-y' : 'd-m-y', 'y-m-d' : 'y-m-d'}
   split_max:
     value: 300
     size: 6
