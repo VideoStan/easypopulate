@@ -91,20 +91,19 @@ class EasyPopulateConfig
 
 	public function getConfigs()
 	{
-		$query = "SELECT name, handler, config FROM  " . TABLE_EASYPOPULATE_FEEDS;
+		$query = "SELECT id, name, handler, config FROM  " . TABLE_EASYPOPULATE_FEEDS;
 
 		if (!empty($name)) $query .= ' WHERE name = :name';
-		$result = ZMRuntime::getDatabase()->query($query, array('name' => $name), TABLE_EASYPOPULATE_FEEDS );
+		$result = ZMRuntime::getDatabase()->query($query, array('name' => $name), TABLE_EASYPOPULATE_FEEDS);
 		$configs = array();
 		foreach ($result as $fields) {
-		//while (!$result->EOF) {
 			$name = $fields['name'];
 			$defaultConfig = $this->fileConfig['handlers'][$name];
 			$defaultConfig['handler'] = $fields['handler'];
+			$defaultConfig['id'] = $fields['id'];
 			//$defaltConfig['item_type'] = $result->fields['item_type'];
 			$config = json_decode($fields['config'], true);
 			$configs[$name] = array_merge($defaultConfig, (array)$config);
-			//$result->MoveNext();
 		}
 		$this->configs = $configs;
 		return $configs;
@@ -141,28 +140,26 @@ class EasyPopulateConfig
 		if (!isset($defaultConfig['item_type'])) $defaultConfig['item_type'] = 'misc';
 
 		$data = array();
-		$exists = (bool)$this->getConfig($name);
-		if (empty($exists)) {
-			$modify = 'INSERT';
+		$data['modified'] = date('Y-m-d H:i:s');
+
+		$exists = $this->getConfig($name);
+		if (empty($exists)) { // INSERT
 			$data['created'] = date('Y-m-d H:i:s');
 			$data['last_run_data'] = json_encode(array());
 			$data['handler'] = $name;
 			$data['name'] = $name;
-
-			$where = '';
 			$this->configs[$name] = $defaultConfig;
-		} else {
-			$modify = 'UPDATE';
+			$data['config'] = json_encode($defaultConfig);
+			$result = ZMRuntime::getDatabase()->createModel(TABLE_EASYPOPULATE_FEEDS, $data);
+		} else { // UPDATE
 			$data['name'] = $name;
-			$where = 'name = :name';
+			$data['id'] = $exists['id'];
 			if (!isset($config['item_type'])) { // just values
 				$this->setValues($name, $config);
 			}
+			$data['config'] = json_encode($this->getConfig($name));
+			$result = ZMRuntime::getDatabase()->updateModel(TABLE_EASYPOPULATE_FEEDS, $data);
 		}
-		$data['modified'] = date('Y-m-d H:i:s');
-		$data['config'] = json_encode($this->getConfig($name));
-		$query = ep_db_modify(TABLE_EASYPOPULATE_FEEDS, $data, $modify, $where);
-		$result = ZMRuntime::getDatabase()->update($query, $data, TABLE_EASYPOPULATE_FEEDS);
 		return true;
 	}
 }
