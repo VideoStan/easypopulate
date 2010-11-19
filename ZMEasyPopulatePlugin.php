@@ -30,12 +30,10 @@ define('TABLE_EASYPOPULATE_FEEDS', ZM_DB_PREFIX . 'easypopulate_feeds');
  * @package org.zenmagick.plugins.easypopulate
  */
 class ZMEasyPopulatePlugin extends Plugin {
-    /**
-     * Create new instance.
-     */
     function __construct() {
         parent::__construct('EasyPopulate', 'Import/Export delimited files', '3.9.5');
         $this->setContext(Plugin::CONTEXT_ADMIN);
+        ZMLoader::instance()->addPath(ZMFileUtils::mkPath(array($this->getPluginDirectory(), 'Handlers')));
     }
 
     public function set($name, $value) {
