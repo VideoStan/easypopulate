@@ -14,11 +14,17 @@
  */
 
 // TEMP ZENCART SUPPORT
+if (function_exists('get_db')) {
 global $db;
 $db = get_db();
-if (!function_exists('zen_db_input')) { function zen_db_input($input) { return addslashes($input); }}
+}
+include_once DIR_FS_ADMIN . 'includes/functions/database.php';
 include_once DIR_FS_ADMIN . 'includes/functions/general.php';
-include_once DIR_FS_ADMIN . 'includes/functions/extra_functions/multisite.php';
+include_once DIR_FS_ADMIN . 'includes/functions/functions_prices.php';
+include_once DIR_FS_CATALOG . 'includes/functions/specials.php';
+if (file_exists(DIR_FS_ADMIN . 'includes/functions/extra_functions/multisite.php')) {
+	include_once DIR_FS_ADMIN . 'includes/functions/extra_functions/multisite.php';
+}
 // END TEMP ZENCART SUPPORT
 
 if (!defined('EASYPOPULATE_CONFIG_IMPORT_HANDLER')) define('EASYPOPULATE_CONFIG_IMPORT_HANDLER', 'Standard');
