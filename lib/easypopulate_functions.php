@@ -170,8 +170,13 @@ function ep_db_modify($table, $data, $action = 'INSERT', $parameters = '')
 
 	if (!is_array($data)) return '';
 
+	$mysql_functions= array('CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP()', 'NOW()');
 	foreach ($data as $column => $value) {
-			$query .= " $column = :$column , ";
+		if (in_array(strtoupper($value), $mysql_functions) || strtoupper($value) == 'NULL' || is_numeric($value)) {
+			$query .= " $column = $value , ";
+		} else {
+			$query .= " $column = '" . zen_db_input($value) . "' , ";
+		}
 	}
 	// Chop off the ') '
 	$query = substr($query, 0, -2);
