@@ -883,30 +883,17 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 	}
 
 	/**
-	 * @todo move this to an event handler outside of this class
+	 * Remove products that are no longer in the input file
+	 * @todo ZM_MIGRATE replace  zen_remove_product with a ZM native method, one that should tell us if it failed.
 	 */
 	protected function removeMissingProducts()
 	{
-		global $db;
-
-		$query = "SELECT * FROM " . TABLE_EASYPOPULATE_FEEDS . " WHERE name = '" . $this->importHandler . "'";
-
-		$result = ep_query($query);
-		$row = mysql_fetch_array($result, MYSQL_ASSOC);
-		$lastProductIds = json_decode($row['last_run_data'], true);
-		if (!empty($lastProductIds)) {
-			$diff = array_diff($lastProductIds, $this->productIds);
-			foreach ($diff as $pid) {
-				zen_remove_product($pid);
+		$missingProducts = $this->config->getMissingItems($this->importHandler);
+		foreach ($missingProducts as $productId) {
+				zen_remove_product($productId);
 			}
 		}
-
-		$data = array();
-		$data['last_run_data'] = json_encode(array_unique($this->productIds));
-		$data['modified'] = 'NOW()';
-		$where = 'id = ' . $row['id'];
-		$query = ep_db_modify(TABLE_EASYPOPULATE_FEEDS, $data, 'UPDATE', $where);
-		$db->Execute($query);
+		$this->config->updateMissingItems($this-importHandler, array());
 	}
 
 	/**

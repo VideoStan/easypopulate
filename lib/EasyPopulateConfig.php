@@ -11,6 +11,7 @@
 /**
  * Handler config options class
  * 
+ * @todo instantiate based on name/handler
  * @todo document the yaml config format
  */
 class EasyPopulateConfig
@@ -162,6 +163,34 @@ class EasyPopulateConfig
 			$result = ZMRuntime::getDatabase()->updateModel(TABLE_EASYPOPULATE_FEEDS, $data);
 		}
 		return true;
+	}
+
+	/**
+	 * Get items that are no longer in the input file
+	 */
+	public function getMissingItems($name, array $productIds)
+	{
+		$query = "SELECT * FROM " . TABLE_EASYPOPULATE_FEEDS . " WHERE name = :name";
+
+		$result = ZMRuntime::getDatabase()->querySingle($query, array('name' => $name), TABLE_EASYPOPULATE_FEEDS);
+		$lastProductIds = json_decode($result['last_run_data'], true);
+		$diff = array();
+		if (!empty($lastProductIds)) {
+			$diff = array_diff($lastProductIds, $productIds);
+		}
+		return $diff;
+	}
+
+	/**
+	 * Update missing items
+	 */
+	public function updateMissingItems($name, $productIds = array())
+	{
+		$data = array();
+		$data['last_run_data'] = json_encode(array_unique($productIds));
+		$data['modified'] = date('Y-m-d H:i:s');
+		$date['name'] = $name;
+		$result = ZMRuntime::getDatabase()->updateModel(TABLE_EASYPOPULATE_FEEDS, $data);
 	}
 }
 ?>
