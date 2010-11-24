@@ -36,7 +36,6 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 		$ep_supported_mods['psd'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_short_desc');
 		$ep_supported_mods['uom'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_price_as'); // uom = unit of measure
 		$ep_supported_mods['upc'] = false; //ep_field_name_exists(TABLE_PRODUCTS_DESCRIPTION,'products_upc'); // upc = UPC Code
-		extract(ep_get_config());
 		extract($this->config->getValues($this->importHandler), EXTR_OVERWRITE);
 
 		$file = $this->openFile($fileInfo);
@@ -84,7 +83,7 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 				// let's check and delete it if requested
 				if (isset($items['products_status']) && $items['products_status'] == 9) {
 					$output_status = EASYPOPULATE_DISPLAY_RESULT_DELETED;
-					$this->removeProductByModel($items['products_model']);
+					zen_remove_product($items['products_id']);
 					continue 2;
 				}
 
@@ -729,23 +728,6 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 			$this->removeMissingProducts();
 		}
 
-		return true;
-	}
-
-	/**
-	 * Remove product by model
-	 *
-	 * @param string $model
-	 */
-	private function removeProductByModel($model)
-	{
-		$query = "SELECT products_id FROM " . TABLE_PRODUCTS . "
-		WHERE products_model = '" . zen_db_input($model) . "'";
-		$result = ep_query($query);
-
-		while ($row = mysql_fetch_array($result)) {
-			zen_remove_product($row['products_id']);
-		}
 		return true;
 	}
 
