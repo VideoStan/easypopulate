@@ -873,9 +873,8 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 		$missingProducts = $this->config->getMissingItems($this->importHandler);
 		foreach ($missingProducts as $productId) {
 				zen_remove_product($productId);
-			}
 		}
-		$this->config->updateMissingItems($this-importHandler, array());
+		$this->config->updateMissingItems($this->importHandler, array());
 	}
 
 	/**
