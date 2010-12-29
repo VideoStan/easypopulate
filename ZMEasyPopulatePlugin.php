@@ -75,14 +75,13 @@ class ZMEasyPopulatePlugin extends Plugin {
         $this->set('temp_path', DIR_FS_CATALOG . $this->get('temp_dir'));
 
         $GLOBALS['epConfig'] = $this->getProperties(); // @todo ZM MIGRATE, drop this line when ep_get_config() is gone
-
-        ZMUrlManager::instance()->setMappings(array(
+        ZMUrlManager::instance()->setMappings(array('page' => array(
             'import' => array('controller' => 'EasyPopulateController#method=route'), 
             'export' => array('controller' => 'EasyPopulateController#method=route'),
             'preset' => array('controller' => 'EasyPopulateController#method=route'), // @todo change the name of this
             // @todo delegate uploads to zenmagick
             'temp_upload' => array('controller' => 'EasyPopulateController#method=upload')
-        ));
+        )));
         // add admin pages
         $menuKey = $this->addMenuGroup(_zm('EasyPopulate'));
         $this->addMenuItem2(_zm('Import'), 'import', $menuKey);
