@@ -102,7 +102,7 @@ STRING;
 	}
 
 	// @todo ZM_MIGRATE
-	public function isXhr()
+	public function isXhr($request)
 	{
 		$headers = ZMNetUtils::getAllHeaders(); // @todo ZM MIGRATE shouldn't have to set this here, it should be in the available in the controller
 		return (array_key_exists('X-Requested-With', $headers) && 'XMLHttpRequest' == $headers['X-Requested-With']);
@@ -181,7 +181,7 @@ STRING;
 		$tpl['item_type'] = $handler_config['item_type'];
 		$tpl['handler'] = $handler_config['import'];
 
-		if ($this->isXhr()) {
+		if ($this->isXhr($this->request)) {
 			// @todo ZM_MIGRATE
 			$view = $this->findView('import-fields', $tpl);
 			$view->setTemplate('import-fields');
