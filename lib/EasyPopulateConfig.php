@@ -95,8 +95,7 @@ class EasyPopulateConfig
 	{
 		$query = "SELECT id, name, handler, config FROM  " . TABLE_EASYPOPULATE_FEEDS;
 
-		if (!empty($name)) $query .= ' WHERE name = :name';
-		$result = ZMRuntime::getDatabase()->query($query, array('name' => $name), TABLE_EASYPOPULATE_FEEDS);
+		$result = ZMRuntime::getDatabase()->query($query, array(), TABLE_EASYPOPULATE_FEEDS);
 		$configs = array();
 		foreach ($result as $fields) {
 			$name = $fields['name'];
