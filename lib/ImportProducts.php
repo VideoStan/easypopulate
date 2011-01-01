@@ -749,28 +749,6 @@ class EasyPopulateImportProducts extends EasyPopulateProcess
 	}
 
 	/**
-	 * Get table field defaults
-	 *
-	 * @param string $table
-	 * @return array array containing default values for each field in the table (field => value)
-	 */
-	protected function getTableDefaults($table)
-	{
-		if (isset($this->tableDefaults[$table])) {
-			return $this->taxClassIds[$table];
-		}
-		$query = 'SHOW COLUMNS FROM ' . $table;
-		$result = mysql_query($query);
-		if (!mysql_num_rows($result)) return array();
-		$defaults = array();
-		while ($row = mysql_fetch_assoc($result)) {
-			$defaults[$row['Field']] = $row['Default'];
-		}
-		$this->tableDefaults[$table] = $defaults;
-		return $defaults;
-	}
-
-	/**
 	 * Get manufacturer id by name
 	 *
 	 * @param name
