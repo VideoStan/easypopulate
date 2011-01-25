@@ -111,7 +111,7 @@ function ep_get_tax_class_titles()
 	$result = mysql_query('SELECT tax_class_title FROM ' . TABLE_TAX_CLASS);
 	$titles = array();
 	while($row = mysql_fetch_array($result)) {
-		$titles[] = $row['tax_class_title'];
+		$titles[$row['tax_class_title']] = $row['tax_class_title'];
 	}
 	return $titles;
 }
@@ -226,8 +226,9 @@ function ep_get_config($var = NULL)
 /**
  * Hacky function to create a select box with multiple data sources
  */
-function ep_pull_down_menu_options($options = array())
+function ep_pull_down_menu_options($options = array(), $valuesAsKeys = false)
 {
+	$map = array();
 	if (is_string($options)) {
 		// @todo restrict to a common class/function prefix
 		if ((false !== strpos($options, '(')) || (false !== strpos($options, '$'))) {
@@ -237,6 +238,13 @@ function ep_pull_down_menu_options($options = array())
 		}
 	}
 	if (is_null($options)) $options = array();
-	return $options;
+	foreach ($options as $k => $v) {
+		if ($valuesAsKeys) {
+			$map[$v] = $v;
+			continue;
+		}
+		$map[$k] = $v;
+	} 
+	return $map;
 }
 ?>
