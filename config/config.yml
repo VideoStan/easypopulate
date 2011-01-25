@@ -38,7 +38,11 @@ both: &both
     value:
     #todo: needs to be made optional
     options: 'read_sites()' 
-
+  use_languages:
+    #todo allow this once there is UI for it.
+    value: ALL
+    input: false 
+  
 # default options for imports
 import: &import
   replace_newlines:
@@ -51,6 +55,9 @@ import: &import
 
 # default options for exports
 export: &export
+  hide_default_language_id:
+    value: false
+    input: false # show this when we have a UI for it
   filelayout:
     input: false
 
