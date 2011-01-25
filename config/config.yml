@@ -245,6 +245,19 @@ handlers:
         value: tracking_numbers,tracker_id
         inputl: null
 
+  Reviews:
+    item_type: reviews
+    import:
+      << : [*both, *import]
+      image_check_exists:
+        input: false
+      filelayout_required:
+        value: products_model,text_1,rating,read,author,customer_id,date_added
+        input: false
+      filelayout_map:
+        value: products_model,text_1,rating,read,author,customer_id,date_added
+        input: false
+
   Testimonials:
     item_type: testimonials
     import:
