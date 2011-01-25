@@ -149,9 +149,9 @@ STRING;
 		$download = $this->request->getParameter('download', 'stream');
 		$this->config->importOrExport = 'export';
 		$config = $this->config->getValues('Standard'); // @todo dont' hardcode this
+		$config['local_file'] =  'EP-' . $type . strftime('%Y%b%d-%H%M%S') . '.' . (($config['column_delimiter'] == ',') ? 'csv' : 'txt'); 
+		$this->config->setValues('Standard', $config);
 		$export = new EasyPopulateExport($this->config);
-		
-		$export->setFormat($format);
 		$export->run();
 
 		if ($download == 'stream') {

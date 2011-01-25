@@ -12,17 +12,10 @@
  */
 class EasyPopulateExport extends EasyPopulateProcess
 {
-	public $fileName = '';
 	public $tempFName = '';
 	private $type = 'full';
 	private $columnDelimiter = ',';
 	private $columnEnclosure = '"';
-
-	public function setFormat($type = 'full')
-	{
-		$this->type = $type;
-		$this->fileName = 'EP-' . $type . strftime('%Y%b%d-%H%M%S') . '.' . (($this->columnDelimiter == ',') ? 'csv' : 'txt');
-	}
 
 	public function run()
 	{
