@@ -26,7 +26,8 @@ class EPFileUploadFactory
 	{
 		require_once self::baseDirectory() . 'Standard.php';
 		$file = self::baseDirectory() . $name . '.php';
-		if (require_once($file)) {
+		if (file_exists($file)) {
+			require_once $file;
 			$classname = 'EPUpload' . $name;
 			return $classname;
 		} else {
