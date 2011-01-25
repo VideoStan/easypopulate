@@ -32,6 +32,11 @@ class EasyPopulateProcess
 		$this->errorLevel = error_reporting();
 	}
 
+	public function dependenciesMet()
+	{
+		return true;
+	}
+
 	public function setImportHandler($handler)
 	{
 		if (!$this->dependenciesMet()) return false;
