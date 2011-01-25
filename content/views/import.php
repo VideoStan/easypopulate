@@ -21,7 +21,7 @@ handlers_all = <?php echo json_encode($handlers_all, true); ?>
 		<legend>Import delimited files</legend>
 		<div>
 		<label for="item_type">Import Item Type</label>
-		<?php echo $this->widget('SelectFormWidget', 'item_types', $item_type, array('options' => ep_pull_down_menu_options($item_types,true))); ?>
+		<?php echo $this->widget('SelectFormWidget', 'item_type', $item_type, array('options' => ep_pull_down_menu_options($item_types,true))); ?>
 		<div>
 		<label for="import_handler">Import File Handler</label>
 		<?php 
