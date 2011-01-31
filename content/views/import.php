@@ -49,7 +49,7 @@ handlers_all = <?php echo json_encode($handlers_all, true); ?>
 				<th>Last Modified</th>
 			</tr>
 			</thead>
-			<?php $linkBase = HTTP_SERVER .  DIR_WS_CATALOG . $tempdir; ?>
+			<?php $linkBase = HTTP_SERVER .  DIR_WS_CATALOG . basename($temp_path) .'/'; ?>
 			<!-- @todo replace the onclick with unobtrusive js when we use jquery -->
 			<?php foreach (new DirectoryIterator($temp_path) as $tempFile) { ?>
 			<?php if (!$tempFile->isDot() && ($tempFile->getFilename() != 'index.html')) { ?>
@@ -57,7 +57,7 @@ handlers_all = <?php echo json_encode($handlers_all, true); ?>
 					<td><input type="button" onclick="this.form.local_file.value='<?php echo $tempFile->getFileName() ?>';" value="Choose"></td>
 					<td><a href="<?php echo $linkBase . $tempFile->getFileName(); ?>"><?php echo $tempFile->getFileName(); ?></a></td>
 					<td><?php echo round(($tempFile->getSize() / 1024)); ?> KB</td>
-					<td><?php echo strftime(UI_DATE_FORMAT, $tempFile->getMTime()); ?></td>
+					<td><?php echo date('Y-m-d', $tempFile->getMTime()); ?></td>
 				</tr>
 			<?php } ?>
 			<?php } ?>
