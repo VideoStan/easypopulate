@@ -31,7 +31,7 @@ class EasyPopulateConfig
 	    $this->importOrExport = $importOrExport;
 		$pluginDir = ZMPlugins::instance()->getPluginForId('easyPopulate')->getPluginDirectory();
 		$yaml = file_get_contents($pluginDir . 'config/config.yml');
-		$this->fileConfig = sfYaml::load($yaml);
+		$this->fileConfig = \Symfony\Component\Yaml\Yaml::load($yaml);
 	}
 
 	public function getItemTypes()
